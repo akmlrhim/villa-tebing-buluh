@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/*
+  Design tokens - dari DESIGN.md (brand logo Villa Tebing Buluh).
+  Kanvas putih, netral hangat ber-tint pasir, satu aksen hijau bambu (#3b7d46)
+  dari logo untuk momen aksi; emas pasir (#c1a993) sebagai aksen sekunder.
+  Heading Playfair Display, body Poppins.
+  Radius lembut: tombol 8px, kartu 14px, pill 9999px. Satu tier bayangan saja.
+*/
+@theme {
+  --font-sans: "Inter", -apple-system, system-ui, Roboto, "Helvetica Neue", sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+
+  --color-primary: #3b7d46;
+  --color-primary-active: #2f6539;
+  --color-primary-disabled: #c9dccc;
+  --color-sand: #c1a993;
+  --color-bronze: #8a6f50;
+  --color-ink: #24211b;
+  --color-body: #454036;
+  --color-muted: #6e6759;
+  --color-muted-soft: #969082;
+  --color-hairline: #ded8cc;
+  --color-hairline-soft: #ebe6dd;
+  --color-border-strong: #c2b9a9;
+  --color-canvas: #ffffff;
+  --color-surface-soft: #f8f6f1;
+  --color-surface-strong: #f1ede4;
+  --color-error: #c13515;
+  --color-wa: #1faa55;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+
+  /* Satu-satunya definisi bayangan di seluruh sistem (DESIGN.md - Elevation) */
+  --shadow-float: 0 0 0 1px rgb(0 0 0 / 0.02), 0 2px 6px 0 rgb(0 0 0 / 0.04), 0 4px 8px 0 rgb(0 0 0 / 0.1);
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    /* Poppins bawaannya renggang; rapatkan sedikit agar teks UI lebih padat.
+       Utility tracking-* di markup tetap menang atas nilai warisan ini. */
+    letter-spacing: -0.015em;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+  }
+
+  dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.5);
+  }
+}
+
+@layer utilities {
+  /* Entrance halus untuk konten hero - dimatikan saat reduced motion */
+  .rise-in {
+    animation: rise-in 0.7s var(--ease-out-quart) both;
+  }
+  .rise-in-late {
+    animation: rise-in 0.7s var(--ease-out-quart) 0.15s both;
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise-in,
+    .rise-in-late {
+      animation: none;
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
