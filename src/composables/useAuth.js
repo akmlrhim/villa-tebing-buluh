@@ -1,29 +1,45 @@
-import { ref } from 'vue'
-import { supabase } from '../lib/supabase'
+import { computed, ref } from 'vue'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
-const user = ref(null)
-const loading = ref(true)
+// Autentikasi admin (F-08) via Supabase Auth (email + password).
+const session = ref(null)
+const ready = ref(false)
+let initPromise = null
 
-supabase.auth.getSession().then(({ data }) => {
-  user.value = data.session?.user ?? null
-  loading.value = false
-})
-
-supabase.auth.onAuthStateChange((_event, session) => {
-  user.value = session?.user ?? null
-})
+async function init() {
+  if (isSupabaseConfigured) {
+    const { data } = await supabase.auth.getSession()
+    session.value = data.session
+    supabase.auth.onAuthStateChange((_event, next) => {
+      session.value = next
+    })
+  }
+  ready.value = true
+}
 
 export function useAuth() {
+  function initAuth() {
+    if (!initPromise) initPromise = init()
+    return initPromise
+  }
+
+  const isAuthenticated = computed(() => Boolean(session.value))
+  const userEmail = computed(() => session.value?.user?.email ?? null)
+
   async function signIn(email, password) {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase belum dikonfigurasi.')
+    }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
+    session.value = data.session
     return data
   }
 
   async function signOut() {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    if (isSupabaseConfigured) await supabase.auth.signOut()
+    session.value = null
   }
 
-  return { user, loading, signIn, signOut }
+  return { ready, initAuth, isAuthenticated, userEmail, signIn, signOut }
 }

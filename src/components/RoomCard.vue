@@ -41,8 +41,7 @@ const totalEstimate = computed(() =>
 		<div class="pt-3">
 			<div class="flex items-baseline justify-between gap-3">
 				<h3 class="text-base font-semibold text-ink">
-					<!-- Tautan "membentang" ke seluruh kartu -->
-					<button type="button" class="text-left after:absolute after:inset-0 after:cursor-pointer"
+					<button type="button" class="text-left font-sans after:absolute after:inset-0 after:cursor-pointer"
 						@click="emit('open', room)">
 						{{ room.name }}
 					</button>

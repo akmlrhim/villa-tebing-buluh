@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Villa-Tebing-Buluh-design-system
-description: Brand system diturunkan dari logo Villa Tebing Buluh — emblem monoline emas-pasir (#c1a993) dengan detail hijau bambu (#428a4d) di kanvas putih. Hijau bambu (digelapkan ke #3b7d46 demi kontras AA di atas putih) adalah satu-satunya voltage aksi: CTA cek ketersediaan, search orb, tombol WhatsApp. Emas pasir hidup di aksen sekunder — hairline hangat, permukaan lembut ber-tint pasir, teks perunggu (#8a6f50), dan blok seleksi. Netral abu digeser hangat ke arah hue logo. Tipografi berpasangan kontras: Playfair Display (serif display, 500–700) untuk heading memikul suasana vila; Poppins (geometris humanis, 400–600) untuk body, tombol, dan navigasi. Fotografi tetap memikul bobot visual; UI minggir. Radius lembut Airbnb dipertahankan: tombol 8px, kartu 14px, pill 9999px; satu tier bayangan.
+description: Brand system diturunkan dari logo Villa Tebing Buluh — emblem monoline emas-pasir (#c1a993) dengan detail hijau bambu (#428a4d) di kanvas putih. Hijau bambu (digelapkan ke #3b7d46 demi kontras AA di atas putih) adalah satu-satunya voltage aksi: CTA cek ketersediaan, search orb, tombol WhatsApp. Emas pasir hidup di aksen sekunder — hairline hangat, permukaan lembut ber-tint pasir, teks perunggu (#8a6f50), dan blok seleksi. Netral abu digeser hangat ke arah hue logo. Tipografi berpasangan kontras: Playfair Display (serif display, 500–700) untuk heading memikul suasana vila; Poppins (sans geometris hangat, 400–600, tracking dirapatkan -0.025em) untuk body, tombol, dan navigasi. Fotografi tetap memikul bobot visual; UI minggir. Radius lembut Airbnb dipertahankan: tombol 8px, kartu 14px, pill 9999px; satu tier bayangan.
 
 colors:
   primary: "#3b7d46"

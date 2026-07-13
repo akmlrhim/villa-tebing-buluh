@@ -11,7 +11,6 @@ export const demoRooms = [
     id: 'demo-cemerlang-1',
     name: 'Cemerlang 1',
     slug: 'cemerlang-1',
-    floor_number: 1,
     description:
       'Kamar di lantai satu dengan akses langsung ke teras dan kolam renang. Interior kayu jati yang hangat, tempat tidur king, dan kamar mandi dalam dengan air panas. Cocok untuk pasangan yang ingin bangun pagi langsung berenang.',
     price_per_night: 850000,
@@ -47,7 +46,6 @@ export const demoRooms = [
     id: 'demo-cemerlang-2',
     name: 'Cemerlang 2',
     slug: 'cemerlang-2',
-    floor_number: 2,
     description:
       'Kamar di lantai dua dengan jendela lebar menghadap rumpun bambu dan lembah sungai. Inilah kamar paling tenang di seluruh vila: yang terdengar hanya angin dan air. Tempat tidur king, meja kerja kecil, dan balkon untuk kopi pagi.',
     price_per_night: 950000,
@@ -83,7 +81,6 @@ export const demoRooms = [
     id: 'demo-serumpun',
     name: 'Serumpun (Family)',
     slug: 'serumpun-family',
-    floor_number: 1,
     description:
       'Unit keluarga dengan dua tempat tidur besar dan ruang duduk sendiri. Dapur kecil lengkap dengan peralatan masak, cocok untuk keluarga yang menginap beberapa malam. Kapasitas hingga 5 tamu.',
     price_per_night: 1400000,
@@ -137,6 +134,12 @@ export const demoSettings = {
   check_in_time: '14.00',
   check_out_time: '12.00',
   instagram: 'villatebingbuluh',
+  // Pembayaran QRIS. Kosongkan qris_image_url untuk memakai placeholder demo;
+  // admin cukup mengisi URL gambar QRIS asli lewat tabel settings.
+  qris_image_url: '',
+  qris_merchant_name: 'Villa Tebing Buluh',
+  qris_nmid: 'ID1024xxxxxxxxx',
+  payment_deadline_hours: 2,
 }
 
 // Foto untuk halaman Our Gallery, dikelompokkan per area (F-05).

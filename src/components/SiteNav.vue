@@ -31,7 +31,9 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
 })
 
-const overlay = computed(() => route.path === '/' && !scrolled.value)
+// Halaman publik yang punya hero berfoto - navbar transparan sebelum di-scroll.
+const HERO_PATHS = new Set(['/', '/gallery', '/about', '/contact'])
+const overlay = computed(() => HERO_PATHS.has(route.path) && !scrolled.value)
 
 watch(
   () => route.fullPath,
@@ -48,7 +50,7 @@ watch(menuOpen, (open) => {
 <template>
   <header
     class="sticky top-0 z-40 border-b transition-colors duration-300"
-    :class="overlay ? 'nav--overlay border-transparent bg-transparent' : 'border-hairline-soft bg-canvas'"
+    :class="overlay ? 'border-transparent bg-transparent [&_:focus-visible]:outline-white' : 'border-hairline-soft bg-canvas'"
   >
     <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 md:h-20">
       <RouterLink to="/" class="flex items-center gap-2.5" aria-label="Ke halaman utama">
@@ -62,7 +64,15 @@ watch(menuOpen, (open) => {
       </RouterLink>
 
       <nav class="hidden items-center gap-7 md:flex" aria-label="Navigasi utama">
-        <RouterLink v-for="link in links" :key="link.to" :to="link.to" class="nav-link">
+        <RouterLink
+          v-for="link in links"
+          :key="link.to"
+          :to="link.to"
+          class="relative px-0.5 py-1.5 text-[15px] font-medium transition-colors [&.router-link-exact-active]:font-semibold [&.router-link-exact-active]:after:absolute [&.router-link-exact-active]:after:inset-x-0.5 [&.router-link-exact-active]:after:-bottom-1 [&.router-link-exact-active]:after:h-0.5 [&.router-link-exact-active]:after:content-['']"
+          :class="overlay
+            ? 'text-white [&.router-link-exact-active]:after:bg-white'
+            : 'text-muted hover:text-ink [&.router-link-exact-active]:text-ink [&.router-link-exact-active]:after:bg-ink'"
+        >
           {{ link.label }}
         </RouterLink>
       </nav>
@@ -106,7 +116,7 @@ watch(menuOpen, (open) => {
             v-for="link in links"
             :key="link.to"
             :to="link.to"
-            class="sheet-link"
+            class="border-b border-hairline-soft py-[15px] text-[17px] font-medium text-ink last-of-type:border-b-0 [&.router-link-exact-active]:font-semibold [&.router-link-exact-active]:text-primary"
           >
             {{ link.label }}
           </RouterLink>
@@ -121,7 +131,7 @@ watch(menuOpen, (open) => {
           <a
             :href="waLink(whatsappNumber, generalMessage())"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             class="flex h-12 items-center justify-center gap-2 rounded-full border border-hairline text-base font-medium text-ink"
           >
             <WhatsAppGlyph class="h-5 w-5 text-wa" />
@@ -134,56 +144,6 @@ watch(menuOpen, (open) => {
 </template>
 
 <style scoped>
-.nav-link {
-  position: relative;
-  padding: 6px 2px;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--color-muted);
-  transition: color 0.15s ease;
-}
-.nav-link:hover {
-  color: var(--color-ink);
-}
-.nav-link.router-link-exact-active {
-  color: var(--color-ink);
-  font-weight: 600;
-}
-.nav-link.router-link-exact-active::after {
-  content: '';
-  position: absolute;
-  inset-inline: 2px;
-  bottom: -4px;
-  height: 2px;
-  background: var(--color-ink);
-}
-
-/* Mode overlay: teks putih di atas foto hero, sebelum di-scroll */
-.nav--overlay .nav-link {
-  color: #fff;
-}
-.nav--overlay .nav-link.router-link-exact-active::after {
-  background: #fff;
-}
-.nav--overlay :focus-visible {
-  outline-color: #fff;
-}
-
-.sheet-link {
-  padding: 15px 0;
-  font-size: 17px;
-  font-weight: 500;
-  color: var(--color-ink);
-  border-bottom: 1px solid var(--color-hairline-soft);
-}
-.sheet-link:last-of-type {
-  border-bottom: none;
-}
-.sheet-link.router-link-exact-active {
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
 .sheet-enter-active {
   transition: opacity 0.25s var(--ease-out-quart), transform 0.25s var(--ease-out-quart);
 }

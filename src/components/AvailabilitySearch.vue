@@ -3,15 +3,11 @@ import { computed, ref } from 'vue'
 import IconGlyph from './IconGlyph.vue'
 import { addDaysISO, todayISO } from '../lib/format'
 
-// F-02: widget cek ketersediaan - check-in, check-out, jumlah tamu.
+// F-02: widget cek ketersediaan - check-in & check-out.
 const emit = defineEmits(['search', 'clear'])
-const props = defineProps({
-	maxGuests: { type: Number, default: 10 },
-})
 
 const checkIn = ref('')
 const checkOut = ref('')
-const guests = ref(2)
 const errorMessage = ref('')
 const hasSearched = ref(false)
 
@@ -37,13 +33,12 @@ function submit() {
 	}
 
 	hasSearched.value = true
-	emit('search', { checkIn: checkIn.value, checkOut: checkOut.value, guests: guests.value })
+	emit('search', { checkIn: checkIn.value, checkOut: checkOut.value })
 }
 
 function clear() {
 	checkIn.value = ''
 	checkOut.value = ''
-	guests.value = 2
 	errorMessage.value = ''
 	hasSearched.value = false
 	emit('clear')
@@ -55,32 +50,28 @@ defineExpose({ clear })
 <template>
 	<form class="rounded-md border border-hairline bg-canvas shadow-float" novalidate @submit.prevent="submit">
 		<div class="flex flex-col md:flex-row md:items-stretch">
-			<label class="segment md:flex-1">
-				<span class="segment-label">Check-in</span>
-				<input v-model="checkIn" type="date" :min="today" class="segment-input" aria-label="Tanggal check-in" />
+			<label class="flex cursor-pointer items-center gap-3 border-b border-hairline-soft px-5 py-3 md:flex-1 md:border-b-0 md:border-r md:px-6">
+				<IconGlyph name="calendar" class="h-5 w-5 shrink-0 text-muted" />
+				<span class="flex min-w-0 flex-1 flex-col">
+					<span class="text-[13px] font-semibold text-ink">Check-in</span>
+					<input v-model="checkIn" type="date" :min="today"
+						class="mt-0.5 h-6 w-full cursor-pointer appearance-none border-none bg-transparent p-0 text-base focus:outline-none md:text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-date-and-time-value]:text-left"
+						:class="checkIn ? 'text-ink' : 'text-muted'" aria-label="Tanggal check-in"
+						@click="$event.currentTarget.showPicker?.()" />
+				</span>
 			</label>
 
-			<label class="segment md:flex-1">
-				<span class="segment-label">Check-out</span>
-				<input v-model="checkOut" type="date" :min="minCheckOut" class="segment-input" aria-label="Tanggal check-out" />
+			<label class="flex cursor-pointer items-center gap-3 border-b border-hairline-soft px-5 py-3 md:flex-1 md:border-b-0 md:px-6">
+				<IconGlyph name="calendar" class="h-5 w-5 shrink-0 text-muted" />
+				<span class="flex min-w-0 flex-1 flex-col">
+					<span class="text-[13px] font-semibold text-ink">Check-out</span>
+					<input v-model="checkOut" type="date" :min="minCheckOut"
+						class="mt-0.5 h-6 w-full cursor-pointer appearance-none border-none bg-transparent p-0 text-base focus:outline-none md:text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-date-and-time-value]:text-left"
+						:class="checkOut ? 'text-ink' : 'text-muted'" aria-label="Tanggal check-out"
+						@click="$event.currentTarget.showPicker?.()" />
+				</span>
 			</label>
 
-			<div class="segment md:w-52">
-				<span class="segment-label" id="label-tamu">Tamu</span>
-				<div class="mt-0.5 flex items-center gap-3">
-					<button type="button" class="stepper" aria-label="Kurangi jumlah tamu" :disabled="guests <= 1"
-						@click="guests--">
-						−
-					</button>
-					<span class="min-w-10 text-center text-sm text-ink" aria-labelledby="label-tamu">
-						{{ guests }} tamu
-					</span>
-					<button type="button" class="stepper" aria-label="Tambah jumlah tamu" :disabled="guests >= props.maxGuests"
-						@click="guests++">
-						+
-					</button>
-				</div>
-			</div>
 
 			<div class="flex items-center gap-2 p-3 md:p-2">
 				<button v-if="hasSearched" type="button"
@@ -102,61 +93,3 @@ defineExpose({ clear })
 		</p>
 	</form>
 </template>
-
-<style scoped>
-.segment {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	padding: 12px 24px;
-}
-
-.segment-label {
-	font-size: 13px;
-	font-weight: 600;
-	color: var(--color-ink);
-}
-
-.segment-input {
-	margin-top: 2px;
-	width: 100%;
-	border: none;
-	background: transparent;
-	padding: 0;
-	font-size: 14px;
-	font-family: inherit;
-	color: var(--color-ink);
-}
-
-.segment-input:focus {
-	outline: none;
-}
-
-.segment-input::-webkit-calendar-picker-indicator {
-	opacity: 0.55;
-	cursor: pointer;
-}
-
-.stepper {
-	display: grid;
-	place-items: center;
-	height: 32px;
-	width: 32px;
-	border-radius: 9999px;
-	border: 1px solid var(--color-border-strong);
-	color: var(--color-ink);
-	font-size: 16px;
-	line-height: 1;
-	transition: border-color 0.15s ease;
-}
-
-.stepper:hover:not(:disabled) {
-	border-color: var(--color-ink);
-}
-
-.stepper:disabled {
-	border-color: var(--color-hairline-soft);
-	color: var(--color-muted-soft);
-	cursor: not-allowed;
-}
-</style>

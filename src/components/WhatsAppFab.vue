@@ -11,7 +11,7 @@ const { whatsappNumber } = useSettings()
   <a
     :href="waLink(whatsappNumber, generalMessage())"
     target="_blank"
-    rel="noopener"
+    rel="noopener noreferrer"
     class="fixed bottom-5 right-5 z-30 flex h-12 items-center gap-2.5 rounded-full border border-hairline-soft bg-canvas pl-3.5 pr-3.5 shadow-float transition-transform duration-200 hover:-translate-y-0.5 sm:pr-5"
     aria-label="Tanya admin via WhatsApp"
   >

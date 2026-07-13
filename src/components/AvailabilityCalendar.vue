@@ -18,6 +18,15 @@ const now = new Date()
 const monthOffset = ref(0)
 const pendingStart = ref(null)
 
+// Utility Tailwind per state sel kalender (menggantikan class scoped .day.*)
+const DAY_CLASS = {
+  free: 'text-ink hover:shadow-[inset_0_0_0_1.5px_var(--color-ink)]',
+  past: 'cursor-not-allowed text-muted-soft',
+  occupied: 'bg-surface-soft text-muted-soft line-through',
+  endpoint: 'bg-ink font-semibold text-white',
+  'in-range': 'bg-surface-strong text-ink',
+}
+
 const MONTH_NAMES = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
@@ -109,7 +118,7 @@ function reset() {
       <div class="flex items-center gap-1">
         <button
           type="button"
-          class="nav-btn"
+          class="grid size-9 place-items-center rounded-full text-ink transition-colors hover:enabled:bg-surface-soft disabled:cursor-not-allowed disabled:text-muted-soft"
           aria-label="Bulan sebelumnya"
           :disabled="monthOffset <= 0"
           @click="monthOffset--"
@@ -118,7 +127,7 @@ function reset() {
         </button>
         <button
           type="button"
-          class="nav-btn"
+          class="grid size-9 place-items-center rounded-full text-ink transition-colors hover:enabled:bg-surface-soft disabled:cursor-not-allowed disabled:text-muted-soft"
           aria-label="Bulan berikutnya"
           :disabled="monthOffset >= props.monthsAhead"
           @click="monthOffset++"
@@ -138,8 +147,8 @@ function reset() {
         <button
           v-else
           type="button"
-          class="day"
-          :class="cellState(cell.iso)"
+          class="mx-auto size-10 rounded-full text-sm transition-colors"
+          :class="DAY_CLASS[cellState(cell.iso)]"
           :disabled="cellState(cell.iso) === 'past'"
           :aria-label="`${cell.day} ${monthLabel}${isOccupied(cell.iso) ? ' (terisi)' : ''}`"
           :aria-pressed="cellState(cell.iso) === 'endpoint'"
@@ -172,52 +181,3 @@ function reset() {
     </div>
   </div>
 </template>
-
-<style scoped>
-.nav-btn {
-  display: grid;
-  place-items: center;
-  height: 36px;
-  width: 36px;
-  border-radius: 9999px;
-  color: var(--color-ink);
-  transition: background-color 0.15s ease;
-}
-.nav-btn:hover:not(:disabled) {
-  background: var(--color-surface-soft);
-}
-.nav-btn:disabled {
-  color: var(--color-muted-soft);
-  cursor: not-allowed;
-}
-
-.day {
-  height: 40px;
-  width: 40px;
-  margin-inline: auto;
-  border-radius: 9999px;
-  font-size: 14px;
-  color: var(--color-ink);
-  transition: background-color 0.12s ease, color 0.12s ease;
-}
-.day.free:hover {
-  box-shadow: inset 0 0 0 1.5px var(--color-ink);
-}
-.day.past {
-  color: var(--color-muted-soft);
-  cursor: not-allowed;
-}
-.day.occupied {
-  color: var(--color-muted-soft);
-  background: var(--color-surface-soft);
-  text-decoration: line-through;
-}
-.day.endpoint {
-  background: var(--color-ink);
-  color: #fff;
-  font-weight: 600;
-}
-.day.in-range {
-  background: var(--color-surface-strong);
-}
-</style>

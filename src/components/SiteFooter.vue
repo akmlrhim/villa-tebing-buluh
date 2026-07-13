@@ -11,6 +11,7 @@ const links = [
 	{ to: '/gallery', label: 'Our Gallery' },
 	{ to: '/about', label: 'About' },
 	{ to: '/contact', label: 'Contact' },
+	{ to: '/cek-booking', label: 'Cek Status Booking' },
 ]
 
 const year = new Date().getFullYear()
@@ -35,7 +36,7 @@ function formatPhone(number) {
 
 			<nav aria-label="Halaman">
 				<p class="text-sm font-semibold text-ink">Halaman</p>
-				<ul class="mt-3 space-y-2.5">
+				<ul class="mt-3 space-y-1">
 					<li v-for="link in links" :key="link.to">
 						<RouterLink :to="link.to" class="text-sm text-black transition-colors hover:text-ink hover:underline">
 							{{ link.label }}
@@ -46,9 +47,9 @@ function formatPhone(number) {
 
 			<div>
 				<p class="text-sm font-semibold text-ink">Kontak</p>
-				<ul class="mt-3 space-y-2.5 text-sm text-black">
+				<ul class="mt-3 space-y-1 text-sm text-black">
 					<li>
-						<a :href="waLink(whatsappNumber, generalMessage())" target="_blank" rel="noopener"
+						<a :href="waLink(whatsappNumber, generalMessage())" target="_blank" rel="noopener noreferrer"
 							class="inline-flex items-center gap-2 transition-colors hover:text-ink hover:underline">
 							<WhatsAppGlyph class="h-4 w-4 text-wa" />
 							{{ formatPhone(whatsappNumber) }}
@@ -59,7 +60,7 @@ function formatPhone(number) {
 						Check-in {{ settings.check_in_time }} · Check-out {{ settings.check_out_time }}
 					</li>
 					<li>
-						<a :href="`https://instagram.com/${settings.instagram}`" target="_blank" rel="noopener"
+						<a :href="`https://instagram.com/${settings.instagram}`" target="_blank" rel="noopener noreferrer"
 							class="inline-flex items-center gap-2 transition-colors hover:text-ink hover:underline">
 							<IconGlyph name="instagram" class="h-4 w-4" />
 							@{{ settings.instagram }}

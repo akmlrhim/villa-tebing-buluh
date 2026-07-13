@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import IconGlyph from '../components/IconGlyph.vue'
+import PageHero from '../components/PageHero.vue'
 import RoomDetailModal from '../components/RoomDetailModal.vue'
 import { useRooms } from '../composables/useRooms'
 import { useSettings } from '../composables/useSettings'
@@ -13,6 +14,11 @@ const selectedRoom = ref(null)
 
 const img = (id, w = 1400) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
+
+const hero = {
+  url: img('1573790387438-4da905039392', 2000),
+  alt: 'Tebing dan pantai berpasir putih di pesisir dekat vila',
+}
 
 const photos = {
   main: {
@@ -45,16 +51,10 @@ const mapsQuery = encodeURIComponent(settings.value.address)
 
 <template>
   <div class="pb-20">
-    <div class="mx-auto max-w-6xl px-4 pt-10 sm:px-6 md:pt-14">
-      <h1 class="text-[26px] font-semibold tracking-tight text-ink md:text-3xl">
-        Tentang {{ villaName }}
-      </h1>
-      <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-body md:text-base">
-        Namanya diambil dari tebing kecil berumpun bambu yang memeluk sungai di
-        belakang vila. Kami membangun tiga kamar saja: cukup untuk tetap sepi,
-        cukup untuk terasa seperti rumah sendiri.
-      </p>
+    <PageHero :image="hero.url" :alt="hero.alt" :title="`Tentang ${villaName}`"
+      subtitle="Namanya diambil dari tebing kecil berumpun bambu yang memeluk sungai di belakang vila. Kami sengaja membatasi jumlah kamar: cukup untuk tetap sepi, cukup untuk terasa seperti rumah sendiri." />
 
+    <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
       <!-- Mosaik foto -->
       <div class="mt-8 grid gap-4 md:grid-cols-[1.8fr_1fr]">
         <img
@@ -130,8 +130,7 @@ const mapsQuery = encodeURIComponent(settings.value.address)
           <span>
             <span class="block text-[15px] font-semibold text-ink">{{ room.name }}</span>
             <span class="mt-0.5 block text-sm text-muted">
-              {{ room.max_guests }} tamu · lantai {{ room.floor_number }} ·
-              {{ formatRupiah(room.price_per_night) }} / malam
+              {{ room.max_guests }} tamu · {{ formatRupiah(room.price_per_night) }} / malam
             </span>
           </span>
           <span class="flex shrink-0 items-center gap-1.5 text-sm font-medium text-ink">
@@ -158,7 +157,7 @@ const mapsQuery = encodeURIComponent(settings.value.address)
           <a
             :href="`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink underline underline-offset-4 transition-colors hover:text-primary"
           >
             Buka di Google Maps

@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import SiteNav from './components/SiteNav.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import WhatsAppFab from './components/WhatsAppFab.vue'
+import ToastHost from './components/ToastHost.vue'
 import { useRooms } from './composables/useRooms'
 import { useAvailability } from './composables/useAvailability'
 import { useSettings } from './composables/useSettings'
@@ -10,6 +12,10 @@ import { useSettings } from './composables/useSettings'
 const { fetchRooms } = useRooms()
 const { fetchAvailability } = useAvailability()
 const { fetchSettings } = useSettings()
+
+// Halaman admin punya chrome-nya sendiri (sidebar), tanpa navbar/footer publik.
+const route = useRoute()
+const isAdmin = computed(() => route.path.startsWith('/admin'))
 
 onMounted(() => {
   fetchRooms()
@@ -20,7 +26,7 @@ onMounted(() => {
 
 <template>
   <div class="flex min-h-dvh flex-col">
-    <SiteNav />
+    <SiteNav v-if="!isAdmin" />
     <main class="flex-1">
       <RouterView v-slot="{ Component }">
         <Transition name="page" mode="out-in">
@@ -28,8 +34,9 @@ onMounted(() => {
         </Transition>
       </RouterView>
     </main>
-    <SiteFooter />
-    <WhatsAppFab />
+    <SiteFooter v-if="!isAdmin" />
+    <WhatsAppFab v-if="!isAdmin" />
+    <ToastHost />
   </div>
 </template>
 
