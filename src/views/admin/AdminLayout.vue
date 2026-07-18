@@ -14,7 +14,6 @@ const nav = [
 	{ to: { name: 'admin-rooms' }, label: 'Kelola Kamar', icon: 'bed' },
 	{ to: { name: 'admin-bookings' }, label: 'Kelola Booking', icon: 'calendar' },
 	{ to: { name: 'admin-gallery' }, label: 'Kelola Galeri', icon: 'image' },
-	{ to: { name: 'admin-users' }, label: 'Kelola Pengguna', icon: 'users' },
 	{ to: { name: 'admin-settings' }, label: 'Pengaturan', icon: 'settings' },
 ]
 
@@ -32,7 +31,7 @@ async function onLogout() {
 			:class="{ 'translate-x-0': mobileOpen }">
 			<div class="flex h-full flex-col">
 				<div class="flex items-center gap-2 border-b border-gray-300 px-5 py-4">
-					<img src="/logo.svg" alt="" class="h-8 w-8" />
+					<img src="/logo.webp" alt="" class="h-8 w-8" />
 					<div class="min-w-0">
 						<p class="truncate text-sm font-semibold text-ink">Villa Tebing Buluh</p>
 					</div>

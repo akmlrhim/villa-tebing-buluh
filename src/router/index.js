@@ -1,12 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth";
 import { useToast } from "../composables/useToast";
+// Home dimuat statis (bukan dynamic import) supaya tidak ada round-trip JS
+// tambahan sebelum hero LCP dirender - ini halaman yang paling sering jadi
+// pintu masuk pertama.
+import HomeView from "../views/HomeView.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
-    component: () => import("../views/HomeView.vue"),
+    component: HomeView,
     meta: { title: "Villa Tebing Buluh · Vila Privat di Tebing Buluh Loksado" },
   },
   {
@@ -87,12 +91,6 @@ const routes = [
         name: "admin-settings",
         component: () => import("../views/admin/AdminSettingsView.vue"),
         meta: { title: "Pengaturan · Admin" },
-      },
-      {
-        path: "pengguna",
-        name: "admin-users",
-        component: () => import("../views/admin/AdminUsersView.vue"),
-        meta: { title: "Kelola Pengguna · Admin" },
       },
     ],
   },

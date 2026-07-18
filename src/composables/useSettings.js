@@ -32,7 +32,7 @@ export function useSettings() {
     // upsert() tidak selalu error walau RLS memblokir sebagian baris -- cek
     // jumlah baris yang benar-benar kena supaya gagal-diam-diam kelihatan.
     if (!data || data.length < rows.length) {
-      throw new Error('Pengaturan gagal tersimpan sepenuhnya (cek izin akun admin).')
+      throw new Error('Pengaturan gagal tersimpan sepenuhnya. Coba muat ulang halaman dan login lagi.')
     }
     // Perbarui state lokal supaya UI langsung ikut berubah.
     for (const [key, value] of Object.entries(patch)) settings.value[key] = value

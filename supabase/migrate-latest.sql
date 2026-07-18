@@ -15,137 +15,29 @@
 -- Anda: TIDAK PERLU cek satu-satu. Cukup jalankan file INI saja, file
 -- migrate-*.sql lain yang lama sudah tidak perlu dijalankan lagi.
 --
--- LANGKAH WAJIB SETELAH MENJALANKAN FILE INI (kalau belum pernah dilakukan):
---   1. Pastikan Anda sudah pernah login sekali ke /admin dengan akun admin
---      (supaya baris akun Anda sudah ada di auth.users).
---   2. Di SQL Editor, jalankan (GANTI email dengan email login admin Anda):
---
---        insert into admin_users (user_id)
---        select id from auth.users where email = 'GANTI-DENGAN-EMAIL-ADMIN-ANDA'
---        on conflict do nothing;
---
---   3. Verifikasi baris sudah masuk (harus muncul 1 baris dengan email Anda):
---
---        select au.email from auth.users au
---        join admin_users a on a.user_id = au.id;
---
---      Kalau kosong -> SEMUA tombol simpan/hapus/toggle di admin akan gagal:
---      kadang diam-diam tanpa error (update/delete), kadang muncul error
---      "new row violates row-level security policy" (insert, mis. saat
---      simpan foto kamar). Ini nyaris selalu penyebabnya -- perbaiki langkah
---      2 di atas, bukan cari bug di kode.
---   4. Di Dashboard -> Authentication -> Sign In / Providers -> Email,
---      matikan "Allow new users to sign up" (menutup jalur orang lain bikin
---      akun sendiri lewat Auth API langsung, di luar aplikasi ini).
+-- SATU-SATUNYA LANGKAH WAJIB SETELAH MENJALANKAN FILE INI:
+--   Di Dashboard -> Authentication -> Sign In / Providers -> Email, matikan
+--   "Allow new users to sign up". Setiap akun yang berhasil login sekarang
+--   otomatis dipercaya PENUH (tidak ada allowlist admin_users lagi) --
+--   satu-satunya cara membatasi siapa yang bisa masuk adalah menutup jalur
+--   pendaftaran akun baru dan hanya membuat akun lewat Dashboard ->
+--   Authentication -> Add user.
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
--- 0. ADMIN ACCESS CONTROL -- admin_users + is_admin()
+-- 0. HAPUS SISTEM ADMIN_USERS / is_admin() -- semua authenticated user dipercaya
 -- ---------------------------------------------------------------------------
-create table if not exists admin_users (
-  user_id uuid primary key references auth.users(id) on delete cascade
-);
-alter table admin_users enable row level security;
--- Sengaja TANPA policy select/insert/update/delete untuk client -- hanya
--- bisa diisi lewat SQL Editor (service role) atau dibaca lewat is_admin().
-revoke all on public.admin_users from anon, authenticated;
-
-create or replace function public.is_admin()
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (select 1 from admin_users where user_id = auth.uid());
-$$;
-
-revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to authenticated;
-
--- ---------------------------------------------------------------------------
--- 0b. ADMIN USER MANAGEMENT -- kelola siapa saja admin (halaman /admin/pengguna)
--- ---------------------------------------------------------------------------
--- Kapan seorang admin ditambahkan (untuk ditampilkan di daftar).
-alter table admin_users add column if not exists created_at timestamptz not null default now();
-
--- Daftar admin saat ini + email-nya. auth.users tidak bisa diquery langsung
--- dari client (bukan di schema public, dan berisi data sensitif) -- fungsi
--- SECURITY DEFINER ini yang menjembataninya, DIBATASI hanya untuk admin
--- (dicek is_admin() di dalam fungsi, bukan cuma lewat GRANT).
-create or replace function public.admin_list_admins()
-returns table (user_id uuid, email text, added_at timestamptz)
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if not is_admin() then
-    raise exception 'NOT_ADMIN' using errcode = '42501';
-  end if;
-  return query
-  select a.user_id, u.email, a.created_at
-  from admin_users a
-  join auth.users u on u.id = a.user_id
-  order by a.created_at asc;
-end;
-$$;
-
--- Jadikan akun (yang SUDAH ada di Supabase Auth) sebagai admin lewat email.
--- Tidak membuat akun baru -- akun harus sudah dibuat dulu lewat Supabase
--- Dashboard -> Authentication -> Add user.
-create or replace function public.admin_add_admin_by_email(p_email text)
-returns table (user_id uuid, email text)
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_user_id uuid;
-begin
-  if not is_admin() then
-    raise exception 'NOT_ADMIN' using errcode = '42501';
-  end if;
-
-  select id into v_user_id from auth.users where email ilike btrim(p_email) limit 1;
-  if v_user_id is null then
-    raise exception 'USER_NOT_FOUND' using errcode = 'P0002';
-  end if;
-
-  insert into admin_users (user_id) values (v_user_id)
-  on conflict (user_id) do nothing;
-
-  return query select v_user_id, (select u.email from auth.users u where u.id = v_user_id);
-end;
-$$;
-
--- Cabut akses admin. Sengaja menolak kalau ini admin TERAKHIR, supaya tidak
--- ada yang tanpa sengaja mengunci total akses admin ke situs.
-create or replace function public.admin_remove_admin(p_user_id uuid)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if not is_admin() then
-    raise exception 'NOT_ADMIN' using errcode = '42501';
-  end if;
-
-  if (select count(*) from admin_users) <= 1 then
-    raise exception 'LAST_ADMIN' using errcode = 'P0001';
-  end if;
-
-  delete from admin_users where user_id = p_user_id;
-end;
-$$;
-
-revoke all on function public.admin_list_admins() from public;
-revoke all on function public.admin_add_admin_by_email(text) from public;
-revoke all on function public.admin_remove_admin(uuid) from public;
-grant execute on function public.admin_list_admins() to authenticated;
-grant execute on function public.admin_add_admin_by_email(text) to authenticated;
-grant execute on function public.admin_remove_admin(uuid) to authenticated;
+-- Sebelumnya akses admin dibatasi tabel admin_users + fungsi is_admin(), yang
+-- perlu diisi manual lewat SQL Editor setiap kali ada akun admin baru --
+-- gampang lupa dan bikin lockout diam-diam (0 baris kena, tanpa error yang
+-- jelas). Sekarang: siapa pun yang berhasil login (role `authenticated`)
+-- otomatis dapat akses penuh. Fitur "Kelola Pengguna" (/admin/pengguna) juga
+-- dihapus karena fungsinya (kelola siapa admin) sudah tidak relevan.
+-- PENTING: DROP FUNCTION/TABLE-nya sendiri ditaruh di BAGIAN PALING BAWAH
+-- file ini (section 7) -- policy lama di rooms/room_images/bookings/dst di
+-- bawah masih memakai is_admin() sampai masing-masing di-drop-lalu-buat-ulang
+-- tanpa is_admin(); Postgres menolak DROP FUNCTION selama masih ada policy
+-- yang bergantung padanya.
 
 -- ---------------------------------------------------------------------------
 -- 1. ROOMS
@@ -153,21 +45,21 @@ grant execute on function public.admin_remove_admin(uuid) to authenticated;
 alter table rooms drop column if exists floor_number; -- fitur "lantai" sudah dihapus
 
 drop policy if exists "Admin can insert rooms" on rooms;
-create policy "Admin can insert rooms" on rooms for insert to authenticated with check (is_admin());
+create policy "Admin can insert rooms" on rooms for insert to authenticated with check (true);
 drop policy if exists "Admin can update rooms" on rooms;
-create policy "Admin can update rooms" on rooms for update to authenticated using (is_admin()) with check (is_admin());
+create policy "Admin can update rooms" on rooms for update to authenticated using (true) with check (true);
 drop policy if exists "Admin can delete rooms" on rooms;
-create policy "Admin can delete rooms" on rooms for delete to authenticated using (is_admin());
+create policy "Admin can delete rooms" on rooms for delete to authenticated using (true);
 
 -- ---------------------------------------------------------------------------
 -- 2. ROOM_IMAGES
 -- ---------------------------------------------------------------------------
 drop policy if exists "Admin can insert room images" on room_images;
-create policy "Admin can insert room images" on room_images for insert to authenticated with check (is_admin());
+create policy "Admin can insert room images" on room_images for insert to authenticated with check (true);
 drop policy if exists "Admin can update room images" on room_images;
-create policy "Admin can update room images" on room_images for update to authenticated using (is_admin()) with check (is_admin());
+create policy "Admin can update room images" on room_images for update to authenticated using (true) with check (true);
 drop policy if exists "Admin can delete room images" on room_images;
-create policy "Admin can delete room images" on room_images for delete to authenticated using (is_admin());
+create policy "Admin can delete room images" on room_images for delete to authenticated using (true);
 
 -- ---------------------------------------------------------------------------
 -- 3. BOOKINGS
@@ -175,15 +67,15 @@ create policy "Admin can delete room images" on room_images for delete to authen
 alter table bookings add column if not exists payment_proof_url text;
 
 drop policy if exists "Admin can view bookings" on bookings;
-create policy "Admin can view bookings" on bookings for select to authenticated using (is_admin());
+create policy "Admin can view bookings" on bookings for select to authenticated using (true);
 
 drop policy if exists "Anyone can create a booking" on bookings; -- kebijakan lama, sudah diganti RPC di bawah
 drop policy if exists "Admin can create bookings" on bookings;
-create policy "Admin can create bookings" on bookings for insert to authenticated with check (is_admin());
+create policy "Admin can create bookings" on bookings for insert to authenticated with check (true);
 drop policy if exists "Admin can update bookings" on bookings;
-create policy "Admin can update bookings" on bookings for update to authenticated using (is_admin()) with check (is_admin());
+create policy "Admin can update bookings" on bookings for update to authenticated using (true) with check (true);
 drop policy if exists "Admin can delete bookings" on bookings;
-create policy "Admin can delete bookings" on bookings for delete to authenticated using (is_admin());
+create policy "Admin can delete bookings" on bookings for delete to authenticated using (true);
 
 revoke insert on public.bookings from anon;
 
@@ -358,11 +250,11 @@ drop policy if exists "Public can view gallery images" on gallery_images;
 create policy "Public can view gallery images" on gallery_images for select using (true);
 
 drop policy if exists "Admin can insert gallery images" on gallery_images;
-create policy "Admin can insert gallery images" on gallery_images for insert to authenticated with check (is_admin());
+create policy "Admin can insert gallery images" on gallery_images for insert to authenticated with check (true);
 drop policy if exists "Admin can update gallery images" on gallery_images;
-create policy "Admin can update gallery images" on gallery_images for update to authenticated using (is_admin()) with check (is_admin());
+create policy "Admin can update gallery images" on gallery_images for update to authenticated using (true) with check (true);
 drop policy if exists "Admin can delete gallery images" on gallery_images;
-create policy "Admin can delete gallery images" on gallery_images for delete to authenticated using (is_admin());
+create policy "Admin can delete gallery images" on gallery_images for delete to authenticated using (true);
 
 -- -------------------------------------------------------------------------
 -- 4. SETTINGS
@@ -377,9 +269,9 @@ drop policy if exists "Public can read settings" on settings;
 create policy "Public can read settings" on settings for select to anon, authenticated using (true);
 
 drop policy if exists "Admin can upsert settings" on settings;
-create policy "Admin can upsert settings" on settings for insert to authenticated with check (is_admin());
+create policy "Admin can upsert settings" on settings for insert to authenticated with check (true);
 drop policy if exists "Admin can update settings" on settings;
-create policy "Admin can update settings" on settings for update to authenticated using (is_admin()) with check (is_admin());
+create policy "Admin can update settings" on settings for update to authenticated using (true) with check (true);
 
 insert into settings (key, value) values
   ('whatsapp_number', '6281234567890'),
@@ -399,11 +291,11 @@ update storage.buckets set public = true where id = 'room-images';
 drop policy if exists "Public can view room images" on storage.objects;
 create policy "Public can view room images" on storage.objects for select using (bucket_id = 'room-images');
 drop policy if exists "Admin can upload room images" on storage.objects;
-create policy "Admin can upload room images" on storage.objects for insert to authenticated with check (bucket_id = 'room-images' and is_admin());
+create policy "Admin can upload room images" on storage.objects for insert to authenticated with check (bucket_id = 'room-images');
 drop policy if exists "Admin can update room images objects" on storage.objects;
-create policy "Admin can update room images objects" on storage.objects for update to authenticated using (bucket_id = 'room-images' and is_admin());
+create policy "Admin can update room images objects" on storage.objects for update to authenticated using (bucket_id = 'room-images');
 drop policy if exists "Admin can delete room images objects" on storage.objects;
-create policy "Admin can delete room images objects" on storage.objects for delete to authenticated using (bucket_id = 'room-images' and is_admin());
+create policy "Admin can delete room images objects" on storage.objects for delete to authenticated using (bucket_id = 'room-images');
 
 -- payment-proofs: bukti bayar tamu -- PRIVAT (data finansial pribadi). Riwayat
 -- bucket ini sempat public=true sebelum diprivatkan -- baris update di bawah
@@ -419,11 +311,11 @@ where id = 'payment-proofs';
 
 drop policy if exists "Public can view payment proofs" on storage.objects; -- kebijakan lama, publik TIDAK boleh baca lagi
 drop policy if exists "Admin can view payment proofs" on storage.objects;
-create policy "Admin can view payment proofs" on storage.objects for select to authenticated using (bucket_id = 'payment-proofs' and is_admin());
+create policy "Admin can view payment proofs" on storage.objects for select to authenticated using (bucket_id = 'payment-proofs');
 drop policy if exists "Anyone can upload payment proofs" on storage.objects;
 create policy "Anyone can upload payment proofs" on storage.objects for insert to anon, authenticated with check (bucket_id = 'payment-proofs');
 drop policy if exists "Admin can delete payment proofs" on storage.objects;
-create policy "Admin can delete payment proofs" on storage.objects for delete to authenticated using (bucket_id = 'payment-proofs' and is_admin());
+create policy "Admin can delete payment proofs" on storage.objects for delete to authenticated using (bucket_id = 'payment-proofs');
 
 -- gallery-images: bucket publik, foto galeri.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -435,9 +327,9 @@ update storage.buckets set public = true where id = 'gallery-images';
 drop policy if exists "Public can view gallery images objects" on storage.objects;
 create policy "Public can view gallery images objects" on storage.objects for select using (bucket_id = 'gallery-images');
 drop policy if exists "Admin can upload gallery images objects" on storage.objects;
-create policy "Admin can upload gallery images objects" on storage.objects for insert to authenticated with check (bucket_id = 'gallery-images' and is_admin());
+create policy "Admin can upload gallery images objects" on storage.objects for insert to authenticated with check (bucket_id = 'gallery-images');
 drop policy if exists "Admin can delete gallery images objects" on storage.objects;
-create policy "Admin can delete gallery images objects" on storage.objects for delete to authenticated using (bucket_id = 'gallery-images' and is_admin());
+create policy "Admin can delete gallery images objects" on storage.objects for delete to authenticated using (bucket_id = 'gallery-images');
 
 -- ---------------------------------------------------------------------------
 -- 6. GRANT LEVEL-TABEL (GRANT selalu aman diulang, tidak pernah "already exists")
@@ -454,3 +346,13 @@ grant select, insert, update, delete on public.room_images    to authenticated;
 grant select, insert, update, delete on public.bookings       to authenticated;
 grant select, insert, update, delete on public.settings       to authenticated;
 grant select, insert, update, delete on public.gallery_images to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 7. DROP ADMIN_USERS / is_admin() -- sekarang aman, semua policy di atas
+-- sudah dibuat ulang tanpa memakai is_admin().
+-- ---------------------------------------------------------------------------
+drop function if exists public.admin_list_admins();
+drop function if exists public.admin_add_admin_by_email(text);
+drop function if exists public.admin_remove_admin(uuid);
+drop function if exists public.is_admin();
+drop table if exists admin_users;
