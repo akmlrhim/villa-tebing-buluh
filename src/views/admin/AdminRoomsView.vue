@@ -10,7 +10,7 @@ import { useAdminRooms } from '../../composables/useAdminRooms'
 import { useToast } from '../../composables/useToast'
 import { usePagination } from '../../composables/usePagination'
 import { formatRupiah } from '../../lib/format'
-import { friendlyDbError } from '../../lib/supabase'
+import { friendlyDbError, supabase } from '../../lib/supabase'
 
 const { rooms, loading, fetchRooms, toggleActive, deleteRoom, bulkDeleteRooms } = useAdminRooms()
 const toast = useToast()
@@ -82,7 +82,15 @@ async function onToggle(room) {
 		await toggleActive(room)
 		toast.success(room.is_active ? `Kamar ${room.name} dinonaktifkan.` : `Kamar ${room.name} diaktifkan.`)
 	} catch (err) {
-		toast.error('Gagal mengubah status kamar: ' + friendlyDbError(err))
+		// DEBUG SEMENTARA: sertakan info sesi login mentah di toast supaya
+		// bisa didiagnosis dari HP/browser tanpa buka DevTools/SQL Editor.
+		// Hapus blok ini setelah root cause "42501 tetap gagal" ketemu.
+		const { data: sessionData } = await supabase.auth.getSession()
+		const s = sessionData?.session
+		const debugInfo = s
+			? `sesi AKTIF: email=${s.user?.email ?? '?'} role=${s.user?.role ?? '?'} exp=${s.expires_at ? new Date(s.expires_at * 1000).toLocaleString('id-ID') : '?'}`
+			: 'TIDAK ADA SESI (anon)'
+		toast.error(`Gagal mengubah status kamar: ${friendlyDbError(err)} || DEBUG: ${debugInfo}`)
 	} finally {
 		busyId.value = null
 	}
