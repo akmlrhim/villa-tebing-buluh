@@ -60,6 +60,8 @@ const mapsQuery = encodeURIComponent(settings.value.address)
         <img
           :src="photos.main.url"
           :alt="photos.main.alt"
+          loading="lazy"
+          decoding="async"
           class="h-64 w-full rounded-md object-cover sm:h-80 md:h-[460px]"
         />
         <div class="grid grid-cols-2 gap-4 md:grid-cols-1">

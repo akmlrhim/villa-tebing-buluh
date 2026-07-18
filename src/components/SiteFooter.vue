@@ -27,7 +27,7 @@ function formatPhone(number) {
 	<footer class="border-t border-hairline-soft">
 		<div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1.2fr] md:py-16">
 			<div>
-				<img src="/logo.svg" :alt="villaName" class="h-14 w-14 object-contain" />
+				<img src="/logo.webp" :alt="villaName" class="h-14 w-14 object-contain" />
 				<p class="mt-4 flex max-w-xs items-start gap-2 text-sm text-black">
 					<IconGlyph name="map-pin" class="mt-0.5 h-4 w-4 shrink-0" />
 					{{ settings.address }}

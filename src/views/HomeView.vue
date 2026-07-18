@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AvailabilitySearch from '../components/AvailabilitySearch.vue'
 import MasterCalendar from '../components/MasterCalendar.vue'
@@ -16,9 +16,14 @@ import { useSettings } from '../composables/useSettings'
 import { formatDateID, nightsBetween } from '../lib/format'
 import { askAvailabilityMessage, waLink } from '../lib/whatsapp'
 
-const { rooms, loading } = useRooms()
+const { rooms, loading, fetchRooms } = useRooms()
 const { isRoomAvailable, fetchAvailability } = useAvailability()
 const { whatsappNumber } = useSettings()
+
+onMounted(() => {
+	fetchRooms()
+	fetchAvailability()
+})
 
 const query = ref(null) // { checkIn, checkOut } | null
 const selectedRoom = ref(null)

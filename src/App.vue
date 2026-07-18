@@ -5,21 +5,20 @@ import SiteNav from './components/SiteNav.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import WhatsAppFab from './components/WhatsAppFab.vue'
 import ToastHost from './components/ToastHost.vue'
-import { useRooms } from './composables/useRooms'
-import { useAvailability } from './composables/useAvailability'
 import { useSettings } from './composables/useSettings'
 
-const { fetchRooms } = useRooms()
-const { fetchAvailability } = useAvailability()
 const { fetchSettings } = useSettings()
 
 // Halaman admin punya chrome-nya sendiri (sidebar), tanpa navbar/footer publik.
 const route = useRoute()
 const isAdmin = computed(() => route.path.startsWith('/admin'))
 
+// Settings (nomor WA, alamat, dst) dipakai di navbar/footer/FAB di semua
+// halaman publik, jadi dimuat di sini. Data kamar & ketersediaan HANYA
+// dipakai sebagian halaman (Home, About, Pembayaran) - masing-masing view
+// itu yang memuatnya sendiri supaya Contact/Gallery/Cek Booking/Admin tidak
+// ikut menunggu dua query yang tidak mereka perlukan.
 onMounted(() => {
-  fetchRooms()
-  fetchAvailability()
   fetchSettings()
 })
 </script>
