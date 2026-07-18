@@ -28,16 +28,19 @@ export function assertRowsAffected(data, message = 'Tidak ada perubahan tersimpa
 
 /**
  * Pesan error RLS mentah dari Postgres ("new row violates row-level security
- * policy for table ...", kode 42501) sulit dipahami. Semua akun yang berhasil
- * login sudah dipercaya penuh (tidak ada allowlist admin lagi) -- kalau error
- * ini tetap muncul, penyebab paling umum adalah sesi sudah habis (request
- * jalan sebagai anon). Pakai di semua toast/errorMsg admin sebagai pengganti
- * `err?.message || err`.
+ * policy for table ...", kode 42501) sulit dipahami sekilas. Semua akun yang
+ * berhasil login sudah dipercaya penuh (tidak ada allowlist admin lagi) --
+ * kalau error ini tetap muncul, penyebabnya HARUS terlihat dari kode/pesan
+ * mentahnya (policy yang belum ke-update, GRANT yang hilang, atau sesi
+ * habis), jadi pesan Postgres asli tetap disertakan, bukan diganti total --
+ * supaya bisa didiagnosis langsung dari toast tanpa buka DevTools/SQL Editor.
+ * Pakai di semua toast/errorMsg admin sebagai pengganti `err?.message || err`.
  */
 export function friendlyDbError(err) {
   const msg = err?.message || String(err ?? '')
+  const code = err?.code ? ` (kode ${err.code})` : ''
   if (err?.code === '42501' || /row-level security policy/i.test(msg)) {
-    return 'Sesi login Anda mungkin sudah habis. Coba muat ulang halaman dan login lagi.'
+    return `Ditolak izin database${code}: ${msg}. Coba login ulang; kalau masih sama, kirim pesan ini.`
   }
-  return msg
+  return code ? `${msg}${code}` : msg
 }
