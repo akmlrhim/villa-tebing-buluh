@@ -364,9 +364,9 @@ create policy "Admin can update gallery images" on gallery_images for update to 
 drop policy if exists "Admin can delete gallery images" on gallery_images;
 create policy "Admin can delete gallery images" on gallery_images for delete to authenticated using (is_admin());
 
--- ---------------------------------------------------------------------------
+-- -------------------------------------------------------------------------
 -- 4. SETTINGS
--- ---------------------------------------------------------------------------
+-- -------------------------------------------------------------------------
 create table if not exists settings (
   key text primary key,
   value text not null
