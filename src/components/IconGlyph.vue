@@ -10,6 +10,7 @@ const PATHS = {
   menu: 'M4 7h16M4 12h16M4 17h16',
   'chevron-left': 'm15 18-6-6 6-6',
   'chevron-right': 'm9 18 6-6-6-6',
+  'chevron-down': 'm6 9 6 6 6-6',
   'arrow-right': 'M5 12h14m-6-6 6 6-6 6',
   'map-pin': 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Zm-5 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
   clock: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 4v5l3 2',

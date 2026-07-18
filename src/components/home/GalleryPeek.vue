@@ -1,31 +1,30 @@
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useGallery } from '../../composables/useGallery'
+import IconGlyph from '../IconGlyph.vue'
 
-const { images, fetchGallery } = useGallery()
-onMounted(fetchGallery)
-
-const galleryPeek = computed(() => images.value.slice(0, 5))
+const cover = {
+	url: '/img/gallery_heros.webp',
+	alt: 'Suasana galeri Villa Tebing Buluh',
+}
 </script>
 
 <template>
-  <!-- Intip galeri -->
-  <section v-if="galleryPeek.length" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
-    <div class="flex items-end justify-between gap-4">
-      <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Suasana di sini</h2>
-      <RouterLink to="/gallery"
-        class="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-ink underline underline-offset-4 transition-colors hover:text-primary">
-        Lihat semua foto
-      </RouterLink>
-    </div>
-    <div
-      class="[scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 mt-6 flex snap-x gap-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
-      <RouterLink v-for="(item, index) in galleryPeek" :key="index" to="/gallery"
-        class="group w-72 shrink-0 snap-start overflow-hidden rounded-md bg-surface-strong md:w-80"
-        :aria-label="`Buka galeri: ${item.alt}`">
-        <img :src="item.url" :alt="item.alt" loading="lazy"
-          class="aspect-[4/3] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
-      </RouterLink>
-    </div>
-  </section>
+	<!-- Teaser galeri: banner foto penuh yang mengarah ke halaman galeri -->
+	<section class="relative isolate mt-20 flex min-h-[420px] items-center overflow-hidden bg-ink md:mt-24 md:min-h-[480px]">
+		<img :src="cover.url" :alt="cover.alt" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+		<div class="absolute inset-0 -z-10 bg-gradient-to-r from-black/75 via-black/40 to-black/10" />
+
+		<div class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+			<div class="max-w-md">
+				<h2 class="text-[28px] font-semibold tracking-tight text-white md:text-4xl">Galeri</h2>
+				<p class="mt-3 text-sm leading-relaxed text-white/85">
+					Lihat suasana kamar, kolam renang, dan sekitar vila lewat kumpulan foto lengkap kami.
+				</p>
+				<RouterLink to="/gallery"
+					class="mt-6 inline-flex h-12 items-center gap-2 rounded-full border border-white/70 px-6 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+					Lihat Galeri
+					<IconGlyph name="arrow-right" class="h-4 w-4 -rotate-45" />
+				</RouterLink>
+			</div>
+		</div>
+	</section>
 </template>

@@ -4,6 +4,118 @@
 -- (needed for the "untuk 14 malam" field shown on the room card design).
 
 -- =========================================
+-- 0. ADMIN ACCESS CONTROL
+-- =========================================
+-- Semua policy "Admin can ..." di bawah dicek pakai is_admin(), BUKAN cuma
+-- `to authenticated`. Alasan: anon key Supabase memang publik (tertanam di
+-- bundle JS), jadi siapa pun yang berhasil membuat akun Supabase Auth
+-- (kalau signup diizinkan) otomatis jadi role `authenticated`. Kalau policy
+-- cuma cek `to authenticated`, akun itu langsung dapat akses tulis PENUH ke
+-- semua tabel admin -- termasuk mengganti settings.qris_image_url untuk
+-- mengalihkan pembayaran tamu. is_admin() mempersempit ini ke user_id yang
+-- memang terdaftar di admin_users.
+create table if not exists admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+alter table admin_users enable row level security;
+-- Sengaja TANPA policy select/insert/update/delete untuk client -- hanya
+-- bisa diisi lewat SQL Editor (service role) atau dibaca lewat is_admin()
+-- (SECURITY DEFINER, bypass RLS).
+revoke all on public.admin_users from anon, authenticated;
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from admin_users where user_id = auth.uid());
+$$;
+
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to authenticated;
+
+-- Manajemen admin (halaman /admin/pengguna): auth.users tidak bisa diquery
+-- langsung dari client, jadi fungsi SECURITY DEFINER ini yang menjembatani --
+-- masing-masing DIBATASI hanya untuk admin (cek is_admin() di dalamnya).
+create or replace function public.admin_list_admins()
+returns table (user_id uuid, email text, added_at timestamptz)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not is_admin() then
+    raise exception 'NOT_ADMIN' using errcode = '42501';
+  end if;
+  return query
+  select a.user_id, u.email, a.created_at
+  from admin_users a
+  join auth.users u on u.id = a.user_id
+  order by a.created_at asc;
+end;
+$$;
+
+-- Jadikan akun (yang SUDAH ada di Supabase Auth) sebagai admin lewat email.
+-- Tidak membuat akun baru -- akun harus sudah dibuat dulu lewat Supabase
+-- Dashboard -> Authentication -> Add user.
+create or replace function public.admin_add_admin_by_email(p_email text)
+returns table (user_id uuid, email text)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  if not is_admin() then
+    raise exception 'NOT_ADMIN' using errcode = '42501';
+  end if;
+
+  select id into v_user_id from auth.users where email ilike btrim(p_email) limit 1;
+  if v_user_id is null then
+    raise exception 'USER_NOT_FOUND' using errcode = 'P0002';
+  end if;
+
+  insert into admin_users (user_id) values (v_user_id)
+  on conflict (user_id) do nothing;
+
+  return query select v_user_id, (select u.email from auth.users u where u.id = v_user_id);
+end;
+$$;
+
+-- Cabut akses admin. Menolak kalau ini admin TERAKHIR supaya tidak ada yang
+-- tanpa sengaja mengunci total akses admin ke situs.
+create or replace function public.admin_remove_admin(p_user_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not is_admin() then
+    raise exception 'NOT_ADMIN' using errcode = '42501';
+  end if;
+
+  if (select count(*) from admin_users) <= 1 then
+    raise exception 'LAST_ADMIN' using errcode = 'P0001';
+  end if;
+
+  delete from admin_users where user_id = p_user_id;
+end;
+$$;
+
+revoke all on function public.admin_list_admins() from public;
+revoke all on function public.admin_add_admin_by_email(text) from public;
+revoke all on function public.admin_remove_admin(uuid) from public;
+grant execute on function public.admin_list_admins() to authenticated;
+grant execute on function public.admin_add_admin_by_email(text) to authenticated;
+grant execute on function public.admin_remove_admin(uuid) to authenticated;
+
+-- =========================================
 -- 1. ROOMS (kamar/unit vila, dikelola admin)
 -- =========================================
 create table if not exists rooms (
@@ -31,18 +143,18 @@ create policy "Public can view active rooms"
 create policy "Admin can insert rooms"
   on rooms for insert
   to authenticated
-  with check (true);
+  with check (is_admin());
 
 create policy "Admin can update rooms"
   on rooms for update
   to authenticated
-  using (true)
-  with check (true);
+  using (is_admin())
+  with check (is_admin());
 
 create policy "Admin can delete rooms"
   on rooms for delete
   to authenticated
-  using (true);
+  using (is_admin());
 
 -- =========================================
 -- 2. ROOM_IMAGES (foto per kamar)
@@ -69,18 +181,18 @@ create policy "Public can view images of active rooms"
 create policy "Admin can insert room images"
   on room_images for insert
   to authenticated
-  with check (true);
+  with check (is_admin());
 
 create policy "Admin can update room images"
   on room_images for update
   to authenticated
-  using (true)
-  with check (true);
+  using (is_admin())
+  with check (is_admin());
 
 create policy "Admin can delete room images"
   on room_images for delete
   to authenticated
-  using (true);
+  using (is_admin());
 
 -- =========================================
 -- 3. BOOKINGS (reservasi tamu)
@@ -109,7 +221,7 @@ alter table bookings enable row level security;
 create policy "Admin can view bookings"
   on bookings for select
   to authenticated
-  using (true);
+  using (is_admin());
 
 -- Publik TIDAK boleh INSERT langsung (bisa disalahgunakan untuk mengunci
 -- kalender / mengatur harga). Booking publik hanya lewat fungsi tervalidasi
@@ -117,18 +229,18 @@ create policy "Admin can view bookings"
 create policy "Admin can create bookings"
   on bookings for insert
   to authenticated
-  with check (true);
+  with check (is_admin());
 
 create policy "Admin can update bookings"
   on bookings for update
   to authenticated
-  using (true)
-  with check (true);
+  using (is_admin())
+  with check (is_admin());
 
 create policy "Admin can delete bookings"
   on bookings for delete
   to authenticated
-  using (true);
+  using (is_admin());
 
 -- View aman untuk publik: hanya room_id + tanggal, TANPA data pribadi tamu (F-05.3).
 -- SECURITY DEFINER (security_invoker = false) disengaja: anon cukup punya akses
@@ -314,18 +426,18 @@ create policy "Public can view gallery images"
 create policy "Admin can insert gallery images"
   on gallery_images for insert
   to authenticated
-  with check (true);
+  with check (is_admin());
 
 create policy "Admin can update gallery images"
   on gallery_images for update
   to authenticated
-  using (true)
-  with check (true);
+  using (is_admin())
+  with check (is_admin());
 
 create policy "Admin can delete gallery images"
   on gallery_images for delete
   to authenticated
-  using (true);
+  using (is_admin());
 
 -- =========================================
 -- 4. SETTINGS (whatsapp_number, villa_name, dst.)
@@ -345,13 +457,13 @@ create policy "Public can read settings"
 create policy "Admin can upsert settings"
   on settings for insert
   to authenticated
-  with check (true);
+  with check (is_admin());
 
 create policy "Admin can update settings"
   on settings for update
   to authenticated
-  using (true)
-  with check (true);
+  using (is_admin())
+  with check (is_admin());
 
 insert into settings (key, value) values
   ('whatsapp_number', '6281234567890'),
@@ -373,17 +485,17 @@ create policy "Public can view room images"
 create policy "Admin can upload room images"
   on storage.objects for insert
   to authenticated
-  with check (bucket_id = 'room-images');
+  with check (bucket_id = 'room-images' and is_admin());
 
 create policy "Admin can update room images objects"
   on storage.objects for update
   to authenticated
-  using (bucket_id = 'room-images');
+  using (bucket_id = 'room-images' and is_admin());
 
 create policy "Admin can delete room images objects"
   on storage.objects for delete
   to authenticated
-  using (bucket_id = 'room-images');
+  using (bucket_id = 'room-images' and is_admin());
 
 -- Bucket bukti pembayaran QRIS (diunggah tamu dari halaman /pembayaran).
 -- PRIVAT: berisi data finansial pribadi tamu. Admin melihatnya lewat signed URL
@@ -397,7 +509,7 @@ on conflict (id) do nothing;
 create policy "Admin can view payment proofs"
   on storage.objects for select
   to authenticated
-  using (bucket_id = 'payment-proofs');
+  using (bucket_id = 'payment-proofs' and is_admin());
 
 create policy "Anyone can upload payment proofs"
   on storage.objects for insert
@@ -407,7 +519,7 @@ create policy "Anyone can upload payment proofs"
 create policy "Admin can delete payment proofs"
   on storage.objects for delete
   to authenticated
-  using (bucket_id = 'payment-proofs');
+  using (bucket_id = 'payment-proofs' and is_admin());
 
 -- Bucket foto galeri publik (admin unggah, dikompres & dikonversi ke WebP di
 -- browser sebelum unggah -- lihat src/lib/imageCompress.js).
@@ -423,12 +535,12 @@ create policy "Public can view gallery images objects"
 create policy "Admin can upload gallery images objects"
   on storage.objects for insert
   to authenticated
-  with check (bucket_id = 'gallery-images');
+  with check (bucket_id = 'gallery-images' and is_admin());
 
 create policy "Admin can delete gallery images objects"
   on storage.objects for delete
   to authenticated
-  using (bucket_id = 'gallery-images');
+  using (bucket_id = 'gallery-images' and is_admin());
 
 -- =========================================
 -- 6. GRANT LEVEL-TABEL (WAJIB, di luar RLS)

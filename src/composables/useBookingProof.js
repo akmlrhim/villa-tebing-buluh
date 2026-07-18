@@ -1,5 +1,6 @@
 import { ref, watch } from 'vue'
 import { signedProofUrl } from '../lib/storage'
+import { friendlyDbError } from '../lib/supabase'
 
 /**
  * URL bertanda-tangan sementara untuk bukti bayar booking. `bookingRef` =
@@ -21,7 +22,7 @@ export function useBookingProof(bookingRef) {
       try {
         url.value = await signedProofUrl(booking.payment_proof_url)
       } catch (err) {
-        error.value = 'Gagal memuat bukti: ' + (err?.message || err)
+        error.value = 'Gagal memuat bukti: ' + friendlyDbError(err)
       } finally {
         loading.value = false
       }

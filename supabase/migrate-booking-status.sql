@@ -1,3 +1,5 @@
+-- DIGANTIKAN oleh supabase/migrate-latest.sql -- jangan jalankan file ini
+-- lagi, disimpan sebagai riwayat perubahan.
 -- MIGRASI: cek status booking publik (halaman /cek-booking)
 -- Jalankan SEKALI di Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 -- Hanya untuk database yang sudah pernah menjalankan schema.sql versi lama;

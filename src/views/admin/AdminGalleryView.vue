@@ -4,18 +4,47 @@ import IconGlyph from '../../components/IconGlyph.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import PaginationBar from '../../components/PaginationBar.vue'
 import GalleryUploadGrid from '../../components/admin/GalleryUploadGrid.vue'
+import BulkActionBar from '../../components/admin/BulkActionBar.vue'
 import { useAdminGallery } from '../../composables/useAdminGallery'
 import { usePagination } from '../../composables/usePagination'
 import { useToast } from '../../composables/useToast'
 import { uploadGalleryImage } from '../../lib/storage'
 import { btnPrimary } from '../../lib/ui'
+import { friendlyDbError } from '../../lib/supabase'
 
-const { images, loading, fetchGallery, addImages, deleteImage } = useAdminGallery()
+const { images, loading, fetchGallery, addImages, deleteImage, bulkDeleteImages } = useAdminGallery()
 const toast = useToast()
 
 const uploading = ref(false)
 const confirmDelete = ref(null)
 const busyId = ref(null)
+
+const selectedIds = ref(new Set())
+const confirmBulkDelete = ref(false)
+const bulkBusy = ref(false)
+
+function toggleSelect(id) {
+	const next = new Set(selectedIds.value)
+	next.has(id) ? next.delete(id) : next.add(id)
+	selectedIds.value = next
+}
+function clearSelection() {
+	selectedIds.value = new Set()
+}
+async function onBulkDelete() {
+	bulkBusy.value = true
+	try {
+		const ids = [...selectedIds.value]
+		await bulkDeleteImages(ids)
+		toast.success(`${ids.length} foto dihapus.`)
+		confirmBulkDelete.value = false
+		clearSelection()
+	} catch (err) {
+		toast.error('Gagal menghapus foto: ' + friendlyDbError(err))
+	} finally {
+		bulkBusy.value = false
+	}
+}
 
 onMounted(fetchGallery)
 
@@ -32,7 +61,7 @@ async function onFiles(event) {
 		await addImages(urls)
 		toast.success(`${urls.length} foto ditambahkan ke galeri.`)
 	} catch (err) {
-		toast.error('Gagal mengunggah foto: ' + (err?.message || err))
+		toast.error('Gagal mengunggah foto: ' + friendlyDbError(err))
 	} finally {
 		uploading.value = false
 	}
@@ -46,7 +75,7 @@ async function onDelete() {
 		confirmDelete.value = null
 		toast.success('Foto dihapus dari galeri.')
 	} catch (err) {
-		toast.error('Gagal menghapus foto: ' + (err?.message || err))
+		toast.error('Gagal menghapus foto: ' + friendlyDbError(err))
 	} finally {
 		busyId.value = null
 	}
@@ -91,7 +120,10 @@ async function onDelete() {
 
 		<!-- Grid -->
 		<template v-else>
-			<GalleryUploadGrid :images="paged" :busy-id="busyId" @delete="confirmDelete = $event" />
+			<BulkActionBar :count="selectedIds.size" item-label="foto" @cancel="clearSelection"
+				@delete="confirmBulkDelete = true" />
+			<GalleryUploadGrid :images="paged" :busy-id="busyId" :selected-ids="selectedIds" @delete="confirmDelete = $event"
+				@toggle="toggleSelect" />
 			<PaginationBar :page="page" :page-count="pageCount" :total="total" :range-start="rangeStart" :range-end="rangeEnd"
 				item-label="foto" @change="goTo" />
 		</template>
@@ -99,6 +131,11 @@ async function onDelete() {
 		<ConfirmDialog :open="Boolean(confirmDelete)" title="Hapus foto?" :busy="busyId === confirmDelete?.id"
 			@cancel="confirmDelete = null" @confirm="onDelete">
 			Foto ini akan dihapus permanen dari galeri publik.
+		</ConfirmDialog>
+
+		<ConfirmDialog :open="confirmBulkDelete" title="Hapus foto terpilih?" :busy="bulkBusy"
+			@cancel="confirmBulkDelete = false" @confirm="onBulkDelete">
+			<strong class="text-ink">{{ selectedIds.size }} foto</strong> akan dihapus permanen dari galeri publik.
 		</ConfirmDialog>
 	</div>
 </template>

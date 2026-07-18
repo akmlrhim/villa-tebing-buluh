@@ -11,6 +11,7 @@ import { useBookingProof } from '../../composables/useBookingProof'
 import { useToast } from '../../composables/useToast'
 import { STATUSES, STATUS_LABEL } from '../../lib/bookingStatus'
 import { btnDanger, btnGhost, selectClass } from '../../lib/ui'
+import { friendlyDbError } from '../../lib/supabase'
 
 // Halaman detail booking penuh: info tamu, status, dan bukti bayar ukuran besar.
 const route = useRoute()
@@ -38,7 +39,7 @@ async function onStatusChange(event) {
     await updateBookingStatus(booking.value.id, status)
     toast.success(`Status diubah ke ${STATUS_LABEL[status]}.`)
   } catch (err) {
-    toast.error('Gagal mengubah status: ' + (err?.message || err))
+    toast.error('Gagal mengubah status: ' + friendlyDbError(err))
   } finally {
     busy.value = false
   }
@@ -56,7 +57,7 @@ async function onDelete() {
     toast.success('Booking dihapus.')
     router.replace({ name: 'admin-bookings' })
   } catch (err) {
-    toast.error('Gagal menghapus booking: ' + (err?.message || err))
+    toast.error('Gagal menghapus booking: ' + friendlyDbError(err))
   } finally {
     busy.value = false
     confirmDelete.value = false

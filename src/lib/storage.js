@@ -1,6 +1,18 @@
 import { supabase } from './supabase'
 import { compressToWebp } from './imageCompress'
 
+/** Batas ukuran gambar SETELAH dikompres — dicek sebelum diunggah ke storage. */
+export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024 // 2MB
+
+function assertMaxSize(file) {
+  if (file.size > MAX_UPLOAD_BYTES) {
+    const mb = (file.size / 1024 / 1024).toFixed(1)
+    throw new Error(
+      `Ukuran gambar ${mb}MB setelah dikompres, masih di atas batas 2MB. Gunakan gambar dengan resolusi/ukuran lebih kecil.`,
+    )
+  }
+}
+
 /**
  * Unggah satu file ke bucket dengan nama acak (UUID.ext).
  * Mengembalikan { path, publicUrl }.
@@ -16,15 +28,20 @@ async function uploadTo(bucket, file) {
   return { path, publicUrl: data.publicUrl }
 }
 
-/** Foto kamar (admin) — bucket publik, simpan public URL. */
+/** Foto kamar / gambar QRIS (admin) — dikompres & dikonversi ke WebP, lalu
+ * divalidasi maks 2MB sebelum diunggah supaya tidak memakan storage. */
 export async function uploadRoomImage(file) {
-  const { publicUrl } = await uploadTo('room-images', file)
+  const compressed = await compressToWebp(file)
+  assertMaxSize(compressed)
+  const { publicUrl } = await uploadTo('room-images', compressed)
   return publicUrl
 }
 
-/** Foto galeri publik (admin) — dikompres & dikonversi ke WebP sebelum unggah. */
+/** Foto galeri publik (admin) — dikompres & dikonversi ke WebP, lalu
+ * divalidasi maks 2MB sebelum diunggah. */
 export async function uploadGalleryImage(file) {
   const compressed = await compressToWebp(file)
+  assertMaxSize(compressed)
   const { publicUrl } = await uploadTo('gallery-images', compressed)
   return publicUrl
 }

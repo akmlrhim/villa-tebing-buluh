@@ -7,7 +7,7 @@ const routes = [
     path: "/",
     name: "home",
     component: () => import("../views/HomeView.vue"),
-    meta: { title: "Villa Tebing Buluh · Vila Privat di Tepi Tebing Bambu Loksado" },
+    meta: { title: "Villa Tebing Buluh · Vila Privat di Tebing Buluh Loksado" },
   },
   {
     path: "/gallery",
@@ -87,6 +87,12 @@ const routes = [
         name: "admin-settings",
         component: () => import("../views/admin/AdminSettingsView.vue"),
         meta: { title: "Pengaturan · Admin" },
+      },
+      {
+        path: "pengguna",
+        name: "admin-users",
+        component: () => import("../views/admin/AdminUsersView.vue"),
+        meta: { title: "Kelola Pengguna · Admin" },
       },
     ],
   },

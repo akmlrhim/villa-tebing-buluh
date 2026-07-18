@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { useAdminRooms } from './useAdminRooms'
 import { uploadRoomImage } from '../lib/storage'
+import { friendlyDbError } from '../lib/supabase'
 
 const blank = () => ({
   id: undefined,
@@ -89,7 +90,7 @@ export function useRoomForm(roomRef, emit) {
         form.value.images.push({ url, is_primary: form.value.images.length === 0 })
       }
     } catch (err) {
-      errorMsg.value = 'Gagal mengunggah foto: ' + (err?.message || err)
+      errorMsg.value = 'Gagal mengunggah foto: ' + friendlyDbError(err)
     } finally {
       uploading.value = false
     }
@@ -130,7 +131,7 @@ export function useRoomForm(roomRef, emit) {
       })
       emit('saved')
     } catch (err) {
-      errorMsg.value = 'Gagal menyimpan: ' + (err?.message || err)
+      errorMsg.value = 'Gagal menyimpan: ' + friendlyDbError(err)
     } finally {
       saving.value = false
     }

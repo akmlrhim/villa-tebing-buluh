@@ -3,6 +3,7 @@ import { toRef } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 import RoomImageManager from './RoomImageManager.vue'
 import AmenityTagsInput from './AmenityTagsInput.vue'
+import CurrencyInput from './CurrencyInput.vue'
 import { useRoomForm } from '../../composables/useRoomForm'
 import { fieldClass, btnGhost, btnPrimary } from '../../lib/ui'
 
@@ -67,7 +68,7 @@ const {
         <div class="grid gap-4 sm:grid-cols-3">
           <div>
             <label class="mb-1.5 block text-[0.8125rem] font-semibold text-ink">Harga / malam (Rp) *</label>
-            <input v-model="form.price_per_night" type="number" min="0" :class="fieldClass" placeholder="850000" />
+            <CurrencyInput v-model="form.price_per_night" placeholder="850.000" />
           </div>
           <div>
             <label class="mb-1.5 block text-[0.8125rem] font-semibold text-ink">Min. malam</label>

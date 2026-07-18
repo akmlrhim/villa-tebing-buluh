@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { supabase, isSupabaseConfigured, friendlyDbError } from '../lib/supabase'
 
 /**
  * Cek status booking publik (halaman /cek-booking) lewat RPC SECURITY DEFINER
@@ -36,7 +36,7 @@ export function useBookingStatus() {
         result.value = data[0]
       }
     } catch (err) {
-      error.value = 'Gagal memeriksa status: ' + (err?.message || err)
+      error.value = 'Gagal memeriksa status: ' + friendlyDbError(err)
     } finally {
       loading.value = false
     }

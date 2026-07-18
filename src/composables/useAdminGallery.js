@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '../lib/supabase'
+import { supabase, assertRowsAffected } from '../lib/supabase'
 
 // CRUD galeri publik untuk admin (bebas unggah multi-foto, tanpa kategori).
 const images = ref([])
@@ -34,10 +34,18 @@ export function useAdminGallery() {
   }
 
   async function deleteImage(id) {
-    const { error: err } = await supabase.from('gallery_images').delete().eq('id', id)
+    const { data, error: err } = await supabase.from('gallery_images').delete().eq('id', id).select('id')
     if (err) throw err
+    assertRowsAffected(data)
     await fetchGallery()
   }
 
-  return { images, loading, error, fetchGallery, addImages, deleteImage }
+  async function bulkDeleteImages(ids) {
+    const { data, error: err } = await supabase.from('gallery_images').delete().in('id', ids).select('id')
+    if (err) throw err
+    assertRowsAffected(data)
+    await fetchGallery()
+  }
+
+  return { images, loading, error, fetchGallery, addImages, deleteImage, bulkDeleteImages }
 }

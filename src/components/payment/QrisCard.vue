@@ -41,12 +41,16 @@ async function copyAmount() {
     </div>
 
     <div class="flex flex-col items-center px-5 py-7">
-      <p class="text-sm font-semibold text-ink">{{ merchantName }}</p>
-      <p class="mt-0.5 text-xs text-muted">NMID: {{ nmid }}</p>
+      <!-- Nama merchant & NMID hanya ditampilkan untuk placeholder demo; gambar QRIS
+           asli yang diunduh dari penyedia QRIS sudah memuat info ini di dalam gambarnya. -->
+      <template v-if="!imageUrl">
+        <p class="text-sm font-semibold text-ink">{{ merchantName }}</p>
+        <p class="mt-0.5 text-xs text-muted">NMID: {{ nmid }}</p>
+      </template>
 
       <!-- Gambar QRIS asli bila diunggah admin, jika tidak pakai placeholder -->
-      <div class="mt-4 rounded-md border border-hairline bg-white p-3">
-        <img v-if="imageUrl" :src="imageUrl" alt="Kode QRIS pembayaran" class="h-56 w-56 object-contain" />
+      <div class="rounded-md border border-hairline bg-white p-3" :class="!imageUrl && 'mt-4'">
+        <img v-if="imageUrl" :src="imageUrl" alt="Kode QRIS pembayaran" class="max-h-[480px] w-64 object-contain" />
         <svg v-else :viewBox="`0 0 ${QR_SIZE} ${QR_SIZE}`" shape-rendering="crispEdges" class="h-56 w-56 text-ink"
           role="img" aria-label="Contoh kode QRIS (placeholder demo)">
           <rect v-for="(cell, i) in qrModules" :key="i" :x="cell.x" :y="cell.y" width="1" height="1"

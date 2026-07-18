@@ -1,4 +1,8 @@
 -- ============================================================================
+-- DIGANTIKAN oleh supabase/migrate-latest.sql (konsolidasi semua migrate-*.sql
+-- jadi satu file idempoten). Jangan jalankan file ini lagi -- jalankan
+-- migrate-latest.sql saja. Disimpan sebagai riwayat perubahan.
+-- ============================================================================
 -- MIGRASI KEAMANAN — Villa Tebing Buluh
 -- Jalankan SEKALI di Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 -- Idempoten (aman dijalankan ulang).

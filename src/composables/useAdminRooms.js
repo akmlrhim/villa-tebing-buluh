@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '../lib/supabase'
+import { supabase, assertRowsAffected } from '../lib/supabase'
 
 // CRUD kamar untuk admin (F-09). Berbeda dari useRooms publik: memuat SEMUA
 // kamar termasuk yang nonaktif, dan menyediakan tulis (create/update/delete).
@@ -56,8 +56,9 @@ export function useAdminRooms() {
 
     let roomId = id
     if (id) {
-      const { error: err } = await supabase.from('rooms').update(fields).eq('id', id)
+      const { data, error: err } = await supabase.from('rooms').update(fields).eq('id', id).select('id')
       if (err) throw err
+      assertRowsAffected(data)
     } else {
       const { data, error: err } = await supabase.from('rooms').insert(fields).select('id').single()
       if (err) throw err
@@ -69,19 +70,29 @@ export function useAdminRooms() {
   }
 
   async function toggleActive(room) {
-    const { error: err } = await supabase
+    const { data, error: err } = await supabase
       .from('rooms')
       .update({ is_active: !room.is_active })
       .eq('id', room.id)
+      .select('id')
     if (err) throw err
+    assertRowsAffected(data)
     await fetchRooms()
   }
 
   async function deleteRoom(id) {
-    const { error: err } = await supabase.from('rooms').delete().eq('id', id)
+    const { data, error: err } = await supabase.from('rooms').delete().eq('id', id).select('id')
     if (err) throw err
+    assertRowsAffected(data)
     await fetchRooms()
   }
 
-  return { rooms, loading, error, fetchRooms, saveRoom, toggleActive, deleteRoom }
+  async function bulkDeleteRooms(ids) {
+    const { data, error: err } = await supabase.from('rooms').delete().in('id', ids).select('id')
+    if (err) throw err
+    assertRowsAffected(data)
+    await fetchRooms()
+  }
+
+  return { rooms, loading, error, fetchRooms, saveRoom, toggleActive, deleteRoom, bulkDeleteRooms }
 }

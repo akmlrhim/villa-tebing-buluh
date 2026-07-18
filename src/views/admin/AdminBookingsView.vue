@@ -6,6 +6,7 @@ import BookingFormModal from '../../components/admin/BookingFormModal.vue'
 import AdminBookingCalendar from '../../components/admin/AdminBookingCalendar.vue'
 import BookingListTable from '../../components/admin/BookingListTable.vue'
 import BookingListCards from '../../components/admin/BookingListCards.vue'
+import BulkActionBar from '../../components/admin/BulkActionBar.vue'
 import PaginationBar from '../../components/PaginationBar.vue'
 import { useBookings } from '../../composables/useBookings'
 import { useAdminRooms } from '../../composables/useAdminRooms'
@@ -13,8 +14,9 @@ import { useToast } from '../../composables/useToast'
 import { usePagination } from '../../composables/usePagination'
 import { STATUSES, STATUS_LABEL } from '../../lib/bookingStatus'
 import { btnPrimary, selectClass } from '../../lib/ui'
+import { friendlyDbError } from '../../lib/supabase'
 
-const { bookings, loading, fetchBookings, updateBookingStatus, deleteBooking } = useBookings()
+const { bookings, loading, fetchBookings, updateBookingStatus, deleteBooking, bulkDeleteBookings } = useBookings()
 const { rooms, fetchRooms } = useAdminRooms()
 const toast = useToast()
 
@@ -22,6 +24,40 @@ const view = ref('list') // 'list' | 'calendar'
 const editing = ref(undefined)
 const confirmDelete = ref(null)
 const busyId = ref(null)
+
+const selectedIds = ref(new Set())
+const confirmBulkDelete = ref(false)
+const bulkBusy = ref(false)
+
+function toggleSelect(id) {
+	const next = new Set(selectedIds.value)
+	next.has(id) ? next.delete(id) : next.add(id)
+	selectedIds.value = next
+}
+function toggleSelectAll() {
+	const allSelected = paged.value.length > 0 && paged.value.every((b) => selectedIds.value.has(b.id))
+	const next = new Set(selectedIds.value)
+	if (allSelected) paged.value.forEach((b) => next.delete(b.id))
+	else paged.value.forEach((b) => next.add(b.id))
+	selectedIds.value = next
+}
+function clearSelection() {
+	selectedIds.value = new Set()
+}
+async function onBulkDelete() {
+	bulkBusy.value = true
+	try {
+		const ids = [...selectedIds.value]
+		await bulkDeleteBookings(ids)
+		toast.success(`${ids.length} booking dihapus.`)
+		confirmBulkDelete.value = false
+		clearSelection()
+	} catch (err) {
+		toast.error('Gagal menghapus booking: ' + friendlyDbError(err))
+	} finally {
+		bulkBusy.value = false
+	}
+}
 
 const filterStatus = ref('')
 const filterRoom = ref('')
@@ -61,7 +97,7 @@ async function onStatusChange(booking, event) {
 		await updateBookingStatus(booking.id, status)
 		toast.success(`Status booking ${booking.guest_name} diubah ke ${STATUS_LABEL[status]}.`)
 	} catch (err) {
-		toast.error('Gagal mengubah status: ' + (err?.message || err))
+		toast.error('Gagal mengubah status: ' + friendlyDbError(err))
 	} finally {
 		busyId.value = null
 	}
@@ -75,7 +111,7 @@ async function onDelete() {
 		confirmDelete.value = null
 		toast.success(`Booking ${booking.guest_name} dihapus.`)
 	} catch (err) {
-		toast.error('Gagal menghapus booking: ' + (err?.message || err))
+		toast.error('Gagal menghapus booking: ' + friendlyDbError(err))
 	} finally {
 		busyId.value = null
 	}
@@ -151,10 +187,14 @@ async function onDelete() {
 			</div>
 
 			<template v-else>
-				<BookingListTable :bookings="paged" :busy-id="busyId" @status-change="onStatusChange" @edit="openEdit"
-					@delete="confirmDelete = $event" />
-				<BookingListCards :bookings="paged" :busy-id="busyId" @status-change="onStatusChange" @edit="openEdit"
-					@delete="confirmDelete = $event" />
+				<BulkActionBar :count="selectedIds.size" item-label="booking" @cancel="clearSelection"
+					@delete="confirmBulkDelete = true" />
+				<BookingListTable :bookings="paged" :busy-id="busyId" :selected-ids="selectedIds"
+					@status-change="onStatusChange" @edit="openEdit" @delete="confirmDelete = $event"
+					@toggle="toggleSelect" @toggle-all="toggleSelectAll" />
+				<BookingListCards :bookings="paged" :busy-id="busyId" :selected-ids="selectedIds"
+					@status-change="onStatusChange" @edit="openEdit" @delete="confirmDelete = $event"
+					@toggle="toggleSelect" />
 				<PaginationBar :page="page" :page-count="pageCount" :total="total" :range-start="rangeStart"
 					:range-end="rangeEnd" item-label="booking" @change="goTo" />
 			</template>
@@ -165,6 +205,12 @@ async function onDelete() {
 		<ConfirmDialog :open="Boolean(confirmDelete)" title="Hapus booking?" :busy="busyId === confirmDelete?.id"
 			@cancel="confirmDelete = null" @confirm="onDelete">
 			Booking <strong class="text-ink">{{ confirmDelete?.guest_name }}</strong> akan dihapus permanen.
+		</ConfirmDialog>
+
+		<ConfirmDialog :open="confirmBulkDelete" title="Hapus booking terpilih?" :busy="bulkBusy"
+			@cancel="confirmBulkDelete = false" @confirm="onBulkDelete">
+			<strong class="text-ink">{{ selectedIds.size }} booking</strong> akan dihapus permanen. Tindakan ini tidak
+			bisa dibatalkan.
 		</ConfirmDialog>
 	</div>
 </template>

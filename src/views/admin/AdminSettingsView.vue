@@ -4,6 +4,7 @@ import IconGlyph from '../../components/IconGlyph.vue'
 import { useSettings } from '../../composables/useSettings'
 import { useToast } from '../../composables/useToast'
 import { uploadRoomImage } from '../../lib/storage'
+import { friendlyDbError } from '../../lib/supabase'
 
 const { settings, fetchSettings, saveSettings } = useSettings()
 const toast = useToast()
@@ -40,7 +41,7 @@ async function onQrisFile(event) {
 		form.qris_image_url = await uploadRoomImage(file)
 		toast.success('Gambar QRIS diunggah.')
 	} catch (err) {
-		toast.error('Gagal mengunggah QRIS: ' + (err?.message || err))
+		toast.error('Gagal mengunggah QRIS: ' + friendlyDbError(err))
 	} finally {
 		uploading.value = false
 	}
@@ -52,7 +53,7 @@ async function onSave() {
 		await saveSettings({ ...form })
 		toast.success('Pengaturan disimpan.')
 	} catch (err) {
-		toast.error('Gagal menyimpan: ' + (err?.message || err))
+		toast.error('Gagal menyimpan: ' + friendlyDbError(err))
 	} finally {
 		saving.value = false
 	}

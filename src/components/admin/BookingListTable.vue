@@ -1,14 +1,20 @@
 <script setup>
+import { computed } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 import { formatDateID, formatRupiah } from '../../lib/format'
 import { STATUSES, STATUS_CLASS } from '../../lib/bookingStatus'
 
 // Tabel booking (tampilan desktop).
-defineProps({
+const props = defineProps({
 	bookings: { type: Array, default: () => [] },
 	busyId: { type: [String, Number], default: null },
+	selectedIds: { type: Set, default: () => new Set() },
 })
-const emit = defineEmits(['status-change', 'edit', 'delete'])
+const emit = defineEmits(['status-change', 'edit', 'delete', 'toggle', 'toggle-all'])
+
+const allSelected = computed(
+	() => props.bookings.length > 0 && props.bookings.every((b) => props.selectedIds.has(b.id)),
+)
 </script>
 
 <template>
@@ -16,6 +22,10 @@ const emit = defineEmits(['status-change', 'edit', 'delete'])
 		<table class="w-full text-sm border-collapse border border-hairline-soft whitespace-nowrap">
 			<thead class="bg-green-800 text-left text-sm text-white">
 				<tr>
+					<th class="border border-hairline-soft px-4 py-3 font-semibold">
+						<input type="checkbox" class="size-4 accent-primary" :checked="allSelected"
+							aria-label="Pilih semua booking" @change="emit('toggle-all')" />
+					</th>
 					<th class="border border-hairline-soft px-4 py-3 font-semibold">Tamu</th>
 					<th class="border border-hairline-soft px-4 py-3 font-semibold">Kamar</th>
 					<th class="border border-hairline-soft px-4 py-3 font-semibold">Tanggal</th>
@@ -26,6 +36,10 @@ const emit = defineEmits(['status-change', 'edit', 'delete'])
 			</thead>
 			<tbody>
 				<tr v-for="b in bookings" :key="b.id" class="hover:bg-surface-soft/60">
+					<td class="border border-hairline-soft px-4 py-3">
+						<input type="checkbox" class="size-4 accent-primary" :checked="selectedIds.has(b.id)"
+							:aria-label="`Pilih booking ${b.guest_name}`" @change="emit('toggle', b.id)" />
+					</td>
 					<td class="border border-hairline-soft px-4 py-3">
 						<RouterLink :to="{ name: 'admin-booking-detail', params: { id: b.id } }"
 							class="block font-medium text-ink hover:underline">{{ b.guest_name }}</RouterLink>

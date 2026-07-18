@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { useBookings } from './useBookings'
 import { nightsBetween } from '../lib/format'
+import { friendlyDbError } from '../lib/supabase'
 
 const BLOCKING = ['pending', 'confirmed', 'checked_in']
 
@@ -104,7 +105,7 @@ export function useBookingForm(bookingRef, roomsRef, emit) {
       })
       emit('saved')
     } catch (err) {
-      errorMsg.value = 'Gagal menyimpan: ' + (err?.message || err)
+      errorMsg.value = 'Gagal menyimpan: ' + friendlyDbError(err)
     } finally {
       saving.value = false
     }

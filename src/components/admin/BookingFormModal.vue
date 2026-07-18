@@ -1,6 +1,7 @@
 <script setup>
 import { toRef } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
+import CurrencyInput from './CurrencyInput.vue'
 import { useBookingForm } from '../../composables/useBookingForm'
 import { formatRupiah, todayISO } from '../../lib/format'
 import { STATUSES } from '../../lib/bookingStatus'
@@ -105,7 +106,7 @@ const DATE_CLASS =
             Total harga (Rp)
             <span v-if="nights" class="font-normal text-muted">· {{ nights }} malam</span>
           </label>
-          <input v-model="form.total_price" type="number" min="0" :class="fieldClass" @input="markTotalTouched" />
+          <CurrencyInput v-model="form.total_price" @update:model-value="markTotalTouched" />
           <p v-if="form.total_price" class="mt-1 text-xs text-muted">{{ formatRupiah(Number(form.total_price)) }}</p>
         </div>
 

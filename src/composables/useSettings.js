@@ -27,8 +27,13 @@ export function useSettings() {
       key,
       value: value == null ? '' : String(value),
     }))
-    const { error } = await supabase.from('settings').upsert(rows)
+    const { data, error } = await supabase.from('settings').upsert(rows).select('key')
     if (error) throw error
+    // upsert() tidak selalu error walau RLS memblokir sebagian baris -- cek
+    // jumlah baris yang benar-benar kena supaya gagal-diam-diam kelihatan.
+    if (!data || data.length < rows.length) {
+      throw new Error('Pengaturan gagal tersimpan sepenuhnya (cek izin akun admin).')
+    }
     // Perbarui state lokal supaya UI langsung ikut berubah.
     for (const [key, value] of Object.entries(patch)) settings.value[key] = value
   }

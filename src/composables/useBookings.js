@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '../lib/supabase'
+import { supabase, assertRowsAffected } from '../lib/supabase'
 
 // Booking (F-10). createPublicBooking (via RPC) dipakai publik; sisanya admin-only.
 const bookings = ref([])
@@ -100,8 +100,9 @@ export function useBookings() {
   async function saveBooking(form) {
     const { id, ...fields } = form
     if (id) {
-      const { error: err } = await supabase.from('bookings').update(fields).eq('id', id)
+      const { data, error: err } = await supabase.from('bookings').update(fields).eq('id', id).select('id')
       if (err) throw err
+      assertRowsAffected(data)
     } else {
       const { error: err } = await supabase.from('bookings').insert(fields)
       if (err) throw err
@@ -110,14 +111,23 @@ export function useBookings() {
   }
 
   async function updateBookingStatus(id, status) {
-    const { error: err } = await supabase.from('bookings').update({ status }).eq('id', id)
+    const { data, error: err } = await supabase.from('bookings').update({ status }).eq('id', id).select('id')
     if (err) throw err
+    assertRowsAffected(data)
     await fetchBookings()
   }
 
   async function deleteBooking(id) {
-    const { error: err } = await supabase.from('bookings').delete().eq('id', id)
+    const { data, error: err } = await supabase.from('bookings').delete().eq('id', id).select('id')
     if (err) throw err
+    assertRowsAffected(data)
+    await fetchBookings()
+  }
+
+  async function bulkDeleteBookings(ids) {
+    const { data, error: err } = await supabase.from('bookings').delete().in('id', ids).select('id')
+    if (err) throw err
+    assertRowsAffected(data)
     await fetchBookings()
   }
 
@@ -132,5 +142,6 @@ export function useBookings() {
     saveBooking,
     updateBookingStatus,
     deleteBooking,
+    bulkDeleteBookings,
   }
 }

@@ -9,6 +9,7 @@ import WhatsAppGlyph from '../components/WhatsAppGlyph.vue'
 import HeroSection from '../components/home/HeroSection.vue'
 import VillaFacilities from '../components/home/VillaFacilities.vue'
 import GalleryPeek from '../components/home/GalleryPeek.vue'
+import FAQSection from '../components/home/FAQSection.vue'
 import { useRooms } from '../composables/useRooms'
 import { useAvailability } from '../composables/useAvailability'
 import { useSettings } from '../composables/useSettings'
@@ -152,6 +153,8 @@ function onClear() {
 		<VillaFacilities />
 
 		<GalleryPeek />
+
+		<FAQSection />
 
 		<RoomDetailModal :room="selectedRoom"
 			:initial-range="query ? { checkIn: query.checkIn, checkOut: query.checkOut } : null" @close="closeRoom" />

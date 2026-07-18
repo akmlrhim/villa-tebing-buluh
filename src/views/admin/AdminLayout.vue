@@ -14,6 +14,7 @@ const nav = [
 	{ to: { name: 'admin-rooms' }, label: 'Kelola Kamar', icon: 'bed' },
 	{ to: { name: 'admin-bookings' }, label: 'Kelola Booking', icon: 'calendar' },
 	{ to: { name: 'admin-gallery' }, label: 'Kelola Galeri', icon: 'image' },
+	{ to: { name: 'admin-users' }, label: 'Kelola Pengguna', icon: 'users' },
 	{ to: { name: 'admin-settings' }, label: 'Pengaturan', icon: 'settings' },
 ]
 

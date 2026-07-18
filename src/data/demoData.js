@@ -166,6 +166,6 @@ export const demoGallery = [
 ]
 
 export const heroImage = {
-  url: img('1582610116397-edb318620f90', 2000),
-  alt: 'Villa Tebing Buluh, vila privat dengan kolam renang dikelilingi taman tropis saat senja',
+  url: img('1721222204314-46922f2aada0', 2000),
+  alt: 'Villa Tebing Buluh, teras kolam renang kayu dikelilingi rumpun bambu dan tanaman tropis',
 }

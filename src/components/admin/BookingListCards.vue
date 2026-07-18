@@ -8,18 +8,23 @@ import { selectClass } from '../../lib/ui'
 defineProps({
   bookings: { type: Array, default: () => [] },
   busyId: { type: [String, Number], default: null },
+  selectedIds: { type: Set, default: () => new Set() },
 })
-const emit = defineEmits(['status-change', 'edit', 'delete'])
+const emit = defineEmits(['status-change', 'edit', 'delete', 'toggle'])
 </script>
 
 <template>
   <ul class="mt-5 space-y-3 lg:hidden">
     <li v-for="b in bookings" :key="b.id" class="rounded-md border border-hairline bg-canvas p-4 shadow-float">
       <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0">
-          <RouterLink :to="{ name: 'admin-booking-detail', params: { id: b.id } }"
-            class="font-medium text-ink hover:underline">{{ b.guest_name }}</RouterLink>
-          <p class="text-xs text-muted">{{ b.rooms?.name ?? '-' }} · {{ b.guest_phone }}</p>
+        <div class="flex min-w-0 items-start gap-2.5">
+          <input type="checkbox" class="mt-1 size-4 shrink-0 accent-primary" :checked="selectedIds.has(b.id)"
+            :aria-label="`Pilih booking ${b.guest_name}`" @change="emit('toggle', b.id)" />
+          <div class="min-w-0">
+            <RouterLink :to="{ name: 'admin-booking-detail', params: { id: b.id } }"
+              class="font-medium text-ink hover:underline">{{ b.guest_name }}</RouterLink>
+            <p class="text-xs text-muted">{{ b.rooms?.name ?? '-' }} · {{ b.guest_phone }}</p>
+          </div>
         </div>
         <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium" :class="STATUS_CLASS[b.status]">
           {{ STATUS_LABEL[b.status] }}

@@ -1,15 +1,18 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import IconGlyph from '../../components/IconGlyph.vue'
 import RoomFormModal from '../../components/admin/RoomFormModal.vue'
 import RoomDetailModal from '../../components/admin/RoomDetailModal.vue'
+import BulkActionBar from '../../components/admin/BulkActionBar.vue'
+import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import PaginationBar from '../../components/PaginationBar.vue'
 import { useAdminRooms } from '../../composables/useAdminRooms'
 import { useToast } from '../../composables/useToast'
 import { usePagination } from '../../composables/usePagination'
 import { formatRupiah } from '../../lib/format'
+import { friendlyDbError } from '../../lib/supabase'
 
-const { rooms, loading, fetchRooms, toggleActive, deleteRoom } = useAdminRooms()
+const { rooms, loading, fetchRooms, toggleActive, deleteRoom, bulkDeleteRooms } = useAdminRooms()
 const toast = useToast()
 
 const { page, pageCount, pageItems: pagedRooms, total, rangeStart, rangeEnd, goTo } = usePagination(rooms, 10)
@@ -19,6 +22,42 @@ const editing = ref(undefined)
 const viewing = ref(null)
 const confirmDelete = ref(null)
 const busyId = ref(null)
+
+const selectedIds = ref(new Set())
+const confirmBulkDelete = ref(false)
+const bulkBusy = ref(false)
+const allSelected = computed(
+	() => pagedRooms.value.length > 0 && pagedRooms.value.every((r) => selectedIds.value.has(r.id)),
+)
+
+function toggleSelect(id) {
+	const next = new Set(selectedIds.value)
+	next.has(id) ? next.delete(id) : next.add(id)
+	selectedIds.value = next
+}
+function toggleSelectAll() {
+	const next = new Set(selectedIds.value)
+	if (allSelected.value) pagedRooms.value.forEach((r) => next.delete(r.id))
+	else pagedRooms.value.forEach((r) => next.add(r.id))
+	selectedIds.value = next
+}
+function clearSelection() {
+	selectedIds.value = new Set()
+}
+async function onBulkDelete() {
+	bulkBusy.value = true
+	try {
+		const ids = [...selectedIds.value]
+		await bulkDeleteRooms(ids)
+		toast.success(`${ids.length} kamar dihapus.`)
+		confirmBulkDelete.value = false
+		clearSelection()
+	} catch (err) {
+		toast.error('Gagal menghapus kamar: ' + friendlyDbError(err))
+	} finally {
+		bulkBusy.value = false
+	}
+}
 
 onMounted(fetchRooms)
 
@@ -43,7 +82,7 @@ async function onToggle(room) {
 		await toggleActive(room)
 		toast.success(room.is_active ? `Kamar ${room.name} dinonaktifkan.` : `Kamar ${room.name} diaktifkan.`)
 	} catch (err) {
-		toast.error('Gagal mengubah status kamar: ' + (err?.message || err))
+		toast.error('Gagal mengubah status kamar: ' + friendlyDbError(err))
 	} finally {
 		busyId.value = null
 	}
@@ -57,7 +96,7 @@ async function onDelete() {
 		confirmDelete.value = null
 		toast.success(`Kamar ${room.name} dihapus.`)
 	} catch (err) {
-		toast.error('Gagal menghapus kamar: ' + (err?.message || err))
+		toast.error('Gagal menghapus kamar: ' + friendlyDbError(err))
 	} finally {
 		busyId.value = null
 	}
@@ -102,11 +141,25 @@ const primaryImage = (room) =>
 		</div>
 
 		<!-- Daftar -->
-		<ul v-else class="mt-6 space-y-3">
-			<li v-for="room in pagedRooms" :key="room.id"
-				class="flex flex-col gap-4 rounded-md border border-hairline bg-canvas p-3 shadow-sm sm:flex-row sm:items-center">
-				<button type="button"
+		<template v-else>
+			<label class="mt-6 flex items-center gap-2 text-sm text-muted">
+				<input type="checkbox" class="size-4 accent-primary" :checked="allSelected"
+					aria-label="Pilih semua kamar" @change="toggleSelectAll" />
+				Pilih semua di halaman ini
+			</label>
+
+			<BulkActionBar :count="selectedIds.size" item-label="kamar" @cancel="clearSelection"
+				@delete="confirmBulkDelete = true" />
+
+			<ul class="mt-3 space-y-3">
+				<li v-for="room in pagedRooms" :key="room.id"
+					class="flex flex-col gap-4 rounded-md border border-hairline bg-canvas p-3 shadow-sm sm:flex-row sm:items-center"
+					:class="!room.is_active && 'bg-surface-soft/60'">
+					<input type="checkbox" class="size-4 shrink-0 accent-primary sm:self-center" :checked="selectedIds.has(room.id)"
+						:aria-label="`Pilih kamar ${room.name}`" @change="toggleSelect(room.id)" />
+					<button type="button"
 					class="h-20 w-full shrink-0 cursor-pointer overflow-hidden rounded-sm bg-surface-strong sm:h-16 sm:w-24"
+					:class="!room.is_active && 'opacity-50 grayscale'"
 					:aria-label="`Lihat detail ${room.name}`" @click="openDetail(room)">
 					<img v-if="primaryImage(room)" :src="primaryImage(room)" alt="" class="h-full w-full object-cover" />
 					<div v-else class="grid h-full w-full place-items-center text-muted-soft">
@@ -114,12 +167,18 @@ const primaryImage = (room) =>
 					</div>
 				</button>
 
-				<div class="min-w-0 flex-1">
+				<div class="min-w-0 flex-1" :class="!room.is_active && 'opacity-70'">
 					<div class="flex flex-wrap items-center gap-2">
 						<button type="button" class="cursor-pointer font-semibold text-ink hover:underline"
 							@click="openDetail(room)">{{ room.name }}</button>
-						<span v-if="!room.is_active"
-							class="rounded-full bg-surface-strong px-2 py-0.5 text-[11px] font-medium text-muted">Nonaktif</span>
+						<span v-if="room.is_active"
+							class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+							<span class="size-1.5 rounded-full bg-primary" /> Aktif
+						</span>
+						<span v-else
+							class="inline-flex items-center gap-1 rounded-full bg-surface-strong px-2 py-0.5 text-[11px] font-medium text-muted">
+							<span class="size-1.5 rounded-full bg-muted-soft" /> Nonaktif
+						</span>
 					</div>
 					<p class="mt-0.5 text-sm text-muted">
 						{{ formatRupiah(room.price_per_night) }} / malam · maks {{ room.max_guests }} tamu
@@ -133,8 +192,9 @@ const primaryImage = (room) =>
 						<IconGlyph name="eye" class="h-5 w-5" />
 					</button>
 					<button type="button"
-						class="grid size-10 place-items-center rounded-sm text-muted transition-colors hover:bg-surface-strong hover:text-ink disabled:opacity-50"
-						:class="!room.is_active && 'text-muted-soft'" :title="room.is_active ? 'Nonaktifkan' : 'Aktifkan'"
+						class="grid size-10 place-items-center rounded-sm transition-colors hover:bg-surface-strong disabled:opacity-50"
+						:class="room.is_active ? 'text-primary' : 'text-muted-soft hover:text-ink'"
+						:title="room.is_active ? 'Nonaktifkan kamar' : 'Aktifkan kamar'"
 						:disabled="busyId === room.id" @click="onToggle(room)">
 						<IconGlyph name="power" class="h-5 w-5" />
 					</button>
@@ -151,6 +211,7 @@ const primaryImage = (room) =>
 				</div>
 			</li>
 		</ul>
+		</template>
 
 		<PaginationBar v-if="rooms.length" :page="page" :page-count="pageCount" :total="total" :range-start="rangeStart"
 			:range-end="rangeEnd" item-label="kamar" @change="goTo" />
@@ -180,5 +241,11 @@ const primaryImage = (room) =>
 				</div>
 			</div>
 		</div>
+
+		<ConfirmDialog :open="confirmBulkDelete" title="Hapus kamar terpilih?" :busy="bulkBusy"
+			@cancel="confirmBulkDelete = false" @confirm="onBulkDelete">
+			<strong class="text-ink">{{ selectedIds.size }} kamar</strong> beserta fotonya akan dihapus permanen.
+			Tindakan ini tidak bisa dibatalkan.
+		</ConfirmDialog>
 	</div>
 </template>

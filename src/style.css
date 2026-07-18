@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", -apple-system, system-ui, Roboto, "Helvetica Neue", sans-serif;
+  --font-sans: "Noto Sans", -apple-system, system-ui, Roboto, "Helvetica Neue", sans-serif;
   --font-display: "Playfair Display", Georgia, serif;
 
   --color-primary: #3b7d46;
@@ -54,6 +54,9 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Cegah rubber-band scroll di Mac/trackpad menyingkap latar putih di atas
+       header sticky saat hero (gelap) berada di paling atas halaman. */
+    overscroll-behavior-y: none;
   }
 
   body {
