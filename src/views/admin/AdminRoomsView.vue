@@ -17,7 +17,6 @@ const toast = useToast()
 
 const { page, pageCount, pageItems: pagedRooms, total, rangeStart, rangeEnd, goTo } = usePagination(rooms, 10)
 
-// undefined = modal tertutup, null = tambah, object = edit
 const editing = ref(undefined)
 const viewing = ref(null)
 const confirmDelete = ref(null)
@@ -120,12 +119,10 @@ const primaryImage = (room) =>
 			</button>
 		</div>
 
-		<!-- Loading -->
 		<div v-if="loading" class="mt-6 space-y-3">
 			<div v-for="i in 3" :key="i" class="h-24 animate-pulse rounded-md bg-surface-strong" />
 		</div>
 
-		<!-- Kosong -->
 		<div v-else-if="!rooms.length"
 			class="mt-6 rounded-md border border-dashed border-border-strong bg-canvas px-6 py-12 text-center">
 			<span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-surface-strong">
@@ -140,7 +137,6 @@ const primaryImage = (room) =>
 			</button>
 		</div>
 
-		<!-- Daftar -->
 		<template v-else>
 			<label class="mt-6 flex items-center gap-2 text-sm text-muted">
 				<input type="checkbox" class="size-4 accent-primary" :checked="allSelected"
@@ -220,7 +216,6 @@ const primaryImage = (room) =>
 
 		<RoomFormModal :room="editing" @close="editing = undefined" @saved="onSaved" />
 
-		<!-- Konfirmasi hapus -->
 		<div v-if="confirmDelete" class="fixed inset-0 z-50 grid place-items-center p-4">
 			<div class="absolute inset-0 bg-black/50" @click="confirmDelete = null" />
 			<div class="relative w-full max-w-sm rounded-md bg-canvas p-6 shadow-float">

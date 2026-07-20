@@ -25,7 +25,6 @@ async function onLogout() {
 
 <template>
 	<div class="min-h-dvh lg:flex">
-		<!-- Sidebar (desktop) / drawer (mobile) -->
 		<aside
 			class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full border-r border-gray-300 bg-canvas transition-transform lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
 			:class="{ 'translate-x-0': mobileOpen }">
@@ -69,12 +68,9 @@ async function onLogout() {
 			</div>
 		</aside>
 
-		<!-- Overlay drawer mobile -->
 		<div v-if="mobileOpen" class="fixed inset-0 z-30 bg-black/40 lg:hidden" @click="mobileOpen = false" />
 
-		<!-- Konten -->
 		<div class="min-w-0 flex-1">
-			<!-- Topbar mobile -->
 			<header class="sticky top-0 z-20 flex items-center gap-3 border-b border-hairline bg-canvas px-4 py-3 lg:hidden">
 				<button type="button" class="grid h-10 w-10 place-items-center rounded-sm hover:bg-surface-strong"
 					aria-label="Buka menu" @click="mobileOpen = true">

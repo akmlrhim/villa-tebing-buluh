@@ -13,7 +13,6 @@ import { STATUSES, STATUS_LABEL } from '../../lib/bookingStatus'
 import { btnDanger, btnGhost, selectClass } from '../../lib/ui'
 import { friendlyDbError } from '../../lib/supabase'
 
-// Halaman detail booking penuh: info tamu, status, dan bukti bayar ukuran besar.
 const route = useRoute()
 const router = useRouter()
 const { bookings, loading, fetchBookings, updateBookingStatus, deleteBooking } = useBookings()

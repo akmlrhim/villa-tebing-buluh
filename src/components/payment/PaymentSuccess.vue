@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 import WhatsAppGlyph from '../WhatsAppGlyph.vue'
 import { formatDateID, formatRupiah } from '../../lib/format'
@@ -27,6 +27,14 @@ const followUpUrl = computed(() =>
     }),
   ),
 )
+
+// Buka WhatsApp otomatis begitu layar ini tampil, supaya tamu tidak perlu
+// tap tombol lagi -- tamu tinggal tekan "Kirim" di WhatsApp. Kalau browser
+// memblokir pembukaan tab otomatis (popup blocker), tombol di bawah tetap
+// jadi jalan manual.
+onMounted(() => {
+  if (props.whatsappNumber) window.open(followUpUrl.value, '_blank', 'noopener,noreferrer')
+})
 </script>
 
 <template>

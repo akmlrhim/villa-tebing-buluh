@@ -97,12 +97,10 @@ async function onDelete() {
 			</label>
 		</div>
 
-		<!-- Loading -->
 		<div v-if="loading" class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
 			<div v-for="i in 8" :key="i" class="aspect-square animate-pulse rounded-md bg-surface-strong" />
 		</div>
 
-		<!-- Kosong -->
 		<div v-else-if="!images.length"
 			class="mt-6 rounded-md border border-dashed border-border-strong bg-canvas px-6 py-12 text-center">
 			<span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-surface-strong">
@@ -118,7 +116,6 @@ async function onDelete() {
 			</label>
 		</div>
 
-		<!-- Grid -->
 		<template v-else>
 			<BulkActionBar :count="selectedIds.size" item-label="foto" @cancel="clearSelection"
 				@delete="confirmBulkDelete = true" />

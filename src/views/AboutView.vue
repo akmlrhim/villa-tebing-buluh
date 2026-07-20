@@ -7,7 +7,6 @@ import { useRooms } from '../composables/useRooms'
 import { useSettings } from '../composables/useSettings'
 import { formatRupiah } from '../lib/format'
 
-// F-06: About - profil vila, fasilitas lengkap, ringkasan kamar, lokasi.
 const { rooms } = useRooms()
 const { settings, villaName } = useSettings()
 const selectedRoom = ref(null)
@@ -55,7 +54,6 @@ const mapsQuery = encodeURIComponent(settings.value.address)
       subtitle="Namanya diambil dari tebing kecil berumpun bambu yang memeluk sungai di belakang vila. Kami sengaja membatasi jumlah kamar: cukup untuk tetap sepi, cukup untuk terasa seperti rumah sendiri." />
 
     <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
-      <!-- Mosaik foto -->
       <div class="mt-8 grid gap-4 md:grid-cols-[1.8fr_1fr]">
         <img
           :src="photos.main.url"
@@ -70,7 +68,6 @@ const mapsQuery = encodeURIComponent(settings.value.address)
         </div>
       </div>
 
-      <!-- Cerita -->
       <div class="mt-12 grid gap-8 md:mt-16 md:grid-cols-2 md:gap-16">
         <div class="space-y-4 text-[15px] leading-relaxed text-body">
           <p>
@@ -100,7 +97,6 @@ const mapsQuery = encodeURIComponent(settings.value.address)
       </div>
     </div>
 
-    <!-- Fasilitas lengkap (F-06.2) -->
     <section class="mt-16 bg-surface-soft py-14 md:mt-20 md:py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Fasilitas vila</h2>
@@ -118,7 +114,6 @@ const mapsQuery = encodeURIComponent(settings.value.address)
       </div>
     </section>
 
-    <!-- Ringkasan kamar (F-06.4) -->
     <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
       <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Tipe kamar</h2>
       <div class="mt-6 divide-y divide-hairline-soft rounded-md border border-hairline">
@@ -143,7 +138,6 @@ const mapsQuery = encodeURIComponent(settings.value.address)
       </div>
     </section>
 
-    <!-- Lokasi (F-06.3) -->
     <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
       <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Lokasi</h2>
       <div class="mt-6 grid gap-8 md:grid-cols-[1fr_1.4fr]">

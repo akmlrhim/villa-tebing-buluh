@@ -20,7 +20,7 @@ const { bookings, loading, fetchBookings, updateBookingStatus, deleteBooking, bu
 const { rooms, fetchRooms } = useAdminRooms()
 const toast = useToast()
 
-const view = ref('list') // 'list' | 'calendar'
+const view = ref('list')
 const editing = ref(undefined)
 const confirmDelete = ref(null)
 const busyId = ref(null)
@@ -144,7 +144,6 @@ async function onDelete() {
 			</div>
 		</div>
 
-		<!-- Filter -->
 		<div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 			<div class="relative">
 				<IconGlyph name="search"
@@ -166,12 +165,10 @@ async function onDelete() {
 			</div>
 		</div>
 
-		<!-- Kalender -->
 		<div v-if="view === 'calendar'" class="mt-5">
 			<AdminBookingCalendar :bookings="filtered" @edit="openEdit" />
 		</div>
 
-		<!-- List -->
 		<template v-else>
 			<div v-if="loading" class="mt-5 space-y-3">
 				<div v-for="i in 5" :key="i" class="h-16 animate-pulse rounded-md bg-surface-strong" />

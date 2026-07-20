@@ -4,7 +4,6 @@ import PageHero from '../components/PageHero.vue'
 import PhotoLightbox from '../components/PhotoLightbox.vue'
 import { useGallery } from '../composables/useGallery'
 
-// F-05: Our Gallery - grid foto bebas (diunggah admin), tanpa kategori.
 const { images, loading, fetchGallery } = useGallery()
 onMounted(fetchGallery)
 
@@ -28,15 +27,12 @@ function openLightbox(index) {
       subtitle="Suasana vila apa adanya: kolam, kamar, sungai, dan sekitarnya. Klik foto untuk melihat lebih besar." />
 
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
-      <!-- Loading -->
       <div v-if="loading" class="mt-8 columns-2 gap-4 md:columns-3">
         <div v-for="i in 9" :key="i" class="mb-4 aspect-[4/3] animate-pulse rounded-md bg-surface-strong" />
       </div>
 
-      <!-- Kosong -->
       <p v-else-if="!images.length" class="mt-10 text-center text-sm text-muted">Belum ada foto galeri.</p>
 
-      <!-- Grid masonry ringan via CSS columns -->
       <div v-else class="mt-8 columns-2 gap-4 md:columns-3">
         <button v-for="(item, index) in images" :key="item.url" type="button"
           class="group mb-4 block w-full cursor-zoom-in overflow-hidden rounded-md bg-surface-strong"

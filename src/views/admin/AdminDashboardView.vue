@@ -37,7 +37,6 @@ const pending = computed(() =>
   bookings.value.filter((b) => b.status === 'pending'),
 );
 
-// Okupansi bulan berjalan: malam terisi / (kamar aktif × jumlah hari bulan ini).
 const occupancy = computed(() => {
   const now = new Date();
   const y = now.getFullYear();
@@ -123,7 +122,6 @@ const STATUS_CLASS = {
     </h1>
     <p class="mt-1 text-sm text-black">Ringkasan aktivitas vila hari ini.</p>
 
-    <!-- Kartu statistik -->
     <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <div
         v-for="s in stats"
@@ -150,7 +148,6 @@ const STATUS_CLASS = {
     </div>
 
     <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-      <!-- Booking mendatang -->
       <section class="border-hairline bg-canvas shadow-float rounded-md border">
         <div
           class="border-hairline-soft flex items-center justify-between border-b px-5 py-4"
@@ -205,7 +202,6 @@ const STATUS_CLASS = {
         </ul>
       </section>
 
-      <!-- Agenda hari ini -->
       <section class="space-y-6">
         <div
           class="border-hairline bg-canvas shadow-float rounded-md border p-5"

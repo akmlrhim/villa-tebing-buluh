@@ -9,9 +9,6 @@ import { formatDateID, formatRupiah, nightsBetween } from '../lib/format'
 import { normalizePhone, waLink, generalMessage } from '../lib/whatsapp'
 import { STATUS_CLASS, STATUS_LABEL } from '../lib/bookingStatus'
 
-// F-13 (baru): tamu cek status booking sendiri lewat kode booking + nomor WA,
-// tanpa perlu menghubungi admin. Lookup lewat RPC get_booking_status
-// (SECURITY DEFINER) - lihat supabase/migrate-booking-status.sql.
 const route = useRoute()
 const { whatsappNumber } = useSettings()
 const { result, loading, error, notFound, checkStatus, reset } = useBookingStatus()
@@ -61,7 +58,6 @@ const INPUT_CLASS =
       </p>
     </div>
 
-    <!-- Form pencarian -->
     <form v-if="!result" class="mt-7 space-y-4 rounded-md border border-hairline bg-canvas p-5 shadow-float" novalidate
       @submit.prevent="onSubmit">
       <div v-if="error" class="flex items-start gap-2 rounded-sm bg-error/10 px-3 py-2.5 text-sm text-error" role="alert">
@@ -98,7 +94,6 @@ const INPUT_CLASS =
       </button>
     </form>
 
-    <!-- Tidak ditemukan -->
     <div v-if="notFound" class="mt-5 rounded-md border border-dashed border-border-strong bg-surface-soft px-6 py-8 text-center">
       <p class="font-medium text-ink">Booking tidak ditemukan</p>
       <p class="mx-auto mt-1.5 max-w-xs text-sm text-muted">
@@ -111,7 +106,6 @@ const INPUT_CLASS =
       </a>
     </div>
 
-    <!-- Hasil -->
     <div v-if="result" class="mt-7 overflow-hidden rounded-md border border-hairline bg-canvas shadow-float">
       <div class="flex items-center justify-between gap-3 bg-primary px-6 py-6 text-center">
         <div class="mx-auto">

@@ -18,7 +18,7 @@ const {
   paymentDeadlineHours,
 } = useSettings()
 
-const submitted = ref(null) // { code, guestName } setelah booking terkirim
+const submitted = ref(null)
 
 const steps = computed(() => [
   'Buka aplikasi e-wallet (GoPay, OVO, DANA, ShopeePay) atau m-banking, lalu pilih menu Bayar / Scan QRIS.',
@@ -40,14 +40,12 @@ function scrollToForm() {
 
 <template>
   <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-12">
-    <!-- Kembali -->
     <RouterLink v-if="!submitted" to="/"
       class="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink">
       <IconGlyph name="chevron-left" class="h-4 w-4" />
       Kembali ke daftar kamar
     </RouterLink>
 
-    <!-- Loading -->
     <div v-if="stillLoading" class="mt-10 animate-pulse space-y-4">
       <div class="h-8 w-64 rounded-xs bg-surface-strong" />
       <div class="grid gap-8 md:grid-cols-[1fr_360px]">
@@ -56,7 +54,6 @@ function scrollToForm() {
       </div>
     </div>
 
-    <!-- Data booking tidak lengkap / tidak valid -->
     <div v-else-if="invalid"
       class="mx-auto mt-12 max-w-md rounded-md border border-hairline bg-surface-soft px-6 py-10 text-center">
       <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-canvas shadow-float">
@@ -73,11 +70,9 @@ function scrollToForm() {
       </RouterLink>
     </div>
 
-    <!-- Sukses: konfirmasi terkirim, menunggu verifikasi admin -->
     <PaymentSuccess v-else-if="submitted" :code="submitted.code" :guest-name="submitted.guestName" :room="room"
       :check-in="params.checkIn" :check-out="params.checkOut" :total="total" :whatsapp-number="whatsappNumber" />
 
-    <!-- Konten pembayaran -->
     <template v-else>
       <header class="mt-6">
         <h1 class="text-2xl font-semibold tracking-tight text-ink md:text-3xl">
@@ -91,11 +86,9 @@ function scrollToForm() {
       </header>
 
       <div class="mt-8 grid items-start gap-8 md:grid-cols-[1fr_360px]">
-        <!-- Kolom kiri: QRIS + tata cara + form konfirmasi -->
         <div class="space-y-8">
           <QrisCard :merchant-name="qrisMerchantName" :nmid="qrisNmid" :image-url="qrisImageUrl" :total="total" />
 
-          <!-- Tata cara pembayaran -->
           <section>
             <h2 class="text-lg font-semibold text-ink">Tata cara pembayaran</h2>
             <ol class="mt-4 space-y-4">
@@ -113,7 +106,6 @@ function scrollToForm() {
             :guests="params.guests" @submitted="onSubmitted" />
         </div>
 
-        <!-- Kolom kanan: ringkasan booking + CTA -->
         <BookingSummary :room="room" :check-in="params.checkIn" :check-out="params.checkOut" :guests="params.guests"
           :nights="nights" :total="total" :deadline-hours="paymentDeadlineHours" @confirm="scrollToForm" />
       </div>

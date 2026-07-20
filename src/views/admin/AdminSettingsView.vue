@@ -9,7 +9,6 @@ import { friendlyDbError } from '../../lib/supabase'
 const { settings, fetchSettings, saveSettings } = useSettings()
 const toast = useToast()
 
-// Field yang dikelola di halaman ini (subset tabel settings).
 const KEYS = [
 	'villa_name',
 	'whatsapp_number',
@@ -66,7 +65,6 @@ async function onSave() {
 		<p class="mt-1 text-sm text-black">Informasi vila, kontak, dan pembayaran QRIS.</p>
 
 		<form class="mt-6 space-y-4" @submit.prevent="onSave">
-			<!-- Info vila  -->
 			<section class="rounded-sm border border-hairline bg-canvas p-5 shadow-sm">
 				<h2 class="font-sans text-base font-semibold text-ink">Informasi Vila</h2>
 				<div class="mt-4 space-y-4">
@@ -111,7 +109,6 @@ async function onSave() {
 				</div>
 			</section>
 
-			<!-- Pembayaran QRIS -->
 			<section class="rounded-sm border border-hairline bg-canvas p-5 shadow-sm">
 				<h2 class="font-sans text-base font-semibold text-ink">Pembayaran QRIS</h2>
 				<p class="mt-1 text-sm text-muted">Tampil di halaman pembayaran saat tamu booking.</p>

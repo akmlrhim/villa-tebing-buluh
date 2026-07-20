@@ -25,11 +25,10 @@ onMounted(() => {
 	fetchAvailability()
 })
 
-const query = ref(null) // { checkIn, checkOut } | null
+const query = ref(null)
 const selectedRoom = ref(null)
 const roomsSection = ref(null)
 
-// Deep-link: /?kamar=<slug> langsung membuka modal detail kamar.
 const route = useRoute()
 const router = useRouter()
 watchEffect(() => {
@@ -48,7 +47,6 @@ const nights = computed(() =>
 	query.value ? nightsBetween(query.value.checkIn, query.value.checkOut) : 0,
 )
 
-// F-01.3: badge Tersedia/Penuh mengikuti tanggal yang dipilih.
 function roomStatus(room) {
 	if (!query.value) return null
 	return isRoomAvailable(room.id, query.value.checkIn, query.value.checkOut)
@@ -61,7 +59,7 @@ const availableCount = computed(() =>
 )
 
 async function onSearch(criteria) {
-	await fetchAvailability({ refresh: true }) // data real-time, tanpa cache basi
+	await fetchAvailability({ refresh: true })
 	query.value = criteria
 	roomsSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
@@ -75,12 +73,10 @@ function onClear() {
 	<div>
 		<HeroSection />
 
-		<!-- Widget cek ketersediaan (F-01.2) -->
 		<section id="cek-ketersediaan" class="relative z-10 mx-auto -mt-12 w-full max-w-4xl scroll-mt-24 px-4 sm:px-6">
 			<AvailabilitySearch @search="onSearch" @clear="onClear" />
 		</section>
 
-		<!-- Daftar kamar (F-01.3) -->
 		<section id="kamar" ref="roomsSection" class="mx-auto max-w-6xl scroll-mt-24 px-4 pt-16 sm:px-6 md:pt-20">
 			<div class="flex flex-wrap items-end justify-between gap-3">
 				<div>
@@ -98,7 +94,6 @@ function onClear() {
 				</button>
 			</div>
 
-			<!-- Skeleton saat memuat -->
 			<div v-if="loading" class="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
 				<div v-for="index in 3" :key="index" class="animate-pulse">
 					<div class="aspect-[4/3] rounded-md bg-surface-strong" />
@@ -112,7 +107,6 @@ function onClear() {
 					@open="selectedRoom = room" />
 			</div>
 
-			<!-- Data kamar belum tersedia (mis. tabel belum diisi) -->
 			<div v-if="!loading && rooms.length === 0"
 				class="mt-8 rounded-md border border-hairline bg-surface-soft px-6 py-8 text-center">
 				<p class="text-base font-semibold text-ink">Daftar kamar sedang disiapkan</p>
@@ -127,7 +121,6 @@ function onClear() {
 				</a>
 			</div>
 
-			<!-- Tidak ada kamar tersedia (F-02.5) -->
 			<div v-if="query && rooms.length > 0 && availableCount === 0 && !loading"
 				class="mt-10 rounded-md border border-hairline bg-surface-soft px-6 py-8 text-center">
 				<p class="text-base font-semibold text-ink">Tanggal itu sudah penuh semua 😔</p>
@@ -143,7 +136,6 @@ function onClear() {
 			</div>
 		</section>
 
-		<!-- Kalender master: semua booking dalam satu kalender -->
 		<section v-if="rooms.length" id="kalender" class="mx-auto max-w-6xl scroll-mt-24 px-4 pt-16 sm:px-6 md:pt-20">
 			<h2 class="text-[22px] font-semibold tracking-tight text-black md:text-2xl">Kalender hunian vila</h2>
 			<p class="mt-1 max-w-[65ch] text-sm text-black">

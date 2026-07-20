@@ -5,7 +5,6 @@ import WhatsAppGlyph from '../components/WhatsAppGlyph.vue'
 import { useSettings } from '../composables/useSettings'
 import { generalMessage, waLink } from '../lib/whatsapp'
 
-// F-07: Contact - alamat, WhatsApp, jam operasional, sosial media, peta.
 const { settings, whatsappNumber } = useSettings()
 
 const hero = {
@@ -55,7 +54,6 @@ function formatPhone(number) {
 					</li>
 				</ul>
 
-				<!-- F-07.2: chat umum, bukan booking kamar tertentu -->
 				<a :href="waLink(whatsappNumber, generalMessage())" target="_blank" rel="noopener noreferrer"
 					class="mt-9 inline-flex h-12 items-center gap-2.5 rounded-sm bg-primary px-6 text-base font-medium text-white transition-colors hover:bg-primary-active">
 					<WhatsAppGlyph class="h-5 w-5" />
