@@ -1,154 +1,100 @@
--- Run this once in the Supabase dashboard: SQL Editor -> New query -> paste -> Run
--- Project: Villa Tebing Buluh
--- Structure follows PRD.md section 5.2, extended with min_nights
--- (needed for the "untuk 14 malam" field shown on the room card design).
+-- ============================================================================
+-- MIGRASI TERBARU (KONSOLIDASI) — Villa Tebing Buluh
+-- Jalankan file ini SEKALI di Supabase dashboard: SQL Editor -> New query ->
+-- paste SELURUH isi file ini -> Run.
+--
+-- File ini MENGGABUNGKAN semua migrate-*.sql sebelumnya (migrate-security,
+-- migrate-bukti-bayar, migrate-gallery, migrate-booking-status,
+-- migrate-drop-floor-number, migrate-admin-lockdown) jadi SATU file, dan
+-- ditulis 100% IDEMPOTEN -- aman dijalankan berkali-kali, tidak akan pernah
+-- muncul error "already exists" walau sebagian isinya sudah pernah
+-- diterapkan sebelumnya (drop-lalu-create untuk semua policy, if-not-exists
+-- untuk tabel/kolom, create-or-replace untuk fungsi/view).
+--
+-- Kalau bingung migrasi mana yang sudah/belum pernah dijalankan di database
+-- Anda: TIDAK PERLU cek satu-satu. Cukup jalankan file INI saja, file
+-- migrate-*.sql lain yang lama sudah tidak perlu dijalankan lagi.
+--
+-- SATU-SATUNYA LANGKAH WAJIB SETELAH MENJALANKAN FILE INI:
+--   Di Dashboard -> Authentication -> Sign In / Providers -> Email, matikan
+--   "Allow new users to sign up". Setiap akun yang berhasil login sekarang
+--   otomatis dipercaya PENUH (tidak ada allowlist admin_users lagi) --
+--   satu-satunya cara membatasi siapa yang bisa masuk adalah menutup jalur
+--   pendaftaran akun baru dan hanya membuat akun lewat Dashboard ->
+--   Authentication -> Add user.
+-- ============================================================================
 
--- =========================================
--- 0. AKSES ADMIN
--- =========================================
--- Setiap akun yang berhasil login (role `authenticated`) dipercaya penuh --
--- TIDAK ada allowlist tambahan (dulu ada tabel admin_users + fungsi
--- is_admin(), sudah dihapus karena cuma menambah langkah manual di SQL
--- Editor yang gampang lupa dan bikin lockout). Satu-satunya pintu masuk yang
--- perlu dijaga adalah siapa yang BISA membuat akun: matikan "Allow new users
--- to sign up" di Dashboard -> Authentication -> Sign In / Providers -> Email,
--- dan hanya buat akun admin manual lewat Dashboard -> Authentication -> Add
--- user. Data yang boleh dibaca TANPA login (anon) tetap dibatasi ketat --
--- cuma kolom yang benar-benar dipakai modal kamar & alur booking publik
--- (rooms aktif, foto kamar aktif, ketersediaan tanpa data pribadi tamu,
--- settings kontak/QRIS, galeri) -- lihat policy "Public can ..." di bawah.
+-- ---------------------------------------------------------------------------
+-- 0. HAPUS SISTEM ADMIN_USERS / is_admin() -- semua authenticated user dipercaya
+-- ---------------------------------------------------------------------------
+-- Sebelumnya akses admin dibatasi tabel admin_users + fungsi is_admin(), yang
+-- perlu diisi manual lewat SQL Editor setiap kali ada akun admin baru --
+-- gampang lupa dan bikin lockout diam-diam (0 baris kena, tanpa error yang
+-- jelas). Sekarang: siapa pun yang berhasil login (role `authenticated`)
+-- otomatis dapat akses penuh. Fitur "Kelola Pengguna" (/admin/pengguna) juga
+-- dihapus karena fungsinya (kelola siapa admin) sudah tidak relevan.
+-- PENTING: DROP FUNCTION/TABLE-nya sendiri ditaruh di BAGIAN PALING BAWAH
+-- file ini (section 7) -- policy lama di rooms/room_images/bookings/dst di
+-- bawah masih memakai is_admin() sampai masing-masing di-drop-lalu-buat-ulang
+-- tanpa is_admin(); Postgres menolak DROP FUNCTION selama masih ada policy
+-- yang bergantung padanya.
 
--- =========================================
--- 1. ROOMS (kamar/unit vila, dikelola admin)
--- =========================================
-create table if not exists rooms (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,                        -- "Cemerlang 1"
-  slug text not null unique,
-  description text,
-  price_per_night numeric(12, 2) not null,
-  min_nights int not null default 1,         -- 14 -> harga ditampilkan sbg price_per_night * 14
-  max_guests int not null default 2,
-  size_sqm int,
-  bed_count int not null default 1,
-  bed_type text,
-  amenities text[] not null default '{}',    -- ['Free WiFi','Free Kano','Gazebo','Dapur + Peralatan Lengkap']
-  is_active boolean not null default true,   -- soft delete (F-07.3)
-  created_at timestamptz not null default now()
-);
+-- ---------------------------------------------------------------------------
+-- 1. ROOMS
+-- ---------------------------------------------------------------------------
+alter table rooms drop column if exists floor_number; -- fitur "lantai" sudah dihapus
 
-alter table rooms enable row level security;
+-- WAJIB: sebelumnya rooms cuma punya policy SELECT publik (is_active = true,
+-- tanpa klausa `to` jadi berlaku untuk SEMUA role termasuk authenticated).
+-- Akibatnya admin tidak bisa melihat kamar nonaktif sama sekali, dan
+-- UPDATE/DELETE...RETURNING yang dipakai useAdminRooms.js untuk mendeteksi
+-- sukses ikut disaring policy SELECT ini -- toggle "nonaktifkan kamar"
+-- selalu dilaporkan gagal (assertRowsAffected melihat 0 baris) walau
+-- update-nya sendiri sebenarnya berhasil di database.
+drop policy if exists "Admin can view all rooms" on rooms;
+create policy "Admin can view all rooms" on rooms for select to authenticated using (true);
 
-create policy "Public can view active rooms"
-  on rooms for select
-  using (is_active = true);
+drop policy if exists "Admin can insert rooms" on rooms;
+create policy "Admin can insert rooms" on rooms for insert to authenticated with check (true);
+drop policy if exists "Admin can update rooms" on rooms;
+create policy "Admin can update rooms" on rooms for update to authenticated using (true) with check (true);
+drop policy if exists "Admin can delete rooms" on rooms;
+create policy "Admin can delete rooms" on rooms for delete to authenticated using (true);
 
-create policy "Admin can insert rooms"
-  on rooms for insert
-  to authenticated
-  with check (true);
+-- ---------------------------------------------------------------------------
+-- 2. ROOM_IMAGES
+-- ---------------------------------------------------------------------------
+-- Sama alasannya dengan "Admin can view all rooms" di atas: tanpa ini foto
+-- kamar nonaktif hilang dari form edit admin.
+drop policy if exists "Admin can view all room images" on room_images;
+create policy "Admin can view all room images" on room_images for select to authenticated using (true);
 
-create policy "Admin can update rooms"
-  on rooms for update
-  to authenticated
-  using (true)
-  with check (true);
+drop policy if exists "Admin can insert room images" on room_images;
+create policy "Admin can insert room images" on room_images for insert to authenticated with check (true);
+drop policy if exists "Admin can update room images" on room_images;
+create policy "Admin can update room images" on room_images for update to authenticated using (true) with check (true);
+drop policy if exists "Admin can delete room images" on room_images;
+create policy "Admin can delete room images" on room_images for delete to authenticated using (true);
 
-create policy "Admin can delete rooms"
-  on rooms for delete
-  to authenticated
-  using (true);
+-- ---------------------------------------------------------------------------
+-- 3. BOOKINGS
+-- ---------------------------------------------------------------------------
+alter table bookings add column if not exists payment_proof_url text;
 
--- =========================================
--- 2. ROOM_IMAGES (foto per kamar)
--- =========================================
-create table if not exists room_images (
-  id uuid primary key default gen_random_uuid(),
-  room_id uuid not null references rooms(id) on delete cascade,
-  image_url text not null,
-  is_primary boolean not null default false,
-  sort_order int not null default 0
-);
+drop policy if exists "Admin can view bookings" on bookings;
+create policy "Admin can view bookings" on bookings for select to authenticated using (true);
 
-alter table room_images enable row level security;
+drop policy if exists "Anyone can create a booking" on bookings; -- kebijakan lama, sudah diganti RPC di bawah
+drop policy if exists "Admin can create bookings" on bookings;
+create policy "Admin can create bookings" on bookings for insert to authenticated with check (true);
+drop policy if exists "Admin can update bookings" on bookings;
+create policy "Admin can update bookings" on bookings for update to authenticated using (true) with check (true);
+drop policy if exists "Admin can delete bookings" on bookings;
+create policy "Admin can delete bookings" on bookings for delete to authenticated using (true);
 
-create policy "Public can view images of active rooms"
-  on room_images for select
-  using (
-    exists (
-      select 1 from rooms
-      where rooms.id = room_images.room_id and rooms.is_active = true
-    )
-  );
+revoke insert on public.bookings from anon;
 
-create policy "Admin can insert room images"
-  on room_images for insert
-  to authenticated
-  with check (true);
-
-create policy "Admin can update room images"
-  on room_images for update
-  to authenticated
-  using (true)
-  with check (true);
-
-create policy "Admin can delete room images"
-  on room_images for delete
-  to authenticated
-  using (true);
-
--- =========================================
--- 3. BOOKINGS (reservasi tamu)
--- =========================================
-create table if not exists bookings (
-  id uuid primary key default gen_random_uuid(),
-  room_id uuid not null references rooms(id),
-  guest_name text not null,
-  guest_phone text not null,
-  check_in date not null,
-  check_out date not null,
-  guest_count int not null default 1,
-  status text not null default 'pending'
-    check (status in ('pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled')),
-  total_price numeric(12, 2),
-  notes text,
-  payment_proof_url text,                    -- bukti bayar QRIS yang diunggah tamu
-  created_at timestamptz not null default now(),
-  constraint valid_dates check (check_out > check_in)
-);
-
-alter table bookings enable row level security;
-
--- Data pribadi tamu tidak boleh terbaca publik (F-05.3) -> tidak ada select policy untuk anon di sini,
--- publik baca ketersediaan lewat view public_availability di bawah.
-create policy "Admin can view bookings"
-  on bookings for select
-  to authenticated
-  using (true);
-
--- Publik TIDAK boleh INSERT langsung (bisa disalahgunakan untuk mengunci
--- kalender / mengatur harga). Booking publik hanya lewat fungsi tervalidasi
--- create_public_booking() di bawah. Admin tetap boleh insert penuh.
-create policy "Admin can create bookings"
-  on bookings for insert
-  to authenticated
-  with check (true);
-
-create policy "Admin can update bookings"
-  on bookings for update
-  to authenticated
-  using (true)
-  with check (true);
-
-create policy "Admin can delete bookings"
-  on bookings for delete
-  to authenticated
-  using (true);
-
--- View aman untuk publik: hanya room_id + tanggal, TANPA data pribadi tamu (F-05.3).
--- SECURITY DEFINER (security_invoker = false) disengaja: anon cukup punya akses
--- ke view ini, tidak perlu (dan tidak boleh) akses ke tabel bookings. View hanya
--- meng-ekspos kolom non-sensitif, jadi data pribadi tamu tetap aman.
+-- View aman untuk publik: hanya room_id + tanggal, TANPA data pribadi tamu.
 create or replace view public_availability
 with (security_invoker = false)
 as
@@ -158,10 +104,8 @@ where status in ('pending', 'confirmed', 'checked_in');
 
 grant select on public_availability to anon, authenticated;
 
--- Pembuatan booking oleh publik (anon) HANYA lewat fungsi ini: validasi kamar,
--- tanggal, tamu, dan bukti bayar di server; cek bentrok atomik; status dipaksa
--- 'pending'; total_price dihitung server (bukan dari klien). Lihat komentar di
--- supabase/migrate-security.sql.
+-- Booking publik (anon) HANYA lewat fungsi ini: validasi & hitung harga di
+-- server, status dipaksa 'pending', cek bentrok atomik.
 create or replace function public.create_public_booking(
   p_room_id            uuid,
   p_guest_name         text,
@@ -265,12 +209,8 @@ revoke all on function public.create_public_booking(
 grant execute on function public.create_public_booking(
   uuid, text, text, date, date, int, text, text) to anon, authenticated;
 
--- Cek status booking oleh publik (halaman /cek-booking): tamu memasukkan kode
--- booking (8 karakter pertama UUID, dari layar sukses/WA follow-up) + nomor
--- WA yang dipakai saat booking. SECURITY DEFINER agar anon tidak perlu akses
--- langsung ke tabel bookings (data pribadi tamu lain tetap tidak terekspos -
--- lookup hanya mengembalikan baris yang cocok DUA-DUANYA kode & nomor).
--- Bukti bayar tidak dikembalikan sebagai path/URL, hanya penanda ada/tidaknya.
+-- Cek status booking publik (/cek-booking): kode booking + no. WA, DUA-DUANYA
+-- harus cocok; bukti bayar cuma dikembalikan sebagai boolean has_proof.
 create or replace function public.get_booking_status(
   p_code  text,
   p_phone text
@@ -309,9 +249,9 @@ $$;
 revoke all on function public.get_booking_status(text, text) from public;
 grant execute on function public.get_booking_status(text, text) to anon, authenticated;
 
--- =========================================
--- 3b. GALLERY_IMAGES (foto galeri publik, bebas unggah, tanpa kategori)
--- =========================================
+-- ---------------------------------------------------------------------------
+-- 3b. GALLERY_IMAGES
+-- ---------------------------------------------------------------------------
 create table if not exists gallery_images (
   id uuid primary key default gen_random_uuid(),
   image_url text not null,
@@ -319,54 +259,34 @@ create table if not exists gallery_images (
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
-
 alter table gallery_images enable row level security;
 
-create policy "Public can view gallery images"
-  on gallery_images for select
-  using (true);
+drop policy if exists "Public can view gallery images" on gallery_images;
+create policy "Public can view gallery images" on gallery_images for select using (true);
 
-create policy "Admin can insert gallery images"
-  on gallery_images for insert
-  to authenticated
-  with check (true);
+drop policy if exists "Admin can insert gallery images" on gallery_images;
+create policy "Admin can insert gallery images" on gallery_images for insert to authenticated with check (true);
+drop policy if exists "Admin can update gallery images" on gallery_images;
+create policy "Admin can update gallery images" on gallery_images for update to authenticated using (true) with check (true);
+drop policy if exists "Admin can delete gallery images" on gallery_images;
+create policy "Admin can delete gallery images" on gallery_images for delete to authenticated using (true);
 
-create policy "Admin can update gallery images"
-  on gallery_images for update
-  to authenticated
-  using (true)
-  with check (true);
-
-create policy "Admin can delete gallery images"
-  on gallery_images for delete
-  to authenticated
-  using (true);
-
--- =========================================
--- 4. SETTINGS (whatsapp_number, villa_name, dst.)
--- =========================================
+-- -------------------------------------------------------------------------
+-- 4. SETTINGS
+-- -------------------------------------------------------------------------
 create table if not exists settings (
   key text primary key,
   value text not null
 );
-
 alter table settings enable row level security;
 
-create policy "Public can read settings"
-  on settings for select
-  to anon, authenticated
-  using (true);
+drop policy if exists "Public can read settings" on settings;
+create policy "Public can read settings" on settings for select to anon, authenticated using (true);
 
-create policy "Admin can upsert settings"
-  on settings for insert
-  to authenticated
-  with check (true);
-
-create policy "Admin can update settings"
-  on settings for update
-  to authenticated
-  using (true)
-  with check (true);
+drop policy if exists "Admin can upsert settings" on settings;
+create policy "Admin can upsert settings" on settings for insert to authenticated with check (true);
+drop policy if exists "Admin can update settings" on settings;
+create policy "Admin can update settings" on settings for update to authenticated using (true) with check (true);
 
 insert into settings (key, value) values
   ('whatsapp_number', '6281234567890'),
@@ -374,94 +294,80 @@ insert into settings (key, value) values
   ('address', 'Jl. Tanuhi, Hulu Banyu, Kec. Loksado, Kabupaten Hulu Sungai Selatan, Kalimantan Selatan 71282')
 on conflict (key) do nothing;
 
--- =========================================
--- 5. STORAGE (foto kamar)
--- =========================================
+-- ---------------------------------------------------------------------------
+-- 5. STORAGE
+-- ---------------------------------------------------------------------------
+-- room-images: bucket publik, foto kamar + gambar QRIS (lihat AdminSettingsView).
 insert into storage.buckets (id, name, public)
 values ('room-images', 'room-images', true)
 on conflict (id) do nothing;
+update storage.buckets set public = true where id = 'room-images';
 
-create policy "Public can view room images"
-  on storage.objects for select
-  using (bucket_id = 'room-images');
+drop policy if exists "Public can view room images" on storage.objects;
+create policy "Public can view room images" on storage.objects for select using (bucket_id = 'room-images');
+drop policy if exists "Admin can upload room images" on storage.objects;
+create policy "Admin can upload room images" on storage.objects for insert to authenticated with check (bucket_id = 'room-images');
+drop policy if exists "Admin can update room images objects" on storage.objects;
+create policy "Admin can update room images objects" on storage.objects for update to authenticated using (bucket_id = 'room-images');
+drop policy if exists "Admin can delete room images objects" on storage.objects;
+create policy "Admin can delete room images objects" on storage.objects for delete to authenticated using (bucket_id = 'room-images');
 
-create policy "Admin can upload room images"
-  on storage.objects for insert
-  to authenticated
-  with check (bucket_id = 'room-images');
-
-create policy "Admin can update room images objects"
-  on storage.objects for update
-  to authenticated
-  using (bucket_id = 'room-images');
-
-create policy "Admin can delete room images objects"
-  on storage.objects for delete
-  to authenticated
-  using (bucket_id = 'room-images');
-
--- Bucket bukti pembayaran QRIS (diunggah tamu dari halaman /pembayaran).
--- PRIVAT: berisi data finansial pribadi tamu. Admin melihatnya lewat signed URL
--- sementara (lihat src/lib/storage.js -> signedProofUrl). Tamu anon tetap boleh
--- mengunggah, tetapi tidak ada yang bisa membaca tanpa token.
+-- payment-proofs: bukti bayar tamu -- PRIVAT (data finansial pribadi). Riwayat
+-- bucket ini sempat public=true sebelum diprivatkan -- baris update di bawah
+-- memaksa state akhir yang benar apa pun riwayatnya.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('payment-proofs', 'payment-proofs', false, 5242880,
         array['image/jpeg', 'image/png', 'image/webp'])
 on conflict (id) do nothing;
+update storage.buckets
+set public = false, file_size_limit = 5242880,
+    allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp']
+where id = 'payment-proofs';
 
-create policy "Admin can view payment proofs"
-  on storage.objects for select
-  to authenticated
-  using (bucket_id = 'payment-proofs');
+drop policy if exists "Public can view payment proofs" on storage.objects; -- kebijakan lama, publik TIDAK boleh baca lagi
+drop policy if exists "Admin can view payment proofs" on storage.objects;
+create policy "Admin can view payment proofs" on storage.objects for select to authenticated using (bucket_id = 'payment-proofs');
+drop policy if exists "Anyone can upload payment proofs" on storage.objects;
+create policy "Anyone can upload payment proofs" on storage.objects for insert to anon, authenticated with check (bucket_id = 'payment-proofs');
+drop policy if exists "Admin can delete payment proofs" on storage.objects;
+create policy "Admin can delete payment proofs" on storage.objects for delete to authenticated using (bucket_id = 'payment-proofs');
 
-create policy "Anyone can upload payment proofs"
-  on storage.objects for insert
-  to anon, authenticated
-  with check (bucket_id = 'payment-proofs');
-
-create policy "Admin can delete payment proofs"
-  on storage.objects for delete
-  to authenticated
-  using (bucket_id = 'payment-proofs');
-
--- Bucket foto galeri publik (admin unggah, dikompres & dikonversi ke WebP di
--- browser sebelum unggah -- lihat src/lib/imageCompress.js).
+-- gallery-images: bucket publik, foto galeri.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('gallery-images', 'gallery-images', true, 8388608,
         array['image/jpeg', 'image/png', 'image/webp'])
 on conflict (id) do nothing;
+update storage.buckets set public = true where id = 'gallery-images';
 
-create policy "Public can view gallery images objects"
-  on storage.objects for select
-  using (bucket_id = 'gallery-images');
+drop policy if exists "Public can view gallery images objects" on storage.objects;
+create policy "Public can view gallery images objects" on storage.objects for select using (bucket_id = 'gallery-images');
+drop policy if exists "Admin can upload gallery images objects" on storage.objects;
+create policy "Admin can upload gallery images objects" on storage.objects for insert to authenticated with check (bucket_id = 'gallery-images');
+drop policy if exists "Admin can delete gallery images objects" on storage.objects;
+create policy "Admin can delete gallery images objects" on storage.objects for delete to authenticated using (bucket_id = 'gallery-images');
 
-create policy "Admin can upload gallery images objects"
-  on storage.objects for insert
-  to authenticated
-  with check (bucket_id = 'gallery-images');
-
-create policy "Admin can delete gallery images objects"
-  on storage.objects for delete
-  to authenticated
-  using (bucket_id = 'gallery-images');
-
--- =========================================
--- 6. GRANT LEVEL-TABEL (WAJIB, di luar RLS)
--- =========================================
--- RLS menentukan BARIS yang terlihat; GRANT ini membuka akses level-tabel yang
--- tetap diminta Postgres sebelum RLS dievaluasi. Tanpa blok ini, semua request
--- anon/authenticated ditolak "permission denied for table" (kode 42501).
+-- ---------------------------------------------------------------------------
+-- 6. GRANT LEVEL-TABEL (GRANT selalu aman diulang, tidak pernah "already exists")
+-- ---------------------------------------------------------------------------
 grant usage on schema public to anon, authenticated;
 
 grant select on public.rooms          to anon, authenticated;
 grant select on public.room_images    to anon, authenticated;
 grant select on public.settings       to anon, authenticated;
 grant select on public.gallery_images to anon, authenticated;
--- Catatan: anon TIDAK diberi insert pada bookings — publik membuat booking hanya
--- lewat fungsi create_public_booking() (SECURITY DEFINER) di atas.
 
 grant select, insert, update, delete on public.rooms          to authenticated;
 grant select, insert, update, delete on public.room_images    to authenticated;
 grant select, insert, update, delete on public.bookings       to authenticated;
 grant select, insert, update, delete on public.settings       to authenticated;
 grant select, insert, update, delete on public.gallery_images to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 7. DROP ADMIN_USERS / is_admin() -- sekarang aman, semua policy di atas
+-- sudah dibuat ulang tanpa memakai is_admin().
+-- ---------------------------------------------------------------------------
+drop function if exists public.admin_list_admins();
+drop function if exists public.admin_add_admin_by_email(text);
+drop function if exists public.admin_remove_admin(uuid);
+drop function if exists public.is_admin();
+drop table if exists admin_users;
