@@ -170,8 +170,10 @@ export const demoGallery = [
   { url: img('1518548419970-58e3b4079ab2', 1600), alt: 'Pura di atas batu karang saat matahari terbenam', group: 'Sekitar Vila', tall: false },
 ]
 
+// Hero Home disimpan lokal (bukan hotlink Unsplash) di public/img/hero/ -
+// selalu tampil di produksi terlepas Supabase terisi atau tidak.
 export const heroImage = {
-  url: img('1721222204314-46922f2aada0', 2000),
-  srcset: imgSrcset('1721222204314-46922f2aada0', [640, 828, 1080, 1600, 2000]),
+  url: '/img/hero/home-2000.webp',
+  srcset: [640, 828, 1080, 1600, 2000].map((w) => `/img/hero/home-${w}.webp ${w}w`).join(', '),
   alt: 'Villa Tebing Buluh, teras kolam renang kayu dikelilingi rumpun bambu dan tanaman tropis',
 }

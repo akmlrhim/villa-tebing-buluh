@@ -7,8 +7,10 @@ import { generalMessage, waLink } from '../lib/whatsapp'
 
 const { settings, whatsappNumber } = useSettings()
 
+// Foto disimpan lokal (bukan hotlink Unsplash) di public/img/contact/.
 const hero = {
-	url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2000&q=80',
+	url: '/img/contact/hero-2000.webp',
+	srcset: [640, 1080, 1600, 2000].map((w) => `/img/contact/hero-${w}.webp ${w}w`).join(', '),
 	alt: 'Deretan kursi berjemur menghadap matahari terbenam',
 }
 
@@ -20,13 +22,13 @@ function formatPhone(number) {
 
 <template>
 	<div class="pb-20">
-		<PageHero :image="hero.url" :alt="hero.alt" title="Hubungi kami"
+		<PageHero :image="hero.url" :srcset="hero.srcset" :alt="hero.alt" title="Hubungi kami"
 			subtitle="Paling cepat lewat WhatsApp. Admin biasanya membalas dalam hitungan menit di jam operasional. Telepon juga boleh." />
 
 		<div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
 		<div class="grid gap-10 md:grid-cols-[1fr_1.3fr] md:gap-16">
 			<div>
-				<ul class="space-y-5 text-[15px] text-body">
+				<ul class="space-y-5 text-[14px] text-body">
 					<li class="flex items-start gap-3.5">
 						<IconGlyph name="map-pin" class="mt-0.5 h-5 w-5 shrink-0 text-muted" />
 						<span>{{ settings.address }}</span>

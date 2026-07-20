@@ -7,8 +7,10 @@ import { useGallery } from '../composables/useGallery'
 const { images, loading, fetchGallery } = useGallery()
 onMounted(fetchGallery)
 
+// Foto disimpan lokal (bukan hotlink Unsplash) di public/img/gallery/.
 const hero = {
-  url: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=2000&q=80',
+  url: '/img/gallery/hero-2000.webp',
+  srcset: [640, 1080, 1600, 2000].map((w) => `/img/gallery/hero-${w}.webp ${w}w`).join(', '),
   alt: 'Gazebo tepi kolam dengan tirai putih saat langit ungu senja',
 }
 
@@ -23,7 +25,7 @@ function openLightbox(index) {
 
 <template>
   <div class="pb-20">
-    <PageHero :image="hero.url" :alt="hero.alt" title="Our Gallery"
+    <PageHero :image="hero.url" :srcset="hero.srcset" :alt="hero.alt" title="Our Gallery"
       subtitle="Suasana vila apa adanya: kolam, kamar, sungai, dan sekitarnya. Klik foto untuk melihat lebih besar." />
 
     <div class="mx-auto max-w-6xl px-4 sm:px-6">

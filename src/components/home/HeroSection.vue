@@ -23,7 +23,7 @@ import { heroImage } from '../../data/demoData';
 
     <div class="mx-auto w-full max-w-6xl px-4 pt-40 sm:px-6">
       <h1
-        class="animate-rise-in max-w-xl text-[clamp(2.1rem,5vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-white motion-reduce:animate-none"
+        class="animate-rise-in max-w-xl text-[clamp(1.9rem,5vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-white motion-reduce:animate-none"
       >
         Menginap tenang di tebing buluh
       </h1>

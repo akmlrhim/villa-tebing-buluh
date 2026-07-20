@@ -11,25 +11,26 @@ const { rooms } = useRooms()
 const { settings, villaName } = useSettings()
 const selectedRoom = ref(null)
 
-const img = (id, w = 1400) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
-
+// Foto disimpan lokal (bukan hotlink Unsplash) di public/img/about/ - hero +
+// mosaik dipilih dari tema "Area Vila" yang sama dengan halaman Gallery,
+// masing-masing beda foto dari hero Our Gallery supaya tidak dobel.
 const hero = {
-  url: img('1573790387438-4da905039392', 2000),
+  url: '/img/about/hero-2000.webp',
+  srcset: [640, 1080, 1600, 2000].map((w) => `/img/about/hero-${w}.webp ${w}w`).join(', '),
   alt: 'Tebing dan pantai berpasir putih di pesisir dekat vila',
 }
 
 const photos = {
   main: {
-    url: img('1559628233-100c798642d4'),
-    alt: 'Pemandangan udara sawah dan hutan kelapa di sekitar vila saat matahari terbit',
+    url: '/img/about/mosaic-main.webp',
+    alt: 'Kolam renang privat dan taman Villa Tebing Buluh saat senja',
   },
   top: {
-    url: img('1584132967334-10e028bd69f7', 900),
+    url: '/img/about/mosaic-top.webp',
     alt: 'Dek kayu dan kursi santai di tepi kolam renang vila',
   },
   bottom: {
-    url: img('1552733407-5d5c46c3bb3b', 900),
+    url: '/img/about/mosaic-bottom.webp',
     alt: 'Kano meluncur pelan di sungai kecil di antara pohon kelapa',
   },
 }
@@ -50,7 +51,7 @@ const mapsQuery = encodeURIComponent(settings.value.address)
 
 <template>
   <div class="pb-20">
-    <PageHero :image="hero.url" :alt="hero.alt" :title="`Tentang ${villaName}`"
+    <PageHero :image="hero.url" :srcset="hero.srcset" :alt="hero.alt" :title="`Tentang ${villaName}`"
       subtitle="Namanya diambil dari tebing kecil berumpun bambu yang memeluk sungai di belakang vila. Kami sengaja membatasi jumlah kamar: cukup untuk tetap sepi, cukup untuk terasa seperti rumah sendiri." />
 
     <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
@@ -69,7 +70,7 @@ const mapsQuery = encodeURIComponent(settings.value.address)
       </div>
 
       <div class="mt-12 grid gap-8 md:mt-16 md:grid-cols-2 md:gap-16">
-        <div class="space-y-4 text-[15px] leading-relaxed text-body">
+        <div class="space-y-4 text-[14px] leading-relaxed text-body">
           <p>
             Vila ini awalnya rumah keluarga yang sering dipinjam kerabat untuk
             liburan. Lama-lama kami sadar: yang orang cari bukan kamar yang
@@ -77,13 +78,14 @@ const mapsQuery = encodeURIComponent(settings.value.address)
             cepat-cepat pulang.
           </p>
           <p>
-            Jadi kami merawat yang sudah ada: kolam yang airnya dari sumber
-            sendiri, gazebo menghadap sungai, dan dapur yang boleh dipakai
-            kapan saja. Pagi-pagi, ambil kano dan susuri sungainya; sorenya,
-            duduk saja mendengar bambu bergesekan.
+            Jadi kami merawat yang sudah ada: kolam privat yang tenang begitu
+            matahari mulai turun, gazebo menghadap sungai, dan dapur yang
+            boleh dipakai kapan saja. Pagi-pagi, ambil kano dan susuri
+            sungainya; sorenya, duduk saja di tepi kolam mendengar bambu
+            bergesekan.
           </p>
         </div>
-        <div class="space-y-4 text-[15px] leading-relaxed text-body">
+        <div class="space-y-4 text-[14px] leading-relaxed text-body">
           <p>
             Kami sengaja tidak memakai sistem pembayaran online. Semua booking
             dikonfirmasi langsung oleh admin lewat WhatsApp. Memang lebih lambat
@@ -99,7 +101,7 @@ const mapsQuery = encodeURIComponent(settings.value.address)
 
     <section class="mt-16 bg-surface-soft py-14 md:mt-20 md:py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Fasilitas vila</h2>
+        <h2 class="text-[20px] font-semibold tracking-tight text-ink md:text-2xl">Fasilitas vila</h2>
         <ul class="mt-8 grid gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
           <li v-for="facility in facilities" :key="facility.label" class="flex items-start gap-4">
             <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-canvas shadow-float">
@@ -115,7 +117,7 @@ const mapsQuery = encodeURIComponent(settings.value.address)
     </section>
 
     <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
-      <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Tipe kamar</h2>
+      <h2 class="text-[20px] font-semibold tracking-tight text-ink md:text-2xl">Tipe kamar</h2>
       <div class="mt-6 divide-y divide-hairline-soft rounded-md border border-hairline">
         <button
           v-for="room in rooms"
@@ -139,9 +141,9 @@ const mapsQuery = encodeURIComponent(settings.value.address)
     </section>
 
     <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
-      <h2 class="text-[22px] font-semibold tracking-tight text-ink md:text-2xl">Lokasi</h2>
+      <h2 class="text-[20px] font-semibold tracking-tight text-ink md:text-2xl">Lokasi</h2>
       <div class="mt-6 grid gap-8 md:grid-cols-[1fr_1.4fr]">
-        <div class="space-y-4 text-[15px] text-body">
+        <div class="space-y-4 text-[14px] text-body">
           <p class="flex items-start gap-3">
             <IconGlyph name="map-pin" class="mt-0.5 h-5 w-5 shrink-0 text-muted" />
             {{ settings.address }}

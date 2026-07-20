@@ -122,7 +122,7 @@ function onBackdropClick(event) {
 					</p>
 				</div>
 
-				<p class="mt-4 max-w-[65ch] text-[15px] leading-relaxed text-body">
+				<p class="mt-4 max-w-[65ch] text-[14px] leading-relaxed text-body">
 					{{ room.description }}
 				</p>
 

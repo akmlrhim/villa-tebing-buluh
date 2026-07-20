@@ -97,7 +97,7 @@ function scrollToForm() {
                   class="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-sm font-semibold text-white">
                   {{ i + 1 }}
                 </span>
-                <p class="text-[15px] leading-relaxed text-body">{{ step }}</p>
+                <p class="text-[14px] leading-relaxed text-body">{{ step }}</p>
               </li>
             </ol>
           </section>

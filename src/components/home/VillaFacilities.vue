@@ -21,7 +21,7 @@ const facilities = [
     >
       <div>
         <h2
-          class="text-ink text-[22px] font-semibold tracking-tight md:text-2xl"
+          class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl"
         >
           Semua yang kamu butuhkan, tidak lebih
         </h2>

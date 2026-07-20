@@ -12,13 +12,13 @@
 	<meta property="og:type" content="website" />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link rel="preconnect" href="https://images.unsplash.com" />
-	<!-- LCP: hero Home (heroImage di demoData.js) - mulai fetch sebelum JS mount.
-	     imagesrcset/imagesizes disamakan dengan srcset di HeroSection.vue supaya
-	     browser mem-preload varian yang sama yang akan dipakai <img>. -->
-	<link rel="preload" as="image" fetchpriority="high"
-		href="https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=2000&q=80"
-		imagesrcset="https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=640&q=80 640w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=828&q=80 828w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=1080&q=80 1080w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=1600&q=80 1600w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=2000&q=80 2000w"
+	<!-- LCP: hero Home (heroImage di demoData.js), disimpan lokal di
+	     public/img/hero/ (bukan hotlink Unsplash) - mulai fetch sebelum JS
+	     mount. imagesrcset/imagesizes disamakan dengan srcset di
+	     HeroSection.vue supaya browser mem-preload varian yang sama yang akan
+	     dipakai <img>. -->
+	<link rel="preload" as="image" fetchpriority="high" href="/img/hero/home-2000.webp"
+		imagesrcset="/img/hero/home-640.webp 640w, /img/hero/home-828.webp 828w, /img/hero/home-1080.webp 1080w, /img/hero/home-1600.webp 1600w, /img/hero/home-2000.webp 2000w"
 		imagesizes="100vw" />
 	<!-- Font non-blocking: preload lalu swap ke stylesheet (media trick), supaya
 	     tidak menahan render awal - noscript untuk fallback JS mati. Swap-nya
