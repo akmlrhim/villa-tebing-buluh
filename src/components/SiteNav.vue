@@ -54,7 +54,7 @@ watch(menuOpen, (open) => {
   >
     <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 md:h-20">
       <RouterLink to="/" class="flex items-center gap-2.5" aria-label="Ke halaman utama">
-        <img src="/logo.webp" alt="" class="h-7 w-7 shrink-0 object-contain md:h-8 md:w-8" aria-hidden="true" />
+        <img src="/logo.png" alt="" width="168" height="158" class="h-7 w-7 shrink-0 object-contain md:h-8 md:w-8" aria-hidden="true" />
         <span
           class="font-display text-base font-semibold tracking-tight transition-colors duration-300 md:text-lg"
           :class="overlay ? 'text-white' : 'text-ink'"

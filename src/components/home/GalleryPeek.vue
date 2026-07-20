@@ -3,6 +3,7 @@ import IconGlyph from '../IconGlyph.vue'
 
 const cover = {
 	url: '/img/gallery_heros.webp',
+	srcset: '/img/gallery_heros-mobile.webp 750w, /img/gallery_heros.webp 1500w',
 	alt: 'Suasana galeri Villa Tebing Buluh',
 }
 </script>
@@ -10,7 +11,7 @@ const cover = {
 <template>
 	<!-- Teaser galeri: banner foto penuh yang mengarah ke halaman galeri -->
 	<section class="relative isolate mt-20 flex min-h-[420px] items-center overflow-hidden bg-ink md:mt-24 md:min-h-[480px]">
-		<img :src="cover.url" :alt="cover.alt" loading="lazy" decoding="async" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+		<img :src="cover.url" :srcset="cover.srcset" sizes="100vw" :alt="cover.alt" loading="lazy" decoding="async" width="1500" height="844" class="absolute inset-0 -z-10 h-full w-full object-cover" />
 		<div class="absolute inset-0 -z-10 bg-gradient-to-r from-black/75 via-black/40 to-black/10" />
 
 		<div class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">

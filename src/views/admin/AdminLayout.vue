@@ -30,7 +30,7 @@ async function onLogout() {
 			:class="{ 'translate-x-0': mobileOpen }">
 			<div class="flex h-full flex-col">
 				<div class="flex items-center gap-2 border-b border-gray-300 px-5 py-4">
-					<img src="/logo.webp" alt="" class="h-8 w-8" />
+					<img src="/logo.png" alt="" width="168" height="158" class="h-8 w-8" />
 					<div class="min-w-0">
 						<p class="truncate text-sm font-semibold text-ink">Villa Tebing Buluh</p>
 					</div>

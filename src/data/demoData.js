@@ -6,6 +6,11 @@ import { addDaysISO, todayISO } from '../lib/format'
 const img = (id, w = 1200) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
 
+// srcset agar mobile tidak mengunduh varian desktop (w besar) - dipakai untuk
+// gambar above-the-fold seperti hero (LCP).
+const imgSrcset = (id, widths) =>
+  widths.map((w) => `${img(id, w)} ${w}w`).join(', ')
+
 export const demoRooms = [
   {
     id: 'demo-cemerlang-1',
@@ -167,5 +172,6 @@ export const demoGallery = [
 
 export const heroImage = {
   url: img('1721222204314-46922f2aada0', 2000),
+  srcset: imgSrcset('1721222204314-46922f2aada0', [640, 828, 1080, 1600, 2000]),
   alt: 'Villa Tebing Buluh, teras kolam renang kayu dikelilingi rumpun bambu dan tanaman tropis',
 }

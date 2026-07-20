@@ -6,7 +6,7 @@ import { heroImage } from '../../data/demoData'
 	<!-- Hero (F-01.1). -mt menarik hero ke bawah navbar (navbar transparan sebelum di-scroll) -->
 	<section
 		class="relative isolate -mt-14 flex min-h-[640px] flex-col justify-end bg-ink pb-24 md:-mt-20 md:h-[78vh] md:max-h-[820px] md:pb-28">
-		 <img :src="heroImage.url" :alt="heroImage.alt" fetchpriority="high"
+		 <img :src="heroImage.url" :srcset="heroImage.srcset" sizes="100vw" :alt="heroImage.alt" fetchpriority="high"
 			class="absolute inset-0 -z-10 h-full w-full object-cover" />
 		<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 via-black/40 to-black/25" />
 		<!-- Scrim atas: menjaga keterbacaan link navbar putih di atas foto -->
