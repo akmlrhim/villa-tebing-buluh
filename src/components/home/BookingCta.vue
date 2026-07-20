@@ -27,7 +27,7 @@ const { whatsappNumber } = useSettings();
       <p
         class="animate-rise-in-late text-body mx-auto mt-4 max-w-md text-sm leading-relaxed motion-reduce:animate-none"
       >
-        Cek kalender di atas, atau langsung tanya admin — booking selesai dalam
+        Cek kalender di atas, atau langsung tanya admin booking selesai dalam
         hitungan menit lewat WhatsApp, tanpa perlu bikin akun.
       </p>
 
