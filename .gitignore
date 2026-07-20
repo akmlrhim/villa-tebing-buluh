@@ -27,3 +27,8 @@ dist-ssr
 # AI agent tooling (local-only, tidak ikut di-push)
 .claude
 .impeccable
+
+# Dokumen internal (local-only, tidak ikut di-push)
+/PRD.md
+/PRODUCT.md
+/DESIGN.md
