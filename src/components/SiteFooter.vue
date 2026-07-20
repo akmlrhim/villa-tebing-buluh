@@ -23,7 +23,7 @@ function formatPhone(number) {
 </script>
 
 <template>
-  <footer class="border-hairline-soft border-t">
+  <footer>
     <div
       class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1.2fr] md:py-16"
     >

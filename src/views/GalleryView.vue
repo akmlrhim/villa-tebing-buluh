@@ -11,7 +11,7 @@ onMounted(fetchGallery)
 const hero = {
   url: '/img/gallery/hero-2000.webp',
   srcset: [640, 1080, 1600, 2000].map((w) => `/img/gallery/hero-${w}.webp ${w}w`).join(', '),
-  alt: 'Gazebo tepi kolam dengan tirai putih saat langit ungu senja',
+  alt: 'Gazebo bambu dengan tirai putih saat langit ungu senja',
 }
 
 const lightboxOpen = ref(false)
@@ -26,7 +26,7 @@ function openLightbox(index) {
 <template>
   <div class="pb-20">
     <PageHero :image="hero.url" :srcset="hero.srcset" :alt="hero.alt" title="Our Gallery"
-      subtitle="Suasana vila apa adanya: kolam, kamar, sungai, dan sekitarnya. Klik foto untuk melihat lebih besar." />
+      subtitle="Suasana vila apa adanya: kamar, pegunungan, dan sekitarnya. Klik foto untuk melihat lebih besar." />
 
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <div v-if="loading" class="mt-8 columns-2 gap-4 md:columns-3">

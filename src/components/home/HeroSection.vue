@@ -30,8 +30,9 @@ import { heroImage } from '../../data/demoData';
       <p
         class="animate-rise-in-late mt-4 max-w-lg text-sm leading-relaxed text-white motion-reduce:animate-none"
       >
-        Vila privat dengan kolam renang, suara sungai, dan udara yang lambat.
-        Cek tanggal kosong di bawah, lalu booking cukup lewat WhatsApp.
+        Vila bambu privat di lereng Pegunungan Meratus, menghadap Gunung
+        Kantawan. Cek tanggal kosong di bawah, lalu booking cukup lewat
+        WhatsApp.
       </p>
       <div
         class="animate-rise-in-late mt-8 flex flex-wrap gap-3 motion-reduce:animate-none"

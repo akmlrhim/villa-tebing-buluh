@@ -35,7 +35,7 @@ const cover = {
           Galeri
         </h2>
         <p class="mt-3 text-sm leading-relaxed text-white/85">
-          Lihat suasana kamar, kolam renang, dan sekitar vila lewat kumpulan
+          Lihat suasana kamar, pegunungan, dan sekitar vila lewat kumpulan
           foto lengkap kami.
         </p>
         <RouterLink

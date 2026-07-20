@@ -10,6 +10,7 @@ import HeroSection from '../components/home/HeroSection.vue';
 import VillaFacilities from '../components/home/VillaFacilities.vue';
 import GalleryPeek from '../components/home/GalleryPeek.vue';
 import FAQSection from '../components/home/FAQSection.vue';
+import BookingCta from '../components/home/BookingCta.vue';
 import { useRooms } from '../composables/useRooms';
 import { useAvailability } from '../composables/useAvailability';
 import { useSettings } from '../composables/useSettings';
@@ -212,6 +213,8 @@ function onClear() {
     <GalleryPeek />
 
     <FAQSection />
+
+    <BookingCta />
 
     <RoomDetailModal
       :room="selectedRoom"

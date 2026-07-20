@@ -8,6 +8,7 @@ const facilities = [
   { icon: 'droplet', label: 'Kamar Mandi & Toilet' },
   { icon: 'wind', label: 'Kamar AC' },
   { icon: 'bath', label: 'Bak Mandi' },
+  { icon: 'mountain', label: 'Pemandangan Gunung Kantawan' },
   { icon: 'net', label: 'Jaring Tali' },
   { icon: 'coffee', label: 'Sarapan untuk 4 Orang' },
 ];

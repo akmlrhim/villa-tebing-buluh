@@ -32,7 +32,7 @@ const faqs = computed(() => [
   },
   {
     q: 'Apa saja fasilitas yang tersedia di vila?',
-    a: 'Kolam renang privat, gazebo tepi sungai, kano gratis, WiFi, AC, dan water heater di tiap kamar, sampai dapur bersama untuk unit keluarga. Rincian lengkap ada di halaman About, dan fasilitas per kamar tertera saat kamu buka detail kamarnya.',
+    a: 'Bathtub dengan pemandangan pegunungan, gazebo bambu, WiFi, AC, dan water heater di tiap kamar, sampai dapur bersama untuk unit keluarga. Dekat vila juga ada akses ke air terjun dan bamboo rafting. Rincian lengkap ada di halaman About, dan fasilitas per kamar tertera saat kamu buka detail kamarnya.',
   },
   {
     q: 'Berapa kapasitas maksimal tamu per kamar?',
@@ -58,10 +58,9 @@ const faqs = computed(() => [
 </script>
 
 <template>
-  <!-- FAQ -->
   <section
     id="faq"
-    class="mx-auto max-w-3xl scroll-mt-24 px-4 pt-16 pb-16 sm:px-6 md:pt-20 md:pb-24"
+    class="mx-auto max-w-3xl scroll-mt-24 px-4 pt-16 pb-10 sm:px-6 md:pt-20 md:pb-10"
   >
     <div class="text-center">
       <h2 class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl">
@@ -79,9 +78,9 @@ const faqs = computed(() => [
         <summary
           class="flex cursor-pointer list-none items-center justify-between gap-4 text-left"
         >
-          <span class="text-md font-sans font-medium text-black">{{
-            faq.q
-          }}</span>
+          <span class="font-sans text-sm font-medium text-black">
+            {{ faq.q }}
+          </span>
           <IconGlyph
             name="chevron-down"
             class="text-muted h-5 w-5 shrink-0 transition-transform duration-200 group-open:rotate-180"

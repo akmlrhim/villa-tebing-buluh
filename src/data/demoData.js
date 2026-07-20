@@ -17,7 +17,7 @@ export const demoRooms = [
     name: 'Cemerlang 1',
     slug: 'cemerlang-1',
     description:
-      'Kamar di lantai satu dengan akses langsung ke teras dan kolam renang. Interior kayu jati yang hangat, tempat tidur king, dan kamar mandi dalam dengan air panas. Cocok untuk pasangan yang ingin bangun pagi langsung berenang.',
+      'Kamar di lantai satu dengan akses langsung ke teras menghadap pegunungan. Interior kayu jati yang hangat, tempat tidur king, dan kamar mandi dalam dengan air panas serta bathtub. Cocok untuk pasangan yang ingin bangun pagi ditemani udara sejuk gunung.',
     price_per_night: 850000,
     min_nights: 1,
     max_guests: 2,
@@ -29,8 +29,8 @@ export const demoRooms = [
       'Water Heater',
       'Free WiFi',
       'Teras Pribadi',
-      'Akses Kolam Renang',
-      'Free Kano',
+      'Bathtub',
+      'Pemandangan Pegunungan',
     ],
     images: [
       {
@@ -52,7 +52,7 @@ export const demoRooms = [
     name: 'Cemerlang 2',
     slug: 'cemerlang-2',
     description:
-      'Kamar di lantai dua dengan jendela lebar menghadap rumpun bambu dan lembah sungai. Inilah kamar paling tenang di seluruh vila: yang terdengar hanya angin dan air. Tempat tidur king, meja kerja kecil, dan balkon untuk kopi pagi.',
+      'Kamar di lantai dua dengan jendela lebar menghadap rumpun bambu dan lembah Pegunungan Meratus. Inilah kamar paling tenang di seluruh vila: yang terdengar hanya angin dan bambu bergesekan. Tempat tidur king, meja kerja kecil, dan balkon untuk kopi pagi.',
     price_per_night: 950000,
     min_nights: 1,
     max_guests: 2,
@@ -63,9 +63,8 @@ export const demoRooms = [
       'AC',
       'Water Heater',
       'Free WiFi',
-      'Balkon View Sungai',
+      'Balkon View Pegunungan',
       'Meja Kerja',
-      'Free Kano',
     ],
     images: [
       {
@@ -101,7 +100,6 @@ export const demoRooms = [
       'Dapur + Peralatan Lengkap',
       'Ruang Duduk',
       'Gazebo',
-      'Free Kano',
     ],
     images: [
       {
@@ -114,7 +112,7 @@ export const demoRooms = [
       },
       {
         url: img('1584132967334-10e028bd69f7'),
-        alt: 'Dek kolam renang bersama di depan unit Serumpun',
+        alt: 'Dek kayu bersama di depan unit Serumpun',
       },
     ],
   },
@@ -150,11 +148,11 @@ export const demoSettings = {
 // Foto untuk halaman Our Gallery, dikelompokkan per area (F-05).
 export const demoGallery = [
   // Area vila
-  { url: img('1582610116397-edb318620f90', 1600), alt: 'Kolam renang privat dan taman Villa Tebing Buluh saat senja', group: 'Area Vila', tall: false },
-  { url: img('1584132967334-10e028bd69f7', 1600), alt: 'Dek kayu dan kursi santai di tepi kolam renang', group: 'Area Vila', tall: false },
-  { url: img('1571003123894-1f0594d2b5d9', 1600), alt: 'Gazebo tepi kolam dengan tirai putih saat langit ungu senja', group: 'Area Vila', tall: true },
+  { url: img('1582610116397-edb318620f90', 1600), alt: 'Taman Villa Tebing Buluh saat senja', group: 'Area Vila', tall: false },
+  { url: img('1584132967334-10e028bd69f7', 1600), alt: 'Dek kayu dan kursi santai di area vila', group: 'Area Vila', tall: false },
+  { url: img('1571003123894-1f0594d2b5d9', 1600), alt: 'Gazebo bambu dengan tirai putih saat langit ungu senja', group: 'Area Vila', tall: true },
   { url: img('1566073771259-6a8506099945', 1600), alt: 'Deretan kursi berjemur menghadap matahari terbenam', group: 'Area Vila', tall: false },
-  { url: img('1552733407-5d5c46c3bb3b', 1600), alt: 'Kano meluncur di sungai kecil di antara pohon kelapa', group: 'Area Vila', tall: true },
+  { url: img('1552733407-5d5c46c3bb3b', 1600), alt: 'Sungai kecil di antara pohon kelapa dekat vila', group: 'Area Vila', tall: true },
   // Kamar
   { url: img('1611892440504-42a792e24d32', 1600), alt: 'Interior kamar Cemerlang 1 dengan kayu jati hangat', group: 'Kamar', roomSlug: 'cemerlang-1', tall: false },
   { url: img('1582719478250-c89cae4dc85b', 1600), alt: 'Kamar Cemerlang 2 dengan jendela menghadap pepohonan', group: 'Kamar', roomSlug: 'cemerlang-2', tall: false },
@@ -175,5 +173,5 @@ export const demoGallery = [
 export const heroImage = {
   url: '/img/hero/home-2000.webp',
   srcset: [640, 828, 1080, 1600, 2000].map((w) => `/img/hero/home-${w}.webp ${w}w`).join(', '),
-  alt: 'Villa Tebing Buluh, teras kolam renang kayu dikelilingi rumpun bambu dan tanaman tropis',
+  alt: 'Villa Tebing Buluh, teras kayu dikelilingi rumpun bambu dan tanaman tropis',
 }
