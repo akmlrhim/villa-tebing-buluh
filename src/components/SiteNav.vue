@@ -49,8 +49,8 @@ watch(menuOpen, (open) => {
 
 <template>
   <header
-    class="sticky top-0 z-40 border-b transition-colors duration-300"
-    :class="overlay ? 'border-transparent bg-transparent [&_:focus-visible]:outline-white' : 'border-hairline-soft bg-canvas'"
+    class="sticky top-0 z-40 transition-colors duration-300"
+    :class="overlay ? 'border-b-0 bg-transparent [&_:focus-visible]:outline-white' : 'border-b border-hairline-soft bg-canvas'"
   >
     <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 md:h-20">
       <RouterLink to="/" class="flex items-center gap-2.5" aria-label="Ke halaman utama">
