@@ -21,12 +21,14 @@
 		imagesrcset="https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=640&q=80 640w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=828&q=80 828w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=1080&q=80 1080w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=1600&q=80 1600w, https://images.unsplash.com/photo-1721222204314-46922f2aada0?auto=format&fit=crop&w=2000&q=80 2000w"
 		imagesizes="100vw" />
 	<!-- Font non-blocking: preload lalu swap ke stylesheet (media trick), supaya
-	     tidak menahan render awal - noscript untuk fallback JS mati. -->
+	     tidak menahan render awal - noscript untuk fallback JS mati. Swap-nya
+	     dilakukan di main.js (bukan onload= inline) karena CSP script-src 'self'
+	     di vercel.json memblokir atribut event inline (script-src-attr). -->
 	<link rel="preload" as="style"
 		href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap" />
-	<link
+	<link id="gfonts-stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap"
-		rel="stylesheet" media="print" onload="this.media='all'">
+		rel="stylesheet" media="print">
 	<noscript>
 		<link
 			href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap"
