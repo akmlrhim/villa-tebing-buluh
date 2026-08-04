@@ -1,10 +1,5 @@
 import { computed, ref, watch } from 'vue'
 
-/**
- * Pagination sisi klien untuk daftar admin (booking, kamar, dst).
- * `items` boleh ref/computed reaktif — halaman otomatis kembali ke 1
- * saat isi (mis. hasil filter) berubah panjangnya.
- */
 export function usePagination(items, pageSize = 10) {
   const page = ref(1)
 

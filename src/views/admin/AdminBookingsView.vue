@@ -14,7 +14,7 @@ import { useToast } from '../../composables/useToast'
 import { usePagination } from '../../composables/usePagination'
 import { STATUSES, STATUS_LABEL } from '../../lib/bookingStatus'
 import { btnPrimary, selectClass } from '../../lib/ui'
-import { friendlyDbError } from '../../lib/supabase'
+import { friendlyDbError } from '../../lib/api'
 
 const { bookings, loading, fetchBookings, updateBookingStatus, deleteBooking, bulkDeleteBookings } = useBookings()
 const { rooms, fetchRooms } = useAdminRooms()
@@ -122,7 +122,7 @@ async function onDelete() {
 	<div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div>
-				<h1 class="font-sans text-2xl font-semibold tracking-tight text-ink">Kelola Booking</h1>
+				<h1 class="text-2xl font-semibold tracking-tight text-ink">Kelola Booking</h1>
 				<p class="mt-1 text-sm text-black">Input, ubah status, dan pantau semua reservasi.</p>
 			</div>
 			<div class="flex items-center gap-2">

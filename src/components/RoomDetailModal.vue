@@ -7,12 +7,11 @@ import RoomGallery from './RoomGallery.vue'
 import RoomAmenities from './RoomAmenities.vue'
 import RoomBookingPanel from './RoomBookingPanel.vue'
 import { useAvailability } from '../composables/useAvailability'
+import { usePromos } from '../composables/usePromos'
 import { formatRupiah, nightsBetween } from '../lib/format'
 
-// F-03: detail kamar sebagai modal - galeri, fasilitas, kalender, booking WA.
 const props = defineProps({
 	room: { type: Object, default: null },
-	/** Rentang dari widget pencarian Home, dipakai sebagai pra-pilihan */
 	initialRange: { type: Object, default: null },
 	initialGuests: { type: Number, default: 2 },
 })
@@ -24,6 +23,7 @@ const guests = ref(2)
 
 const router = useRouter()
 const { occupiedNights } = useAvailability()
+const { stayPrice, promoHighlight } = usePromos()
 
 const occupied = computed(() =>
 	props.room ? occupiedNights(props.room.id) : new Set(),
@@ -55,12 +55,14 @@ const nights = computed(() =>
 const belowMinNights = computed(
 	() => props.room && nights.value > 0 && nights.value < props.room.min_nights,
 )
-const total = computed(() =>
-	props.room && nights.value > 0 ? props.room.price_per_night * nights.value : 0,
+const stay = computed(() =>
+	props.room && range.value
+		? stayPrice(props.room, range.value.checkIn, range.value.checkOut)
+		: null,
 )
+const highlight = computed(() => (props.room ? promoHighlight(props.room) : null))
 const canBook = computed(() => range.value && !belowMinNights.value)
 
-// Lanjut ke halaman pembayaran (QRIS + tata cara) alih-alih langsung ke WA.
 function goToPayment() {
 	if (!props.room || !canBook.value) return
 	emit('close')
@@ -96,7 +98,6 @@ function onBackdropClick(event) {
 		class="m-0 h-dvh max-h-none w-full max-w-none bg-canvas p-0 md:m-auto md:h-auto md:max-h-[94dvh] md:max-w-4xl rounded-sm"
 		@close="emit('close')" @click="onBackdropClick">
 		<div v-if="room" class="flex h-full max-h-dvh flex-col overflow-y-auto md:max-h-[94dvh]">
-			<!-- Header -->
 			<div
 				class="sticky top-0 z-10 flex items-center justify-between border-b border-hairline-soft bg-canvas px-4 py-3 md:px-8">
 				<p class="text-sm font-semibold text-ink">{{ room.name }}</p>
@@ -107,17 +108,18 @@ function onBackdropClick(event) {
 				</button>
 			</div>
 
-			<!-- Galeri foto (F-03.2) -->
 			<RoomGallery :images="room.images" />
 
 			<div class="px-4 py-6 md:px-8 md:py-8">
-				<!-- Info kamar (F-03.3) -->
 				<div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
 					<div>
 						<h2 class="text-xl font-semibold tracking-tight text-ink md:text-[22px]">{{ room.name }}</h2>
 					</div>
 					<p class="text-lg">
-						<span class="font-semibold text-ink">{{ formatRupiah(room.price_per_night) }}</span>
+						<span v-if="highlight?.running" class="mr-1.5 text-base text-muted line-through">{{
+							formatRupiah(room.price_per_night) }}</span>
+						<span class="font-semibold" :class="highlight?.running ? 'text-primary' : 'text-ink'">{{
+							formatRupiah(highlight?.running ? highlight.price : room.price_per_night) }}</span>
 						<span class="text-sm text-muted"> / malam</span>
 					</p>
 				</div>
@@ -126,11 +128,9 @@ function onBackdropClick(event) {
 					{{ room.description }}
 				</p>
 
-				<!-- Fasilitas (F-03.4) -->
 				<hr class="my-7 border-hairline-soft" />
 				<RoomAmenities :amenities="room.amenities" />
 
-				<!-- Kalender + booking (F-03.5, F-03.7) -->
 				<hr class="my-7 border-hairline-soft" />
 				<h3 class="text-lg font-semibold text-ink">Pilih tanggal menginap</h3>
 				<p class="mt-1 text-sm text-muted">
@@ -140,8 +140,8 @@ function onBackdropClick(event) {
 				<div class="mt-6 grid items-start gap-8 md:grid-cols-[1fr_310px]">
 					<AvailabilityCalendar v-model="range" :occupied="occupied" />
 
-					<RoomBookingPanel :room="room" :range="range" v-model:guests="guests" :nights="nights" :total="total"
-						:below-min-nights="belowMinNights" :can-book="canBook" @book="goToPayment" />
+					<RoomBookingPanel :room="room" :range="range" v-model:guests="guests" :nights="nights"
+						:stay="stay" :below-min-nights="belowMinNights" :can-book="canBook" @book="goToPayment" />
 				</div>
 			</div>
 		</div>

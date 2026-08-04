@@ -14,16 +14,19 @@ import BookingCta from '../components/home/BookingCta.vue';
 import { useRooms } from '../composables/useRooms';
 import { useAvailability } from '../composables/useAvailability';
 import { useSettings } from '../composables/useSettings';
+import { usePromos } from '../composables/usePromos';
 import { formatDateID, nightsBetween } from '../lib/format';
 import { askAvailabilityMessage, waLink } from '../lib/whatsapp';
 
 const { rooms, loading, fetchRooms } = useRooms();
 const { isRoomAvailable, fetchAvailability } = useAvailability();
 const { whatsappNumber } = useSettings();
+const { fetchPromos } = usePromos();
 
 onMounted(() => {
   fetchRooms();
   fetchAvailability();
+  fetchPromos();
 });
 
 const query = ref(null);
@@ -135,6 +138,8 @@ function onClear() {
           :room="room"
           :status="roomStatus(room)"
           :nights="nights"
+          :check-in="query?.checkIn ?? ''"
+          :check-out="query?.checkOut ?? ''"
           @open="selectedRoom = room"
         />
       </div>

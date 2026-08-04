@@ -3,12 +3,9 @@ import { computed, ref } from 'vue'
 import IconGlyph from './IconGlyph.vue'
 import { addDaysISO, toISODate, todayISO } from '../lib/format'
 
-// F-03.5: kalender ketersediaan per kamar - tanggal terisi disabled,
-// tanggal kosong bisa dipilih sebagai rentang check-in → check-out.
 const props = defineProps({
-  /** Set berisi tanggal ISO yang malamnya sudah terisi */
   occupied: { type: Set, required: true },
-  modelValue: { type: Object, default: null }, // { checkIn, checkOut } | null
+  modelValue: { type: Object, default: null },
   monthsAhead: { type: Number, default: 5 },
 })
 const emit = defineEmits(['update:modelValue'])
@@ -18,7 +15,6 @@ const now = new Date()
 const monthOffset = ref(0)
 const pendingStart = ref(null)
 
-// Utility Tailwind per state sel kalender (menggantikan class scoped .day.*)
 const DAY_CLASS = {
   free: 'text-ink hover:shadow-[inset_0_0_0_1.5px_var(--color-ink)]',
   past: 'cursor-not-allowed text-muted-soft',
@@ -40,7 +36,7 @@ const monthLabel = computed(() => `${MONTH_NAMES[viewMonth.value]} ${viewYear.va
 const cells = computed(() => {
   const first = new Date(viewYear.value, viewMonth.value, 1)
   const daysInMonth = new Date(viewYear.value, viewMonth.value + 1, 0).getDate()
-  const leading = (first.getDay() + 6) % 7 // grid mulai Senin
+  const leading = (first.getDay() + 6) % 7
 
   const list = Array.from({ length: leading }, () => null)
   for (let day = 1; day <= daysInMonth; day++) {
@@ -80,7 +76,6 @@ function cellState(iso) {
 function pick(iso) {
   if (isPast(iso)) return
 
-  // Belum ada titik awal → tanggal terisi tidak bisa jadi check-in.
   if (!pendingStart.value) {
     if (isOccupied(iso)) return
     pendingStart.value = iso
@@ -88,14 +83,11 @@ function pick(iso) {
     return
   }
 
-  // Klik sebelum/sama dengan titik awal → pindahkan titik awal.
   if (iso <= pendingStart.value) {
     if (!isOccupied(iso)) pendingStart.value = iso
     return
   }
 
-  // Tanggal check-out sah selama semua malam sebelumnya kosong -
-  // hari check-out sendiri boleh bertepatan dengan check-in tamu lain.
   if (nightsFreeBetween(pendingStart.value, iso)) {
     emit('update:modelValue', { checkIn: pendingStart.value, checkOut: iso })
     pendingStart.value = null

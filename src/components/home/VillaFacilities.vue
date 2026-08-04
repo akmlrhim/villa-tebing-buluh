@@ -15,7 +15,6 @@ const facilities = [
 </script>
 
 <template>
-  <!-- Fasilitas vila (F-01.4) -->
   <section class="bg-surface-soft mt-20 py-16 md:mt-24 md:py-20">
     <div
       class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 md:grid-cols-[1fr_1.3fr] md:gap-16"

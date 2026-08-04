@@ -18,7 +18,6 @@ const links = [
 
 const menuOpen = ref(false);
 
-// Mode overlay: transparan di atas hero (hanya di Home, sebelum di-scroll).
 const scrolled = ref(false);
 function onScroll() {
   scrolled.value = window.scrollY > 8;
@@ -31,7 +30,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll);
 });
 
-// Halaman publik yang punya hero berfoto - navbar transparan sebelum di-scroll.
 const HERO_PATHS = new Set(['/', '/gallery', '/about', '/contact']);
 const overlay = computed(() => HERO_PATHS.has(route.path) && !scrolled.value);
 
@@ -73,7 +71,7 @@ watch(menuOpen, (open) => {
           aria-hidden="true"
         />
         <span
-          class="font-display text-base font-semibold tracking-tight transition-colors duration-300 md:text-lg"
+          class="text-base font-semibold tracking-tight transition-colors duration-300 md:text-lg"
           :class="overlay ? 'text-white' : 'text-ink'"
         >
           {{ villaName }}
@@ -123,7 +121,6 @@ watch(menuOpen, (open) => {
       </div>
     </div>
 
-    <!-- Menu layar penuh (mobile) -->
     <Transition name="sheet">
       <div
         v-if="menuOpen"

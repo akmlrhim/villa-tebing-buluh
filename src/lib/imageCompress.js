@@ -1,8 +1,3 @@
-/**
- * Kompres & konversi foto ke WebP di browser sebelum diunggah (hemat storage
- * & bandwidth). Turunkan resolusi bila melebihi maxDimension; kembalikan file
- * asli bila browser tak mendukung encode WebP atau file bukan gambar.
- */
 export async function compressToWebp(file, { maxDimension = 1920, quality = 0.82 } = {}) {
   if (!file.type?.startsWith('image/')) return file
 

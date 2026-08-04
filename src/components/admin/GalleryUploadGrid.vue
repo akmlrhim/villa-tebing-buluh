@@ -1,7 +1,6 @@
 <script setup>
 import IconGlyph from '../IconGlyph.vue'
 
-// Grid foto galeri (tampilan admin). Presentasional; parent mengelola data & aksi.
 defineProps({
   images: { type: Array, default: () => [] },
   busyId: { type: [String, Number], default: null },

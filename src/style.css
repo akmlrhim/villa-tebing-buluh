@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Noto Sans", -apple-system, system-ui, Roboto, "Helvetica Neue", sans-serif;
-  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans: system-ui, sans-serif;
 
   --color-primary: #3b7d46;
   --color-primary-active: #2f6539;
@@ -28,13 +27,10 @@
   --radius-lg: 20px;
   --radius-xl: 32px;
 
-  /* Satu-satunya definisi bayangan di seluruh sistem (DESIGN.md - Elevation) */
   --shadow-float: 0 0 0 1px rgb(0 0 0 / 0.02), 0 2px 6px 0 rgb(0 0 0 / 0.04), 0 4px 8px 0 rgb(0 0 0 / 0.1);
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 
-  /* Entrance halus untuk konten hero - pakai via utility animate-rise-in;
-     matikan dengan motion-reduce:animate-none di markup. */
   --animate-rise-in: rise-in 0.7s var(--ease-out-quart) both;
   --animate-rise-in-late: rise-in 0.7s var(--ease-out-quart) 0.15s both;
 
@@ -54,8 +50,6 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    /* Cegah rubber-band scroll di Mac/trackpad menyingkap latar putih di atas
-       header sticky saat hero (gelap) berada di paling atas halaman. */
     overscroll-behavior-y: none;
   }
 
@@ -68,7 +62,6 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
     text-wrap: balance;
   }
 

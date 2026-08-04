@@ -3,8 +3,6 @@ import { ref, watch } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 import { formatRupiah } from '../../lib/format'
 
-// Detail kamar read-only untuk admin (F-09): semua field kamar tanpa alur
-// booking publik. prop.room: null = tersembunyi, object = tampil.
 const props = defineProps({
 	room: { type: Object, default: null },
 })
@@ -38,7 +36,7 @@ function nextPhoto() {
 			class="relative flex max-h-[94dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-lg bg-canvas shadow-float sm:rounded-lg">
 			<header class="flex items-center justify-between border-b border-hairline-soft px-5 py-4">
 				<div class="flex items-center gap-2.5">
-					<h2 class="font-sans text-lg font-semibold text-ink">{{ room.name }}</h2>
+					<h2 class="text-lg font-semibold text-ink">{{ room.name }}</h2>
 					<span class="rounded-full px-2 py-0.5 text-[11px] font-medium"
 						:class="room.is_active ? 'bg-primary/10 text-primary' : 'bg-surface-strong text-muted'">
 						{{ room.is_active ? 'Aktif' : 'Nonaktif' }}
@@ -51,7 +49,6 @@ function nextPhoto() {
 			</header>
 
 			<div class="flex-1 overflow-y-auto">
-				<!-- Galeri foto -->
 				<div class="relative aspect-[16/9] overflow-hidden bg-surface-strong">
 					<img v-if="room.images.length" :src="room.images[photoIndex]?.url"
 						:alt="room.images[photoIndex]?.alt" class="h-full w-full object-cover" />
@@ -94,22 +91,22 @@ function nextPhoto() {
 						<div>
 							<dt class="text-muted">Tempat tidur</dt>
 							<dd class="mt-0.5 font-medium text-ink">
-								{{ room.bed_count }}{{ room.bed_type ? ` × ${room.bed_type}` : ' bed' }}
+								{{ room.bed_count }}{{ room.bed_type ? ` Ã— ${room.bed_type}` : ' bed' }}
 							</dd>
 						</div>
 						<div>
 							<dt class="text-muted">Luas</dt>
-							<dd class="mt-0.5 font-medium text-ink">{{ room.size_sqm ? `${room.size_sqm} m²` : '-' }}</dd>
+							<dd class="mt-0.5 font-medium text-ink">{{ room.size_sqm ? `${room.size_sqm} mÂ²` : '-' }}</dd>
 						</div>
 					</dl>
 
 					<div v-if="room.description">
-						<h3 class="font-sans text-sm font-semibold text-ink">Deskripsi</h3>
+						<h3 class="text-sm font-semibold text-ink">Deskripsi</h3>
 						<p class="mt-1.5 text-sm leading-relaxed text-body">{{ room.description }}</p>
 					</div>
 
 					<div v-if="room.amenities?.length">
-						<h3 class="font-sans text-sm font-semibold text-ink">Fasilitas</h3>
+						<h3 class="text-sm font-semibold text-ink">Fasilitas</h3>
 						<ul class="mt-2 flex flex-wrap gap-2">
 							<li v-for="amenity in room.amenities" :key="amenity"
 								class="rounded-full bg-surface-strong px-3 py-1 text-sm text-body">

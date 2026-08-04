@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { useAdminRooms } from './useAdminRooms'
 import { uploadRoomImage } from '../lib/storage'
-import { friendlyDbError } from '../lib/supabase'
+import { friendlyDbError } from '../lib/api'
 
 const blank = () => ({
   id: undefined,
@@ -27,10 +27,6 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '')
 }
 
-/**
- * State & logika form kamar (F-09). `roomRef` = ref/computed ke prop.room
- * (null = tambah, object = edit, undefined = tersembunyi).
- */
 export function useRoomForm(roomRef, emit) {
   const { saveRoom } = useAdminRooms()
 
@@ -61,7 +57,6 @@ export function useRoomForm(roomRef, emit) {
     { immediate: true },
   )
 
-  // Slug selalu mengikuti nama — tidak ada input slug manual di form.
   watch(
     () => form.value.name,
     (name) => {

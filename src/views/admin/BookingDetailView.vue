@@ -11,7 +11,7 @@ import { useBookingProof } from '../../composables/useBookingProof'
 import { useToast } from '../../composables/useToast'
 import { STATUSES, STATUS_LABEL } from '../../lib/bookingStatus'
 import { btnDanger, btnGhost, selectClass } from '../../lib/ui'
-import { friendlyDbError } from '../../lib/supabase'
+import { friendlyDbError } from '../../lib/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,7 +83,7 @@ async function onDelete() {
     <template v-else>
       <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 class="font-sans text-2xl font-semibold tracking-tight text-ink">{{ booking.guest_name }}</h1>
+          <h1 class="text-2xl font-semibold tracking-tight text-ink">{{ booking.guest_name }}</h1>
           <p class="mt-1 text-sm text-muted">{{ booking.rooms?.name ?? '-' }}</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">

@@ -7,8 +7,6 @@ import { formatRupiah, todayISO } from '../../lib/format'
 import { STATUSES } from '../../lib/bookingStatus'
 import { fieldClass, selectClass, btnGhost, btnPrimary } from '../../lib/ui'
 
-// Modal input/edit booking (F-10). prop.booking: null = baru, object = edit,
-// undefined = tersembunyi. prop.rooms: daftar kamar untuk dropdown.
 const props = defineProps({
   booking: { type: Object, default: undefined },
   rooms: { type: Array, default: () => [] },
@@ -21,7 +19,6 @@ const { form, saving, errorMsg, isOpen, isEdit, nights, markTotalTouched, onSubm
   emit,
 )
 
-// Input tanggal punya gaya khusus (picker kustom).
 const DATE_CLASS =
   'h-10.5 w-full cursor-pointer appearance-none rounded-sm border border-hairline bg-canvas px-3.5 pr-10 text-sm placeholder:text-sm leading-normal text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-date-and-time-value]:text-left'
 </script>
@@ -34,7 +31,7 @@ const DATE_CLASS =
     <div
       class="relative flex max-h-[94dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-lg bg-canvas shadow-float sm:rounded-lg">
       <header class="flex items-center justify-between border-b border-hairline-soft px-5 py-4">
-        <h2 class="font-sans text-lg font-semibold text-ink">{{ isEdit ? 'Edit Booking' : 'Booking Baru' }}</h2>
+        <h2 class="text-lg font-semibold text-ink">{{ isEdit ? 'Edit Booking' : 'Booking Baru' }}</h2>
         <button type="button" class="grid h-9 w-9 place-items-center rounded-full hover:bg-surface-strong"
           aria-label="Tutup" @click="emit('close')">
           <IconGlyph name="x" class="h-5 w-5" />

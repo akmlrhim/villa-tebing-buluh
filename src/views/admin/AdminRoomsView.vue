@@ -10,7 +10,7 @@ import { useAdminRooms } from '../../composables/useAdminRooms'
 import { useToast } from '../../composables/useToast'
 import { usePagination } from '../../composables/usePagination'
 import { formatRupiah } from '../../lib/format'
-import { friendlyDbError } from '../../lib/supabase'
+import { friendlyDbError } from '../../lib/api'
 
 const { rooms, loading, fetchRooms, toggleActive, deleteRoom, bulkDeleteRooms } = useAdminRooms()
 const toast = useToast()
@@ -109,7 +109,7 @@ const primaryImage = (room) =>
 	<div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div>
-				<h1 class="font-sans text-2xl font-semibold tracking-tight text-ink">Kelola Kamar</h1>
+				<h1 class="text-2xl font-semibold tracking-tight text-ink">Kelola Kamar</h1>
 				<p class="mt-1 text-sm text-black">Tambah, ubah, atau nonaktifkan kamar vila.</p>
 			</div>
 			<button type="button"
@@ -219,7 +219,7 @@ const primaryImage = (room) =>
 		<div v-if="confirmDelete" class="fixed inset-0 z-50 grid place-items-center p-4">
 			<div class="absolute inset-0 bg-black/50" @click="confirmDelete = null" />
 			<div class="relative w-full max-w-sm rounded-md bg-canvas p-6 shadow-float">
-				<h2 class="font-sans text-lg font-semibold text-ink">Hapus kamar?</h2>
+				<h2 class="text-lg font-semibold text-ink">Hapus kamar?</h2>
 				<p class="mt-2 text-sm text-muted">
 					Kamar <strong class="text-ink">{{ confirmDelete.name }}</strong> akan dihapus permanen beserta
 					fotonya. Tindakan ini tidak bisa dibatalkan.

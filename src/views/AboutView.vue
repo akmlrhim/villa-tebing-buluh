@@ -11,7 +11,6 @@ const { rooms } = useRooms();
 const { settings, villaName } = useSettings();
 const selectedRoom = ref(null);
 
-// Hero disimpan lokal (bukan hotlink Unsplash) di public/img/about/.
 const hero = {
   url: '/img/about/hero-2000.webp',
   srcset: [640, 1080, 1600, 2000]

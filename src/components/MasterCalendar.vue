@@ -42,7 +42,6 @@ const viewYear = computed(() => new Date(now.getFullYear(), now.getMonth() + mon
 const viewMonth = computed(() => new Date(now.getFullYear(), now.getMonth() + monthOffset.value, 1).getMonth())
 const monthLabel = computed(() => `${MONTH_NAMES[viewMonth.value]} ${viewYear.value}`)
 
-/** Malam `iso` tertutup booking bila check_in <= iso < check_out. */
 function bookingFor(roomId, iso) {
 	return (
 		occupancies.value.find(
@@ -54,7 +53,7 @@ function bookingFor(roomId, iso) {
 const cells = computed(() => {
 	const first = new Date(viewYear.value, viewMonth.value, 1)
 	const daysInMonth = new Date(viewYear.value, viewMonth.value + 1, 0).getDate()
-	const leading = (first.getDay() + 6) % 7 // grid mulai Senin
+	const leading = (first.getDay() + 6) % 7
 
 	const list = Array.from({ length: leading }, () => null)
 	for (let day = 1; day <= daysInMonth; day++) {

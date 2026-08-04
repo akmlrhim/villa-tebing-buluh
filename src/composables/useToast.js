@@ -1,7 +1,5 @@
 import { ref } from 'vue'
 
-// Toast global: notifikasi singkat untuk hasil aksi (simpan, hapus, salin, dll).
-// Dipakai di admin maupun publik; dirender oleh <ToastHost> di App.vue.
 const toasts = ref([])
 let nextId = 0
 

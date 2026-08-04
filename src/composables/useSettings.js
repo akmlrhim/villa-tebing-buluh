@@ -1,17 +1,14 @@
 import { computed, ref } from 'vue'
-import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { api, authApi } from '../lib/api'
 import { demoSettings } from '../data/demoData'
 
-// Nilai demo dipakai sebagai fallback per-key supaya halaman tetap utuh
-// walau tabel settings baru terisi sebagian.
 const settings = ref({ ...demoSettings })
 let loadPromise = null
 
 async function load() {
-  if (!isSupabaseConfigured) return
-  const { data, error } = await supabase.from('settings').select('key, value')
-  if (!error && data) {
-    for (const row of data) settings.value[row.key] = row.value
+  try {
+    Object.assign(settings.value, await api.get('/settings'))
+  } catch {
   }
 }
 
@@ -21,20 +18,8 @@ export function useSettings() {
     return loadPromise
   }
 
-  /** Simpan sebagian setting (F-11.2). `patch` = { key: value, ... }. */
   async function saveSettings(patch) {
-    const rows = Object.entries(patch).map(([key, value]) => ({
-      key,
-      value: value == null ? '' : String(value),
-    }))
-    const { data, error } = await supabase.from('settings').upsert(rows).select('key')
-    if (error) throw error
-    // upsert() tidak selalu error walau RLS memblokir sebagian baris -- cek
-    // jumlah baris yang benar-benar kena supaya gagal-diam-diam kelihatan.
-    if (!data || data.length < rows.length) {
-      throw new Error('Pengaturan gagal tersimpan sepenuhnya. Coba muat ulang halaman dan login lagi.')
-    }
-    // Perbarui state lokal supaya UI langsung ikut berubah.
+    await authApi.put('/settings', patch)
     for (const [key, value] of Object.entries(patch)) settings.value[key] = value
   }
 

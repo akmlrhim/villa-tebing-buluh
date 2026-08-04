@@ -8,7 +8,6 @@ export function formatRupiah(value) {
   return rupiah.format(value)
 }
 
-/** 'YYYY-MM-DD' -> Date lokal (hindari pergeseran zona waktu dari parsing ISO murni) */
 export function parseISODate(iso) {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d)
@@ -36,7 +35,6 @@ export function nightsBetween(checkInISO, checkOutISO) {
   return Math.round(ms / 86400000)
 }
 
-/** '2026-07-10' -> 'Jum, 10 Jul 2026' */
 export function formatDateID(iso, { weekday = true } = {}) {
   return parseISODate(iso).toLocaleDateString('id-ID', {
     ...(weekday ? { weekday: 'short' } : {}),
@@ -46,7 +44,6 @@ export function formatDateID(iso, { weekday = true } = {}) {
   })
 }
 
-/** '2026-07-10' -> '10 Juli 2026' */
 export function formatDateLongID(iso) {
   return parseISODate(iso).toLocaleDateString('id-ID', {
     day: 'numeric',

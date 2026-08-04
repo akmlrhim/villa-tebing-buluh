@@ -1,9 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth";
 import { useToast } from "../composables/useToast";
-// Home dimuat statis (bukan dynamic import) supaya tidak ada round-trip JS
-// tambahan sebelum hero LCP dirender - ini halaman yang paling sering jadi
-// pintu masuk pertama.
 import HomeView from "../views/HomeView.vue";
 
 const routes = [
@@ -44,7 +41,6 @@ const routes = [
     meta: { title: "Cek Status Booking · Villa Tebing Buluh" },
   },
 
-  // ---------- Admin ----------
   {
     path: "/admin/login",
     name: "admin-login",
@@ -81,6 +77,12 @@ const routes = [
         meta: { title: "Detail Booking · Admin" },
       },
       {
+        path: "promo",
+        name: "admin-promos",
+        component: () => import("../views/admin/AdminPromosView.vue"),
+        meta: { title: "Kelola Promo · Admin" },
+      },
+      {
         path: "galeri",
         name: "admin-gallery",
         component: () => import("../views/admin/AdminGalleryView.vue"),
@@ -106,10 +108,7 @@ export const router = createRouter({
   },
 });
 
-// Guard admin (F-08.2): tunggu status auth siap, redirect ke login bila perlu.
 router.beforeEach(async (to, from) => {
-  // Path tak dikenal: batalkan navigasi (tetap di halaman sebelumnya);
-  // bila diakses langsung (tidak ada halaman sebelumnya), arahkan ke beranda.
   if (!to.matched.length) {
     useToast().info("Halaman tidak ditemukan.");
     return from.matched.length ? false : { name: "home" };

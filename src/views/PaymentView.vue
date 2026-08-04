@@ -9,7 +9,7 @@ import { usePaymentBooking } from '../composables/usePaymentBooking'
 import { useSettings } from '../composables/useSettings'
 import { formatRupiah } from '../lib/format'
 
-const { params, room, nights, total, stillLoading, invalid } = usePaymentBooking()
+const { params, room, nights, stay, total, stillLoading, invalid } = usePaymentBooking()
 const {
   whatsappNumber,
   qrisImageUrl,
@@ -107,7 +107,7 @@ function scrollToForm() {
         </div>
 
         <BookingSummary :room="room" :check-in="params.checkIn" :check-out="params.checkOut" :guests="params.guests"
-          :nights="nights" :total="total" :deadline-hours="paymentDeadlineHours" @confirm="scrollToForm" />
+          :nights="nights" :stay="stay" :deadline-hours="paymentDeadlineHours" @confirm="scrollToForm" />
       </div>
     </template>
   </div>

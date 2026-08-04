@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import IconGlyph from './IconGlyph.vue';
 import { addDaysISO, todayISO } from '../lib/format';
 
-// F-02: widget cek ketersediaan - check-in & check-out.
 const emit = defineEmits(['search', 'clear']);
 const checkIn = ref('');
 const checkOut = ref('');

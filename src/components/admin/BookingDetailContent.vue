@@ -5,7 +5,6 @@ import { useToast } from '../../composables/useToast'
 import { formatDateID, formatRupiah, nightsBetween } from '../../lib/format'
 import { STATUS_CLASS, STATUS_LABEL } from '../../lib/bookingStatus'
 
-// Isi detail booking + bukti bayar, dipakai oleh BookingDetailView.
 const props = defineProps({
   booking: { type: Object, required: true },
   proofUrl: { type: String, default: '' },
@@ -16,8 +15,6 @@ const props = defineProps({
 const toast = useToast()
 const copied = ref(false)
 
-// 8 karakter pertama UUID, huruf besar — kode yang sama persis dipakai tamu
-// di layar sukses pembayaran & halaman publik /cek-booking.
 const code = computed(() => props.booking.id.slice(0, 8).toUpperCase())
 
 async function copyCode() {
@@ -45,7 +42,6 @@ const createdAt = (iso) =>
 
 <template>
   <div class="grid gap-8 px-6 py-6 md:grid-cols-2">
-    <!-- Ringkasan booking & pembayaran -->
     <dl class="grid grid-cols-2 content-start gap-x-5 gap-y-4 text-sm">
       <div class="col-span-2">
         <dt class="text-xs text-muted">Kode booking</dt>
@@ -107,7 +103,6 @@ const createdAt = (iso) =>
       </div>
     </dl>
 
-    <!-- Bukti bayar -->
     <div>
       <p class="text-xs font-medium text-muted">Bukti bayar</p>
       <div class="mt-2 grid min-h-64 place-items-center rounded-md bg-surface-soft p-3">

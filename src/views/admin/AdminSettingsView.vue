@@ -4,7 +4,7 @@ import IconGlyph from '../../components/IconGlyph.vue'
 import { useSettings } from '../../composables/useSettings'
 import { useToast } from '../../composables/useToast'
 import { uploadRoomImage } from '../../lib/storage'
-import { friendlyDbError } from '../../lib/supabase'
+import { friendlyDbError } from '../../lib/api'
 
 const { settings, fetchSettings, saveSettings } = useSettings()
 const toast = useToast()
@@ -61,12 +61,12 @@ async function onSave() {
 
 <template>
 	<div class="max-w-2xl">
-		<h1 class="font-sans text-2xl font-semibold tracking-tight text-ink">Pengaturan</h1>
+		<h1 class="text-2xl font-semibold tracking-tight text-ink">Pengaturan</h1>
 		<p class="mt-1 text-sm text-black">Informasi vila, kontak, dan pembayaran QRIS.</p>
 
 		<form class="mt-6 space-y-4" @submit.prevent="onSave">
 			<section class="rounded-sm border border-hairline bg-canvas p-5 shadow-sm">
-				<h2 class="font-sans text-base font-semibold text-ink">Informasi Vila</h2>
+				<h2 class="text-base font-semibold text-ink">Informasi Vila</h2>
 				<div class="mt-4 space-y-4">
 					<div>
 						<label class="mb-1.5 block text-[0.8125rem] font-semibold text-ink">Nama vila</label>
@@ -110,7 +110,7 @@ async function onSave() {
 			</section>
 
 			<section class="rounded-sm border border-hairline bg-canvas p-5 shadow-sm">
-				<h2 class="font-sans text-base font-semibold text-ink">Pembayaran QRIS</h2>
+				<h2 class="text-base font-semibold text-ink">Pembayaran QRIS</h2>
 				<p class="mt-1 text-sm text-muted">Tampil di halaman pembayaran saat tamu booking.</p>
 				<div class="mt-4 space-y-4">
 					<div class="grid gap-4 sm:grid-cols-2">

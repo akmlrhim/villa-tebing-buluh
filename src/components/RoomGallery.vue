@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue'
 import IconGlyph from './IconGlyph.vue'
 
-// Galeri foto kamar (F-03.2) dengan navigasi + dot indikator.
 const props = defineProps({
   images: { type: Array, default: () => [] },
 })

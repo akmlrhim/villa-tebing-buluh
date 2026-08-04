@@ -7,8 +7,6 @@ import CurrencyInput from './CurrencyInput.vue'
 import { useRoomForm } from '../../composables/useRoomForm'
 import { fieldClass, btnGhost, btnPrimary } from '../../lib/ui'
 
-// Modal tambah/edit kamar (F-09). prop.room: null = tambah, object = edit,
-// undefined = tersembunyi.
 const props = defineProps({
   room: { type: Object, default: undefined },
 })
@@ -39,7 +37,7 @@ const {
     <div
       class="relative flex max-h-[94dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-lg bg-canvas shadow-float sm:rounded-lg">
       <header class="flex items-center justify-between border-b border-hairline-soft px-5 py-4">
-        <h2 class="font-sans text-lg font-semibold text-ink">{{ isEdit ? 'Edit Kamar' : 'Tambah Kamar' }}</h2>
+        <h2 class="text-lg font-semibold text-ink">{{ isEdit ? 'Edit Kamar' : 'Tambah Kamar' }}</h2>
         <button type="button" class="grid h-9 w-9 place-items-center rounded-full hover:bg-surface-strong"
           aria-label="Tutup" @click="emit('close')">
           <IconGlyph name="x" class="h-5 w-5" />

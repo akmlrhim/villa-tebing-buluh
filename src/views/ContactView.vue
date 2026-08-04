@@ -7,7 +7,6 @@ import { generalMessage, waLink } from '../lib/whatsapp'
 
 const { settings, whatsappNumber } = useSettings()
 
-// Foto disimpan lokal (bukan hotlink Unsplash) di public/img/contact/.
 const hero = {
 	url: '/img/contact/hero-2000.webp',
 	srcset: [640, 1080, 1600, 2000].map((w) => `/img/contact/hero-${w}.webp ${w}w`).join(', '),

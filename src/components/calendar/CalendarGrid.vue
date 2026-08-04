@@ -1,9 +1,6 @@
 <script setup>
 import IconGlyph from '../IconGlyph.vue'
 
-// Grid kalender bulan penuh (presentasional). Data & derivasi state sel
-// (cells / cellClass / cellAria) dihitung oleh induk MasterCalendar dan
-// dioper lewat props agar `bookingFor` tetap satu sumber.
 defineProps({
 	monthLabel: { type: String, required: true },
 	dayNames: { type: Array, required: true },

@@ -4,14 +4,12 @@ export function waLink(number, message) {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`
 }
 
-/** Nomor WA tamu: buang non-digit, awalan 0 -> 62 (dipakai form booking & cek status). */
 export function normalizePhone(input) {
   let digits = (input || '').replace(/\D/g, '')
   if (digits.startsWith('0')) digits = '62' + digits.slice(1)
   return digits
 }
 
-/** Template pesan booking per PRD F-04.2 */
 export function bookingMessage({ roomName, checkIn, checkOut, guests }) {
   const nights = nightsBetween(checkIn, checkOut)
   return (
@@ -29,11 +27,6 @@ export function askAvailabilityMessage({ checkIn, checkOut, guests }) {
   )
 }
 
-/**
- * Follow-up setelah tamu mengirim form konfirmasi pembayaran.
- * Bukti bayar sudah terunggah lewat form, jadi pesan ini hanya untuk
- * mempercepat verifikasi / bertanya ke admin.
- */
 export function paymentSubmittedMessage({ guestName, roomName, checkIn, checkOut, bookingCode }) {
   return (
     `Halo, saya *${guestName}*. Saya sudah membayar via QRIS dan mengisi ` +

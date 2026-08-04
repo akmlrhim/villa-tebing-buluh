@@ -11,9 +11,10 @@ const mobileOpen = ref(false)
 
 const nav = [
 	{ to: { name: 'admin-dashboard' }, label: 'Dashboard', icon: 'grid' },
-	{ to: { name: 'admin-rooms' }, label: 'Kelola Kamar', icon: 'bed' },
-	{ to: { name: 'admin-bookings' }, label: 'Kelola Booking', icon: 'calendar' },
-	{ to: { name: 'admin-gallery' }, label: 'Kelola Galeri', icon: 'image' },
+	{ to: { name: 'admin-rooms' }, label: 'Kamar', icon: 'bed' },
+	{ to: { name: 'admin-bookings' }, label: 'Booking', icon: 'calendar' },
+	{ to: { name: 'admin-promos' }, label: 'Promo', icon: 'tag' },
+	{ to: { name: 'admin-gallery' }, label: 'Galeri', icon: 'image' },
 	{ to: { name: 'admin-settings' }, label: 'Pengaturan', icon: 'settings' },
 ]
 

@@ -4,7 +4,6 @@ import IconGlyph from '../IconGlyph.vue'
 import { formatDateID, formatRupiah } from '../../lib/format'
 import { STATUSES, STATUS_CLASS } from '../../lib/bookingStatus'
 
-// Tabel booking (tampilan desktop).
 const props = defineProps({
 	bookings: { type: Array, default: () => [] },
 	busyId: { type: [String, Number], default: null },

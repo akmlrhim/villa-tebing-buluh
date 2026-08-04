@@ -29,7 +29,6 @@ const phoneNormalized = computed(() => normalizePhone(guestPhone.value))
 const nameValid = computed(() => guestName.value.trim().length >= 3)
 const phoneValid = computed(() => /^62\d{8,13}$/.test(phoneNormalized.value))
 
-// Pesan ramah untuk error tervalidasi dari fungsi RPC create_public_booking.
 const RPC_ERRORS = {
   DATE_TAKEN: 'Maaf, tanggal ini baru saja dipesan tamu lain. Hubungi admin via WhatsApp untuk solusinya.',
   DUPLICATE_PENDING: 'Konfirmasi untuk tanggal ini sudah pernah dikirim dari nomor ini dan sedang diproses.',
@@ -51,7 +50,6 @@ async function submitConfirmation() {
   }
   submitting.value = true
   try {
-    // Cek ulang ketersediaan tepat sebelum menyimpan (server tetap cek atomik).
     const conflict = await hasPublicConflict({
       roomId: props.room.id,
       checkIn: props.checkIn,

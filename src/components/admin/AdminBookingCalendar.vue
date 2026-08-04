@@ -3,7 +3,6 @@ import { computed, ref } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 import { toISODate, todayISO } from '../../lib/format'
 
-// Kalender booking admin (F-10.5): semua booking, warna per status.
 const props = defineProps({
 	bookings: { type: Array, default: () => [] },
 })
@@ -29,7 +28,6 @@ const cells = computed(() => {
 	const y = cursor.value.getFullYear()
 	const m = cursor.value.getMonth()
 	const first = new Date(y, m, 1)
-	// Senin sebagai kolom pertama.
 	const lead = (first.getDay() + 6) % 7
 	const daysInMonth = new Date(y, m + 1, 0).getDate()
 	const out = []
@@ -52,7 +50,7 @@ function shift(delta) {
 <template>
 	<div class="rounded-md border border-hairline bg-canvas p-4 shadow-float sm:p-5">
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="font-sans text-base font-semibold text-ink">{{ monthLabel }}</h2>
+			<h2 class="text-base font-semibold text-ink">{{ monthLabel }}</h2>
 			<div class="flex items-center gap-1">
 				<button type="button" class="grid h-9 w-9 place-items-center rounded-sm hover:bg-surface-strong"
 					aria-label="Bulan sebelumnya" @click="shift(-1)">

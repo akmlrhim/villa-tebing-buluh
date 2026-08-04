@@ -1,7 +1,6 @@
 import { ref } from 'vue'
-import { supabase, assertRowsAffected } from '../lib/supabase'
+import { api, authApi } from '../lib/api'
 
-// CRUD galeri publik untuk admin (bebas unggah multi-foto, tanpa kategori).
 const images = ref([])
 const loading = ref(false)
 const error = ref(null)
@@ -11,12 +10,7 @@ export function useAdminGallery() {
     loading.value = images.value.length === 0
     error.value = null
     try {
-      const { data, error: err } = await supabase
-        .from('gallery_images')
-        .select('*')
-        .order('sort_order', { ascending: true })
-      if (err) throw err
-      images.value = data
+      images.value = await api.get('/gallery')
     } catch (err) {
       error.value = err
     } finally {
@@ -24,26 +18,18 @@ export function useAdminGallery() {
     }
   }
 
-  /** `urls`: array of public URL string hasil upload. */
   async function addImages(urls) {
-    const startOrder = images.value.length
-    const rows = urls.map((url, i) => ({ image_url: url, sort_order: startOrder + i }))
-    const { error: err } = await supabase.from('gallery_images').insert(rows)
-    if (err) throw err
+    await authApi.post('/gallery', { urls })
     await fetchGallery()
   }
 
   async function deleteImage(id) {
-    const { data, error: err } = await supabase.from('gallery_images').delete().eq('id', id).select('id')
-    if (err) throw err
-    assertRowsAffected(data)
+    await authApi.del(`/gallery/${id}`)
     await fetchGallery()
   }
 
   async function bulkDeleteImages(ids) {
-    const { data, error: err } = await supabase.from('gallery_images').delete().in('id', ids).select('id')
-    if (err) throw err
-    assertRowsAffected(data)
+    await authApi.post('/gallery/bulk-delete', { ids })
     await fetchGallery()
   }
 

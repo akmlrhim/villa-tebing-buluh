@@ -1,10 +1,8 @@
 import { ref } from 'vue'
-import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { api } from '../lib/api'
 import { demoBookings } from '../data/demoData'
 import { addDaysISO, nightsBetween } from '../lib/format'
 
-// Baris { room_id, check_in, check_out } dari view public_availability -
-// tanpa data pribadi tamu (PRD F-03.6).
 const occupancies = ref([])
 const loading = ref(false)
 const error = ref(null)
@@ -14,33 +12,23 @@ async function load() {
   loading.value = true
   error.value = null
 
-  if (!isSupabaseConfigured) {
-    occupancies.value = demoBookings
-    loading.value = false
-    return
-  }
-
-  const { data, error: err } = await supabase
-    .from('public_availability')
-    .select('room_id, check_in, check_out')
-
-  if (err) {
+  try {
+    occupancies.value = await api.get('/bookings/availability')
+  } catch (err) {
     if (import.meta.env.DEV) {
       console.warn(
-        '[useAvailability] Gagal membaca public_availability - jalankan supabase/schema.sql. Sementara memakai data demo.',
+        '[useAvailability] Gagal memuat /api/bookings/availability - jalankan `npm run server`. Sementara memakai data demo.',
         err.message,
       )
       occupancies.value = demoBookings
     } else {
       error.value = err
     }
-  } else {
-    occupancies.value = data
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
-/** Malam [check_in, check_out) beririsan - perbandingan string ISO aman untuk tanggal. */
 function overlaps(row, checkIn, checkOut) {
   return row.check_in < checkOut && row.check_out > checkIn
 }
@@ -57,7 +45,6 @@ export function useAvailability() {
     )
   }
 
-  /** Set tanggal ISO yang malamnya sudah terisi untuk satu kamar (untuk kalender). */
   function occupiedNights(roomId) {
     const nights = new Set()
     for (const row of occupancies.value) {

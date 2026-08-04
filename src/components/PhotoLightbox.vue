@@ -2,9 +2,8 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import IconGlyph from './IconGlyph.vue'
 
-// F-05.3: lightbox layar penuh dengan navigasi next/prev + keyboard.
 const props = defineProps({
-	items: { type: Array, required: true }, // [{ url, alt }]
+	items: { type: Array, required: true },
 	index: { type: Number, default: 0 },
 	open: { type: Boolean, default: false },
 })

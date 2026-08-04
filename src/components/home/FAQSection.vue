@@ -78,7 +78,7 @@ const faqs = computed(() => [
         <summary
           class="flex cursor-pointer list-none items-center justify-between gap-4 text-left"
         >
-          <span class="font-sans text-sm font-medium text-black">
+          <span class="text-sm font-medium text-black">
             {{ faq.q }}
           </span>
           <IconGlyph
@@ -87,7 +87,7 @@ const faqs = computed(() => [
           />
         </summary>
         <p
-          class="mt-3 max-w-[65ch] font-sans text-sm leading-relaxed text-black"
+          class="mt-3 max-w-[65ch] text-sm leading-relaxed text-black"
         >
           {{ faq.a }}
         </p>

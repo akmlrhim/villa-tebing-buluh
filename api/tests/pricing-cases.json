@@ -1,0 +1,195 @@
+[
+  {
+    "name": "tanpa promo sama sekali",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-10",
+    "checkOut": "2026-08-13",
+    "promos": []
+  },
+  {
+    "name": "diskon persen menutupi seluruh masa inap",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-13",
+    "promos": [
+      {
+        "id": "p1", "name": "Kemerdekaan", "discount_type": "percent", "discount_value": 20,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "prorata: masa inap melewati akhir periode promo",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-18",
+    "checkOut": "2026-08-22",
+    "promos": [
+      {
+        "id": "p1", "name": "Kemerdekaan", "discount_type": "percent", "discount_value": 20,
+        "start_date": "2026-08-10", "end_date": "2026-08-19",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "batas inklusif: malam end_date ikut dapat promo",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-20",
+    "checkOut": "2026-08-21",
+    "promos": [
+      {
+        "id": "p1", "name": "Batas", "discount_type": "percent", "discount_value": 25,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "batas awal: malam sebelum start_date tetap harga normal",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-09",
+    "checkOut": "2026-08-11",
+    "promos": [
+      {
+        "id": "p1", "name": "Batas", "discount_type": "percent", "discount_value": 25,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "potongan nominal per malam",
+    "room": { "id": "r1", "price_per_night": 1200000 },
+    "checkIn": "2026-09-01",
+    "checkOut": "2026-09-04",
+    "promos": [
+      {
+        "id": "p2", "name": "Potongan Khusus", "discount_type": "nominal", "discount_value": 300000,
+        "start_date": "2026-09-01", "end_date": "2026-09-30",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "dua promo bertumpuk: yang termurah menang",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-13",
+    "promos": [
+      {
+        "id": "p1", "name": "Persen", "discount_type": "percent", "discount_value": 20,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      },
+      {
+        "id": "p2", "name": "Nominal", "discount_type": "nominal", "discount_value": 200000,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "promo nonaktif diabaikan",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-13",
+    "promos": [
+      {
+        "id": "p1", "name": "Mati", "discount_type": "percent", "discount_value": 50,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": false, "is_active": false, "room_ids": ["r1"]
+      }
+    ]
+  },
+  {
+    "name": "promo kamar lain tidak berlaku",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-13",
+    "promos": [
+      {
+        "id": "p1", "name": "Kamar Lain", "discount_type": "percent", "discount_value": 30,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": false, "is_active": true, "room_ids": ["r2", "r3"]
+      }
+    ]
+  },
+  {
+    "name": "promo kamar tertentu yang cocok",
+    "room": { "id": "r2", "price_per_night": 950000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-14",
+    "promos": [
+      {
+        "id": "p1", "name": "Suite Saja", "discount_type": "percent", "discount_value": 15,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": false, "is_active": true, "room_ids": ["r2", "r3"]
+      }
+    ]
+  },
+  {
+    "name": "potongan nominal melebihi harga kamar tidak pernah negatif",
+    "room": { "id": "r1", "price_per_night": 500000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-13",
+    "promos": [
+      {
+        "id": "p1", "name": "Salah Isi", "discount_type": "nominal", "discount_value": 900000,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "persen pecahan menghasilkan pembulatan",
+    "room": { "id": "r1", "price_per_night": 777777 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-14",
+    "promos": [
+      {
+        "id": "p1", "name": "Pecahan", "discount_type": "percent", "discount_value": 12.5,
+        "start_date": "2026-08-10", "end_date": "2026-08-20",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "promo terpotong di tengah masa inap (dua periode terpisah)",
+    "room": { "id": "r1", "price_per_night": 600000 },
+    "checkIn": "2026-08-10",
+    "checkOut": "2026-08-18",
+    "promos": [
+      {
+        "id": "p1", "name": "Awal", "discount_type": "percent", "discount_value": 10,
+        "start_date": "2026-08-10", "end_date": "2026-08-11",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      },
+      {
+        "id": "p2", "name": "Akhir", "discount_type": "nominal", "discount_value": 150000,
+        "start_date": "2026-08-15", "end_date": "2026-08-17",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "masa inap melintasi pergantian bulan dan tahun",
+    "room": { "id": "r1", "price_per_night": 850000 },
+    "checkIn": "2026-12-30",
+    "checkOut": "2027-01-03",
+    "promos": [
+      {
+        "id": "p1", "name": "Tahun Baru", "discount_type": "percent", "discount_value": 10,
+        "start_date": "2026-12-31", "end_date": "2027-01-01",
+        "applies_to_all": true, "is_active": true, "room_ids": []
+      }
+    ]
+  },
+  {
+    "name": "satu malam saja",
+    "room": { "id": "r1", "price_per_night": 800000 },
+    "checkIn": "2026-08-11",
+    "checkOut": "2026-08-12",
+    "promos": []
+  }
+]

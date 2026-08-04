@@ -7,7 +7,6 @@ import { useGallery } from '../composables/useGallery'
 const { images, loading, fetchGallery } = useGallery()
 onMounted(fetchGallery)
 
-// Foto disimpan lokal (bukan hotlink Unsplash) di public/img/gallery/.
 const hero = {
   url: '/img/gallery/hero-2000.webp',
   srcset: [640, 1080, 1600, 2000].map((w) => `/img/gallery/hero-${w}.webp ${w}w`).join(', '),

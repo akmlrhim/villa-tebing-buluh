@@ -2,11 +2,9 @@
 import { onBeforeUnmount, ref } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 
-// Dropzone + pratinjau bukti pembayaran. Mengelola object URL & validasi
-// tipe/ukuran sendiri; file terpilih diekspos lewat v-model:file.
 const props = defineProps({
   file: { type: Object, default: null },
-  invalid: { type: Boolean, default: false }, // ditandai wajib oleh induk saat submit
+  invalid: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:file'])
 
@@ -34,7 +32,7 @@ function setProof(file) {
 
 function onChange(event) {
   setProof(event.target.files?.[0])
-  event.target.value = '' // Reset supaya file sama bisa dipilih ulang.
+  event.target.value = ''
 }
 
 function remove() {

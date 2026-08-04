@@ -1,6 +1,7 @@
 <script setup>
 import IconGlyph from '../IconGlyph.vue'
-import { formatDateID, formatRupiah } from '../../lib/format'
+import PriceBreakdown from '../PriceBreakdown.vue'
+import { formatDateID } from '../../lib/format'
 
 defineProps({
   room: { type: Object, required: true },
@@ -8,7 +9,7 @@ defineProps({
   checkOut: { type: String, required: true },
   guests: { type: Number, required: true },
   nights: { type: Number, required: true },
-  total: { type: Number, required: true },
+  stay: { type: Object, default: null },
   deadlineHours: { type: [Number, String], default: 24 },
 })
 const emit = defineEmits(['confirm'])
@@ -37,15 +38,8 @@ const emit = defineEmits(['confirm'])
           </div>
         </dl>
 
-        <div class="space-y-2 border-t border-hairline-soft pt-4 text-sm">
-          <div class="flex justify-between text-body">
-            <span>{{ formatRupiah(room.price_per_night) }} × {{ nights }} malam</span>
-            <span>{{ formatRupiah(total) }}</span>
-          </div>
-          <div class="flex justify-between text-base font-semibold text-ink">
-            <span>Total</span>
-            <span>{{ formatRupiah(total) }}</span>
-          </div>
+        <div class="border-t border-hairline-soft pt-4">
+          <PriceBreakdown :stay="stay" />
         </div>
 
         <div

@@ -4,7 +4,6 @@ import { formatDateID, formatRupiah } from '../../lib/format'
 import { STATUSES, STATUS_LABEL, STATUS_CLASS } from '../../lib/bookingStatus'
 import { selectClass } from '../../lib/ui'
 
-// Daftar booking (tampilan kartu mobile).
 defineProps({
   bookings: { type: Array, default: () => [] },
   busyId: { type: [String, Number], default: null },

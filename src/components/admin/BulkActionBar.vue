@@ -2,8 +2,6 @@
 import IconGlyph from '../IconGlyph.vue'
 import { btnGhost } from '../../lib/ui'
 
-// Toolbar aksi massal (muncul saat ada item tercentang). Dipakai di
-// Kelola Booking, Kelola Kamar, dan Kelola Galeri.
 defineProps({
   count: { type: Number, default: 0 },
   itemLabel: { type: String, default: 'item' },

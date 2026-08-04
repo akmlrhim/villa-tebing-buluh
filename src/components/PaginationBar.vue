@@ -2,9 +2,6 @@
 import { computed } from 'vue'
 import IconGlyph from './IconGlyph.vue'
 
-// Pager generik untuk daftar admin (booking, kamar, dst). Dipasangkan dengan
-// composables/usePagination.js — terima state-nya lewat props, pancarkan
-// event 'change' berisi nomor halaman baru.
 const props = defineProps({
   page: { type: Number, required: true },
   pageCount: { type: Number, required: true },
@@ -15,7 +12,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['change'])
 
-// Jendela nomor halaman dengan elipsis, mis: 1 … 4 5 [6] 7 8 … 12
 const pages = computed(() => {
   const { page, pageCount } = props
   const out = []

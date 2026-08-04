@@ -1,9 +1,8 @@
 <script setup>
 import { computed } from 'vue'
-import { fieldClass } from '../../lib/ui'
 
-// Input angka yang menampilkan pemisah ribuan (.) saat diketik, mis. 12000 ->
-// 12.000. v-model tetap berupa Number|null (bukan string berformat).
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps({
   modelValue: { type: [Number, String, null], default: null },
 })
@@ -26,5 +25,11 @@ function onInput(event) {
 </script>
 
 <template>
-  <input :value="displayValue" inputmode="numeric" autocomplete="off" :class="fieldClass" @input="onInput" />
+  <div
+    class="flex h-10.5 w-full items-center rounded-sm border border-hairline bg-canvas focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
+    <span class="select-none pl-3.5 pr-2 text-sm text-muted">Rp</span>
+    <input v-bind="$attrs" :value="displayValue" inputmode="numeric" autocomplete="off"
+      class="h-full min-w-0 flex-1 rounded-sm bg-transparent pr-3.5 text-sm leading-normal text-ink placeholder:text-sm focus:outline-none"
+      @input="onInput" />
+  </div>
 </template>

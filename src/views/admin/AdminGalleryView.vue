@@ -10,7 +10,7 @@ import { usePagination } from '../../composables/usePagination'
 import { useToast } from '../../composables/useToast'
 import { uploadGalleryImage } from '../../lib/storage'
 import { btnPrimary } from '../../lib/ui'
-import { friendlyDbError } from '../../lib/supabase'
+import { friendlyDbError } from '../../lib/api'
 
 const { images, loading, fetchGallery, addImages, deleteImage, bulkDeleteImages } = useAdminGallery()
 const toast = useToast()
@@ -86,7 +86,7 @@ async function onDelete() {
 	<div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div>
-				<h1 class="font-sans text-2xl font-semibold tracking-tight text-ink">Kelola Galeri</h1>
+				<h1 class="text-2xl font-semibold tracking-tight text-ink">Kelola Galeri</h1>
 				<p class="mt-1 text-sm text-black">Unggah foto galeri publik bebas, tanpa kategori. Foto otomatis dikompres
 					& dikonversi ke WebP.</p>
 			</div>

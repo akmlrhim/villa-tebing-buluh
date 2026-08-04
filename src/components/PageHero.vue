@@ -1,7 +1,4 @@
 <script setup>
-// Hero pendek untuk halaman selain Home: foto latar + judul putih, dengan
-// navbar overlay transparan di atasnya (konsep sama dengan hero Home).
-// -mt menarik hero ke bawah navbar; scrim atas menjaga keterbacaan link putih.
 defineProps({
 	image: { type: String, required: true },
 	srcset: { type: String, default: '' },

@@ -2,7 +2,6 @@
 import IconGlyph from './IconGlyph.vue'
 import { useToast } from '../composables/useToast'
 
-// Penampung toast global — di atas modal (z-50), aman untuk admin & publik.
 const { toasts, dismiss } = useToast()
 
 const ICONS = { success: 'check', error: 'alert', info: 'clock' }

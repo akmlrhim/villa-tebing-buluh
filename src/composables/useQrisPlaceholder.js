@@ -1,5 +1,3 @@
-// Generator pola QRIS DEKORATIF (bukan kode QR valid) — dipakai saat admin
-// belum mengunggah gambar QRIS asli. Deterministik agar tidak berubah tiap render.
 export const QR_SIZE = 33
 
 export function qrPlaceholderCells(size = QR_SIZE) {
@@ -15,7 +13,6 @@ export function qrPlaceholderCells(size = QR_SIZE) {
   finder(0, 0)
   finder(0, size - 7)
   finder(size - 7, 0)
-  // Pola data pseudo-acak deterministik (murni dekoratif).
   let s = 1013904223
   const rand = () => {
     s = (Math.imul(s, 1664525) + 1013904223) & 0x7fffffff

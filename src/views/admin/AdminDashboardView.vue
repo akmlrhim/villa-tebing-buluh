@@ -1,14 +1,17 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import IconGlyph from '../../components/IconGlyph.vue';
+import DateRangeFilter from '../../components/admin/DateRangeFilter.vue';
 import { useBookings } from '../../composables/useBookings';
 import { useAdminRooms } from '../../composables/useAdminRooms';
+import { defaultRange, rangeLabel } from '../../lib/dateRange';
 import {
+  addDaysISO,
   formatDateID,
+  formatRupiah,
   nightsBetween,
   todayISO,
-  toISODate,
 } from '../../lib/format';
 
 const { bookings, loading, fetchBookings } = useBookings();
@@ -20,79 +23,83 @@ onMounted(() => {
 });
 
 const BLOCKING = ['pending', 'confirmed', 'checked_in'];
+const VOID = ['cancelled', 'no_show'];
 const today = todayISO();
 const roomName = (b) => b.rooms?.name ?? '-';
 
-const checkInsToday = computed(() =>
+const range = ref(defaultRange());
+
+const scoped = computed(() =>
   bookings.value.filter(
-    (b) => b.check_in === today && b.status !== 'cancelled',
+    (b) => b.check_in >= range.value.start && b.check_in <= range.value.end,
   ),
 );
-const checkOutsToday = computed(() =>
-  bookings.value.filter(
-    (b) => b.check_out === today && b.status !== 'cancelled',
-  ),
+const scopedActive = computed(() =>
+  scoped.value.filter((b) => !VOID.includes(b.status)),
 );
-const pending = computed(() =>
-  bookings.value.filter((b) => b.status === 'pending'),
+const scopedPending = computed(() =>
+  scoped.value.filter((b) => b.status === 'pending'),
+);
+const revenue = computed(() =>
+  scopedActive.value.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0),
 );
 
 const occupancy = computed(() => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  const monthStart = toISODate(new Date(y, m, 1));
-  const monthEnd = toISODate(new Date(y, m + 1, 1));
-  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const start = range.value.start;
+  const end = addDaysISO(range.value.end, 1);
+  const days = nightsBetween(start, end);
   const activeRooms = rooms.value.filter((r) => r.is_active).length;
-  if (!activeRooms) return 0;
+  if (!activeRooms || days <= 0) return 0;
 
   let occupied = 0;
   for (const b of bookings.value) {
     if (!BLOCKING.includes(b.status)) continue;
-    const start = b.check_in > monthStart ? b.check_in : monthStart;
-    const end = b.check_out < monthEnd ? b.check_out : monthEnd;
-    if (start < end) occupied += nightsBetween(start, end);
+    const from = b.check_in > start ? b.check_in : start;
+    const to = b.check_out < end ? b.check_out : end;
+    if (from < to) occupied += nightsBetween(from, to);
   }
-  return Math.min(
-    100,
-    Math.round((occupied / (activeRooms * daysInMonth)) * 100),
-  );
+  return Math.min(100, Math.round((occupied / (activeRooms * days)) * 100));
 });
 
-const upcoming = computed(() =>
-  bookings.value
-    .filter(
-      (b) =>
-        b.check_in >= today &&
-        b.status !== 'cancelled' &&
-        b.status !== 'checked_out',
-    )
+const checkInsToday = computed(() =>
+  bookings.value.filter(
+    (b) => b.check_in === today && !VOID.includes(b.status),
+  ),
+);
+const checkOutsToday = computed(() =>
+  bookings.value.filter(
+    (b) => b.check_out === today && !VOID.includes(b.status),
+  ),
+);
+
+const scopedList = computed(() =>
+  [...scoped.value]
     .sort((a, b) => a.check_in.localeCompare(b.check_in))
-    .slice(0, 6),
+    .slice(0, 8),
 );
 
 const stats = computed(() => [
   {
-    label: 'Check-in hari ini',
-    value: checkInsToday.value.length,
+    label: 'Check-in di rentang ini',
+    value: scopedActive.value.length,
     icon: 'log-in',
     tone: 'primary',
   },
   {
-    label: 'Check-out hari ini',
-    value: checkOutsToday.value.length,
-    icon: 'log-out',
-    tone: 'bronze',
-  },
-  {
     label: 'Booking pending',
-    value: pending.value.length,
+    value: scopedPending.value.length,
     icon: 'clock',
     tone: 'sand',
   },
   {
-    label: 'Kepadatan bulan ini',
+    label: 'Perkiraan pendapatan',
+    value: formatRupiah(revenue.value),
+    icon: 'tag',
+    tone: 'bronze',
+    compact: true,
+  },
+  {
+    label: 'Kepadatan',
     value: occupancy.value + '%',
     icon: 'trending-up',
     tone: 'primary',
@@ -104,23 +111,33 @@ const STATUS_LABEL = {
   confirmed: 'Terkonfirmasi',
   checked_in: 'Check-in',
   checked_out: 'Check-out',
+  completed: 'Selesai',
   cancelled: 'Batal',
+  no_show: 'Tidak datang',
 };
 const STATUS_CLASS = {
   pending: 'bg-sand/25 text-bronze',
   confirmed: 'bg-primary/12 text-primary',
   checked_in: 'bg-primary/12 text-primary',
   checked_out: 'bg-surface-strong text-muted',
+  completed: 'bg-surface-strong text-muted',
   cancelled: 'bg-error/10 text-error',
+  no_show: 'bg-error/10 text-error',
 };
 </script>
 
 <template>
   <div>
-    <h1 class="text-ink font-sans text-2xl font-semibold tracking-tight">
+    <h1 class="text-ink text-2xl font-semibold tracking-tight">
       Dashboard
     </h1>
-    <p class="mt-1 text-sm text-black">Ringkasan aktivitas vila hari ini.</p>
+    <p class="mt-1 text-sm text-black">
+      Ringkasan aktivitas vila untuk {{ rangeLabel(range) }}.
+    </p>
+
+    <div class="mt-5">
+      <DateRangeFilter v-model="range" />
+    </div>
 
     <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <div
@@ -140,7 +157,10 @@ const STATUS_CLASS = {
             <IconGlyph :name="s.icon" class="h-5 w-5" />
           </span>
         </div>
-        <p class="text-ink mt-3 text-3xl font-semibold tracking-tight">
+        <p
+          class="text-ink mt-3 font-semibold tracking-tight"
+          :class="s.compact ? 'text-xl' : 'text-3xl'"
+        >
           {{ s.value }}
         </p>
         <p class="text-muted mt-0.5 text-sm">{{ s.label }}</p>
@@ -152,8 +172,8 @@ const STATUS_CLASS = {
         <div
           class="border-hairline-soft flex items-center justify-between border-b px-5 py-4"
         >
-          <h2 class="text-ink font-sans text-base font-semibold">
-            Booking mendatang
+          <h2 class="text-ink text-base font-semibold">
+            Booking di rentang ini
           </h2>
           <RouterLink
             :to="{ name: 'admin-bookings' }"
@@ -170,13 +190,13 @@ const STATUS_CLASS = {
           />
         </div>
         <p
-          v-else-if="!upcoming.length"
+          v-else-if="!scopedList.length"
           class="text-muted px-5 py-10 text-center text-sm"
         >
-          Belum ada booking mendatang.
+          Tidak ada booking yang check-in di rentang tanggal ini.
         </p>
         <ul v-else class="divide-hairline-soft divide-y">
-          <li v-for="b in upcoming" :key="b.id">
+          <li v-for="b in scopedList" :key="b.id">
             <RouterLink
               :to="{ name: 'admin-booking-detail', params: { id: b.id } }"
               class="hover:bg-surface-soft flex items-center justify-between gap-3 px-5 py-3 transition-colors"
@@ -195,7 +215,7 @@ const STATUS_CLASS = {
                 class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium"
                 :class="STATUS_CLASS[b.status]"
               >
-                {{ STATUS_LABEL[b.status] }}
+                {{ STATUS_LABEL[b.status] ?? b.status }}
               </span>
             </RouterLink>
           </li>
@@ -207,7 +227,7 @@ const STATUS_CLASS = {
           class="border-hairline bg-canvas shadow-float rounded-md border p-5"
         >
           <h2
-            class="text-ink flex items-center gap-2 font-sans text-base font-semibold"
+            class="text-ink flex items-center gap-2 text-base font-semibold"
           >
             <IconGlyph name="log-in" class="text-primary h-5 w-5" /> Check-in
             hari ini
@@ -229,7 +249,7 @@ const STATUS_CLASS = {
           class="border-hairline bg-canvas shadow-float rounded-md border p-5"
         >
           <h2
-            class="text-ink flex items-center gap-2 font-sans text-base font-semibold"
+            class="text-ink flex items-center gap-2 text-base font-semibold"
           >
             <IconGlyph name="log-out" class="text-bronze h-5 w-5" /> Check-out
             hari ini

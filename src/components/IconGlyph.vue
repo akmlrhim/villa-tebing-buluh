@@ -1,5 +1,4 @@
 <script setup>
-// Satu set glyph garis 24×24 (stroke 1.7) supaya ikon konsisten di seluruh situs.
 const props = defineProps({
   name: { type: String, required: true },
 })
@@ -56,6 +55,8 @@ const PATHS = {
   instagram: 'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm9 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm1.5-5.6h.01',
   power: 'M12 3v9m5.7-6.3a8 8 0 1 1-11.4 0',
   sparkle: 'M12 3l1.8 5.7L19.5 10.5l-5.7 1.8L12 18l-1.8-5.7L4.5 10.5l5.7-1.8L12 3Zm7-1v3m-1.5-1.5h3M4 18v2.5m-1.25-1.25h2.5',
+  tag: 'M3 3h7.2a2 2 0 0 1 1.4.6l8.8 8.8a2 2 0 0 1 0 2.8l-5.2 5.2a2 2 0 0 1-2.8 0L3.6 11.6a2 2 0 0 1-.6-1.4V3Zm4 4h.01',
+  filter: 'M3 5h18l-7 8v6l-4 2v-8L3 5Z',
 }
 </script>
 

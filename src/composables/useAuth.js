@@ -1,21 +1,26 @@
 import { computed, ref } from 'vue'
-import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { api, authApi, getToken, setToken, clearToken } from '../lib/api'
 
-// Autentikasi admin (F-08) via Supabase Auth (email + password).
-const session = ref(null)
+const user = ref(null)
 const ready = ref(false)
 let initPromise = null
 
 async function init() {
-  if (isSupabaseConfigured) {
-    const { data } = await supabase.auth.getSession()
-    session.value = data.session
-    supabase.auth.onAuthStateChange((_event, next) => {
-      session.value = next
-    })
+  if (getToken()) {
+    try {
+      const { user: me } = await authApi.get('/auth/me')
+      user.value = me
+    } catch {
+      clearToken()
+      user.value = null
+    }
   }
   ready.value = true
 }
+
+window.addEventListener('vtb:unauthorized', () => {
+  user.value = null
+})
 
 export function useAuth() {
   function initAuth() {
@@ -23,22 +28,19 @@ export function useAuth() {
     return initPromise
   }
 
-  const isAuthenticated = computed(() => Boolean(session.value))
-  const userEmail = computed(() => session.value?.user?.email ?? null)
+  const isAuthenticated = computed(() => Boolean(user.value))
+  const userEmail = computed(() => user.value?.email ?? null)
 
   async function signIn(email, password) {
-    if (!isSupabaseConfigured) {
-      throw new Error('Supabase belum dikonfigurasi.')
-    }
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) throw error
-    session.value = data.session
+    const data = await api.post('/auth/login', { email, password })
+    setToken(data.token)
+    user.value = data.user
     return data
   }
 
   async function signOut() {
-    if (isSupabaseConfigured) await supabase.auth.signOut()
-    session.value = null
+    clearToken()
+    user.value = null
   }
 
   return { ready, initAuth, isAuthenticated, userEmail, signIn, signOut }

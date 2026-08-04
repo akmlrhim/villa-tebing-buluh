@@ -41,7 +41,7 @@ async function onSubmit() {
 		<div class="w-full max-w-sm">
 			<form class="mt-8 space-y-4 rounded-md border border-hairline bg-canvas p-6 shadow-float"
 				@submit.prevent="onSubmit">
-				<h1 class="font-sans text-lg font-semibold text-ink">Masuk</h1>
+				<h1 class="text-lg font-semibold text-ink">Masuk</h1>
 
 				<div v-if="errorMsg" class="flex items-start gap-2 rounded-sm bg-error/10 px-3 py-2.5 text-sm text-error"
 					role="alert">

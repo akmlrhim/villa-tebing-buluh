@@ -10,30 +10,9 @@
 	<meta property="og:description"
 		content="Vila bambu privat di lereng Pegunungan Meratus, Loksado, menghadap Gunung Kantawan. Cek tanggal kosong dan booking via WhatsApp." />
 	<meta property="og:type" content="website" />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<!-- LCP: hero Home (heroImage di demoData.js), disimpan lokal di
-	     public/img/hero/ (bukan hotlink Unsplash) - mulai fetch sebelum JS
-	     mount. imagesrcset/imagesizes disamakan dengan srcset di
-	     HeroSection.vue supaya browser mem-preload varian yang sama yang akan
-	     dipakai <img>. -->
 	<link rel="preload" as="image" fetchpriority="high" href="/img/hero/home-2000.webp"
 		imagesrcset="/img/hero/home-640.webp 640w, /img/hero/home-828.webp 828w, /img/hero/home-1080.webp 1080w, /img/hero/home-1600.webp 1600w, /img/hero/home-2000.webp 2000w"
 		imagesizes="100vw" />
-	<!-- Font non-blocking: preload lalu swap ke stylesheet (media trick), supaya
-	     tidak menahan render awal - noscript untuk fallback JS mati. Swap-nya
-	     dilakukan di main.js (bukan onload= inline) karena CSP script-src 'self'
-	     di vercel.json memblokir atribut event inline (script-src-attr). -->
-	<link rel="preload" as="style"
-		href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap" />
-	<link id="gfonts-stylesheet"
-		href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap"
-		rel="stylesheet" media="print">
-	<noscript>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap"
-			rel="stylesheet">
-	</noscript>
 	<title>Villa Tebing Buluh · Vila Privat di Tebing Buluh Loksado</title>
 </head>
 <body>

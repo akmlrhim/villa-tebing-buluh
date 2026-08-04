@@ -1,8 +1,6 @@
 <script setup>
 import IconGlyph from '../IconGlyph.vue'
 
-// Grid foto kamar + unggah. State foto dikelola parent (useRoomForm); komponen
-// ini presentasional dan meng-emit intent.
 defineProps({
   images: { type: Array, default: () => [] },
   uploading: { type: Boolean, default: false },

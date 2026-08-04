@@ -1,5 +1,3 @@
-// Status booking (F-10) — dipakai di AdminBookingsView, BookingFormModal,
-// dan AdminBookingCalendar.
 
 export const STATUSES = [
   { value: 'pending', label: 'Pending' },

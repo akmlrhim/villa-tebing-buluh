@@ -1,7 +1,8 @@
 import { computed, ref, watch } from 'vue'
 import { useBookings } from './useBookings'
+import { usePromos } from './usePromos'
 import { nightsBetween } from '../lib/format'
-import { friendlyDbError } from '../lib/supabase'
+import { friendlyDbError } from '../lib/api'
 
 const BLOCKING = ['pending', 'confirmed', 'checked_in']
 
@@ -18,12 +19,11 @@ const blank = () => ({
   notes: '',
 })
 
-/**
- * State & logika form booking admin (F-10). `bookingRef` = ref ke prop.booking
- * (null = baru, object = edit, undefined = tersembunyi); `roomsRef` = ref daftar kamar.
- */
 export function useBookingForm(bookingRef, roomsRef, emit) {
   const { findConflict, saveBooking } = useBookings()
+  const { fetchPromos, stayPrice } = usePromos()
+
+  fetchPromos()
 
   const form = ref(blank())
   const totalTouched = ref(false)
@@ -53,10 +53,13 @@ export function useBookingForm(bookingRef, roomsRef, emit) {
       : 0,
   )
 
-  // Auto-hitung total dari harga kamar × malam, kecuali admin mengubah manual.
   watch([selectedRoom, nights], () => {
     if (!totalTouched.value && selectedRoom.value && nights.value > 0) {
-      form.value.total_price = selectedRoom.value.price_per_night * nights.value
+      form.value.total_price = stayPrice(
+        selectedRoom.value,
+        form.value.check_in,
+        form.value.check_out,
+      ).total
     }
   })
 
@@ -77,7 +80,6 @@ export function useBookingForm(bookingRef, roomsRef, emit) {
     }
     saving.value = true
     try {
-      // Anti double-booking (F-10.3) — hanya jika status menahan tanggal.
       if (BLOCKING.includes(f.status)) {
         const conflict = await findConflict({
           roomId: f.room_id,

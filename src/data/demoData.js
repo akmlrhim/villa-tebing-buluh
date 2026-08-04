@@ -1,13 +1,8 @@
-// Data contoh untuk mode demo (Supabase belum dikonfigurasi di .env).
-// Begitu .env terisi, halaman publik otomatis membaca tabel rooms / room_images /
-// public_availability / settings - file ini tidak dipakai lagi.
 import { addDaysISO, todayISO } from '../lib/format'
 
 const img = (id, w = 1200) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
 
-// srcset agar mobile tidak mengunduh varian desktop (w besar) - dipakai untuk
-// gambar above-the-fold seperti hero (LCP).
 const imgSrcset = (id, widths) =>
   widths.map((w) => `${img(id, w)} ${w}w`).join(', ')
 
@@ -118,7 +113,6 @@ export const demoRooms = [
   },
 ]
 
-// Booking contoh (relatif terhadap hari ini) supaya kalender demo terasa hidup.
 const t = todayISO()
 export const demoBookings = [
   { room_id: 'demo-cemerlang-1', check_in: addDaysISO(t, 3), check_out: addDaysISO(t, 6), status: 'confirmed' },
@@ -137,30 +131,24 @@ export const demoSettings = {
   check_in_time: '14.00',
   check_out_time: '12.00',
   instagram: 'villatebingbuluh',
-  // Pembayaran QRIS. Kosongkan qris_image_url untuk memakai placeholder demo;
-  // admin cukup mengisi URL gambar QRIS asli lewat tabel settings.
   qris_image_url: '',
   qris_merchant_name: 'Villa Tebing Buluh',
   qris_nmid: 'ID1024xxxxxxxxx',
   payment_deadline_hours: 2,
 }
 
-// Foto untuk halaman Our Gallery, dikelompokkan per area (F-05).
 export const demoGallery = [
-  // Area vila
   { url: img('1582610116397-edb318620f90', 1600), alt: 'Taman Villa Tebing Buluh saat senja', group: 'Area Vila', tall: false },
   { url: img('1584132967334-10e028bd69f7', 1600), alt: 'Dek kayu dan kursi santai di area vila', group: 'Area Vila', tall: false },
   { url: img('1571003123894-1f0594d2b5d9', 1600), alt: 'Gazebo bambu dengan tirai putih saat langit ungu senja', group: 'Area Vila', tall: true },
   { url: img('1566073771259-6a8506099945', 1600), alt: 'Deretan kursi berjemur menghadap matahari terbenam', group: 'Area Vila', tall: false },
   { url: img('1552733407-5d5c46c3bb3b', 1600), alt: 'Sungai kecil di antara pohon kelapa dekat vila', group: 'Area Vila', tall: true },
-  // Kamar
   { url: img('1611892440504-42a792e24d32', 1600), alt: 'Interior kamar Cemerlang 1 dengan kayu jati hangat', group: 'Kamar', roomSlug: 'cemerlang-1', tall: false },
   { url: img('1582719478250-c89cae4dc85b', 1600), alt: 'Kamar Cemerlang 2 dengan jendela menghadap pepohonan', group: 'Kamar', roomSlug: 'cemerlang-2', tall: false },
   { url: img('1595576508898-0ad5c879a061', 1600), alt: 'Unit keluarga Serumpun dengan dua tempat tidur', group: 'Kamar', roomSlug: 'serumpun-family', tall: false },
   { url: img('1591088398332-8a7791972843', 1600), alt: 'Sudut duduk kamar Cemerlang 2', group: 'Kamar', roomSlug: 'cemerlang-2', tall: false },
   { url: img('1552321554-5fefe8c9ef14', 1600), alt: 'Kamar mandi bersih dengan tanaman gantung', group: 'Kamar', roomSlug: 'cemerlang-1', tall: true },
   { url: img('1512918728675-ed5a9ecdebfd', 1600), alt: 'Tempat tidur unit Serumpun dengan cahaya pagi', group: 'Kamar', roomSlug: 'serumpun-family', tall: false },
-  // Sekitar vila
   { url: img('1555400038-63f5ba517a47', 1600), alt: 'Terasering sawah hijau tidak jauh dari vila', group: 'Sekitar Vila', tall: false },
   { url: img('1573790387438-4da905039392', 1600), alt: 'Tebing dan pantai berpasir putih di pesisir dekat vila', group: 'Sekitar Vila', tall: true },
   { url: img('1537996194471-e657df975ab4', 1600), alt: 'Pura di tepi danau berkabut pagi hari', group: 'Sekitar Vila', tall: true },
@@ -168,8 +156,6 @@ export const demoGallery = [
   { url: img('1518548419970-58e3b4079ab2', 1600), alt: 'Pura di atas batu karang saat matahari terbenam', group: 'Sekitar Vila', tall: false },
 ]
 
-// Hero Home disimpan lokal (bukan hotlink Unsplash) di public/img/hero/ -
-// selalu tampil di produksi terlepas Supabase terisi atau tidak.
 export const heroImage = {
   url: '/img/hero/home-2000.webp',
   srcset: [640, 828, 1080, 1600, 2000].map((w) => `/img/hero/home-${w}.webp ${w}w`).join(', '),

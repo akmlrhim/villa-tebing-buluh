@@ -1,16 +1,14 @@
 <script setup>
 import IconGlyph from './IconGlyph.vue'
-import { formatDateID, formatRupiah } from '../lib/format'
+import PriceBreakdown from './PriceBreakdown.vue'
+import { formatDateID } from '../lib/format'
 
-// Panel ringkasan booking di detail kamar: tanggal terpilih, jumlah tamu,
-// estimasi harga, dan tombol lanjut ke pembayaran. Presentasional — state
-// range/guests dan derivasi harga dikelola RoomDetailModal.
 defineProps({
   room: { type: Object, required: true },
   range: { type: Object, default: null },
   guests: { type: Number, required: true },
   nights: { type: Number, default: 0 },
-  total: { type: Number, default: 0 },
+  stay: { type: Object, default: null },
   belowMinNights: { type: Boolean, default: false },
   canBook: { type: Boolean, default: false },
 })
@@ -49,15 +47,8 @@ const emit = defineEmits(['update:guests', 'book'])
     </div>
     <p class="mt-1.5 text-xs text-muted">Maksimal {{ room.max_guests }} tamu untuk kamar ini.</p>
 
-    <div v-if="nights > 0" class="mt-4 space-y-1.5 border-t border-hairline-soft pt-4 text-sm">
-      <div class="flex justify-between text-body">
-        <span>{{ formatRupiah(room.price_per_night) }} × {{ nights }} malam</span>
-        <span>{{ formatRupiah(total) }}</span>
-      </div>
-      <div class="flex justify-between font-semibold text-ink">
-        <span>Estimasi total</span>
-        <span>{{ formatRupiah(total) }}</span>
-      </div>
+    <div v-if="nights > 0" class="mt-4 border-t border-hairline-soft pt-4">
+      <PriceBreakdown :stay="stay" total-label="Estimasi total" />
     </div>
 
     <p v-if="belowMinNights" class="mt-3 text-sm text-error" role="alert">
