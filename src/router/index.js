@@ -22,7 +22,7 @@ const routes = [
     meta: {
       title: "Galeri Foto Villa Tebing Buluh Loksado",
       description:
-        "Foto kamar, gazebo bambu, dan pemandangan Pegunungan Meratus di Villa Tebing Buluh, Loksado — apa adanya, tanpa polesan.",
+        "Foto kamar, gazebo bambu, dan pemandangan Pegunungan Meratus di Villa Tebing Buluh, Loksado. Apa adanya, tanpa polesan.",
     },
   },
   {

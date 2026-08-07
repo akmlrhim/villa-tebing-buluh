@@ -215,7 +215,7 @@ async function onBulkDelete() {
     <ConfirmDialog :open="Boolean(confirmDelete)" title="Hapus promo?" :busy="busyId === confirmDelete?.id"
       @cancel="confirmDelete = null" @confirm="onDelete">
       Promo <strong class="text-ink">{{ confirmDelete?.name }}</strong> akan dihapus permanen. Booking
-      yang sudah terlanjur dibuat tidak berubah — harganya sudah tersimpan saat pemesanan.
+      yang sudah terlanjur dibuat tidak berubah karena harganya sudah tersimpan saat pemesanan.
     </ConfirmDialog>
 
     <ConfirmDialog :open="confirmBulkDelete" title="Hapus promo terpilih?" :busy="bulkBusy"

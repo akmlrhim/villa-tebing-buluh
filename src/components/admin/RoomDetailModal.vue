@@ -91,12 +91,12 @@ function nextPhoto() {
 						<div>
 							<dt class="text-muted">Tempat tidur</dt>
 							<dd class="mt-0.5 font-medium text-ink">
-								{{ room.bed_count }}{{ room.bed_type ? ` Ã— ${room.bed_type}` : ' bed' }}
+								{{ room.bed_count }}{{ room.bed_type ? ` × ${room.bed_type}` : ' bed' }}
 							</dd>
 						</div>
 						<div>
 							<dt class="text-muted">Luas</dt>
-							<dd class="mt-0.5 font-medium text-ink">{{ room.size_sqm ? `${room.size_sqm} mÂ²` : '-' }}</dd>
+							<dd class="mt-0.5 font-medium text-ink">{{ room.size_sqm ? `${room.size_sqm} m²` : '-' }}</dd>
 						</div>
 					</dl>
 

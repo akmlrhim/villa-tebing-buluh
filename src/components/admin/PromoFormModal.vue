@@ -132,7 +132,7 @@ const labelClass = 'mb-1.5 block text-[0.8125rem] font-medium text-body'
             </li>
           </ul>
           <p v-if="preview.some((r) => r.free)" class="mt-2 text-xs leading-relaxed text-error">
-            Potongannya melebihi harga kamar — kamar itu jadi gratis. Kecilkan nilainya bila tidak disengaja.
+            Potongannya melebihi harga kamar, jadi kamar itu gratis. Kecilkan nilainya bila tidak disengaja.
           </p>
         </section>
 
