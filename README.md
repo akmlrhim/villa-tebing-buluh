@@ -251,7 +251,17 @@ Dua hal yang dilindungi dari `--delete` supaya data produksi tidak ikut terhapus
 - `HOSTINGER_DEPLOY_PATH tidak ditemukan` — path-nya relatif terhadap home SSH,
   bukan `/home/uXXXX/...`.
 - Langkah **Cek situs hidup** merah tapi rsync hijau — kodenya sudah naik,
-  masalahnya di `config.php` atau database. Cek `error_log` di File Manager.
+  masalahnya di `config.php`, database, atau domainnya belum mengarah ke server
+  ini. Bandingkan dengan origin langsung:
+  `curl -sk --resolve villatebingbuluh.com:443:145.79.28.37 https://villatebingbuluh.com/api/rooms`
+  Kalau origin membalas JSON tapi domain publik tidak, masalahnya di DNS/proksi,
+  bukan di deploy.
+
+> **Domain di belakang Cloudflare.** `villatebingbuluh.com` di-proksi Cloudflare,
+> jadi A record di dasbor Cloudflare harus menunjuk ke `145.79.28.37` — bukan ke
+> IP parkir Hostinger. Langkah cek memeriksa **isi** balasan, bukan sekadar kode
+> 200, karena halaman parkir Hostinger juga membalas 200 dan pernah membuat
+> deploy tampak hijau padahal situsnya tidak tersaji.
 
 ---
 

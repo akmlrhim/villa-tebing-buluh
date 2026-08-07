@@ -101,9 +101,20 @@ jobs:
       - name: Cek situs hidup
         run: |
           set -euo pipefail
-          code=$(curl -s -o /dev/null -w '%{http_code}' "https://${{ secrets.SITUS_URL }}/api/rooms")
-          echo "GET /api/rooms -> $code"
-          test "$code" = "200"
+          body=$(curl -sS --max-time 30 "https://${{ secrets.SITUS_URL }}/api/rooms")
+          echo "GET /api/rooms:"
+          printf '%s' "$body" | head -c 300
+          echo
+          case "$body" in
+            '['*|'{'*)
+              echo "OK: API membalas JSON"
+              ;;
+            *)
+              echo "GAGAL: balasan bukan JSON."
+              echo "Kemungkinan domain belum mengarah ke server ini (halaman parkir atau proksi salah origin)."
+              exit 1
+              ;;
+          esac
 
       - name: Bersihkan kunci
         if: always()
