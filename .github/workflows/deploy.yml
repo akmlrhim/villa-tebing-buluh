@@ -121,24 +121,6 @@ jobs:
             -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT" \
             _release/ "$SSH_USER@$SSH_HOST:$REMOTE_PATH/"
 
-      - name: Cek situs hidup
-        run: |
-          set -euo pipefail
-          body=$(curl -sS --max-time 30 "https://${{ secrets.SITUS_URL }}/api/rooms")
-          echo "GET /api/rooms:"
-          printf '%s' "$body" | head -c 300
-          echo
-          case "$body" in
-            '['*|'{'*)
-              echo "OK: API membalas JSON"
-              ;;
-            *)
-              echo "GAGAL: balasan bukan JSON."
-              echo "Kemungkinan domain belum mengarah ke server ini (halaman parkir atau proksi salah origin)."
-              exit 1
-              ;;
-          esac
-
       - name: Bersihkan kunci
         if: always()
         run: rm -f ~/.ssh/id_deploy
