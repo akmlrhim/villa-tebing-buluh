@@ -63,6 +63,18 @@ jobs:
           du -sh _release
           find _release -maxdepth 2 -mindepth 1 | sort
 
+      - name: Pastikan tidak ada gambar di atas 50 KB
+        run: |
+          set -euo pipefail
+          besar=$(find _release -type f \( -iname '*.webp' -o -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.avif' \) -size +51200c)
+          if [ -n "$besar" ]; then
+            echo "GAGAL: gambar berikut melebihi 50 KB."
+            echo "Jalankan 'npm run images' lalu commit hasilnya."
+            printf '%s\n' "$besar" | xargs -r du -h
+            exit 1
+          fi
+          echo "OK: semua gambar rilis di bawah 50 KB."
+
       - name: Siapkan kunci SSH
         run: |
           set -euo pipefail
@@ -86,6 +98,13 @@ jobs:
             test -d '$REMOTE_PATH' || { echo 'HOSTINGER_DEPLOY_PATH tidak ditemukan: $REMOTE_PATH'; exit 1; }
             test -f '$REMOTE_PATH/api/config.php' || echo 'PERINGATAN: api/config.php belum ada di server, API akan gagal'
             php -v | head -1
+            php -r 'exit(function_exists(\"imagewebp\") ? 0 : 1);' || {
+              echo 'GAGAL: PHP di server tidak punya GD dengan dukungan WebP.'
+              echo 'Tanpa itu unggahan admin disimpan mentah dan bisa melebihi 50 KB.'
+              echo 'Aktifkan ekstensi GD di hPanel: Advanced > PHP Configuration > PHP Extensions.'
+              exit 1
+            }
+            php -r 'echo \"GD WebP: ada, lossless \", (defined(\"IMG_WEBP_LOSSLESS\") ? \"didukung\" : \"TIDAK didukung (QRIS akan lossy)\"), PHP_EOL;'
           "
 
       - name: Kirim rilis
