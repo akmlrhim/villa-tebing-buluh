@@ -58,7 +58,7 @@ function formatPhone(number) {
 
       <div>
         <p class="text-ink text-sm font-semibold">Kontak</p>
-        <ul class="mt-3 space-y-1 text-sm font-bold text-black">
+        <ul class="mt-3 space-y-1 text-sm text-black">
           <li>
             <a
               :href="waLink(whatsappNumber, generalMessage())"
