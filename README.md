@@ -194,6 +194,67 @@ pengembangan. (`shared/pricing.js` sudah ikut ter-_bundle_ ke dalam `dist/`.)
 
 ---
 
+## Deploy otomatis lewat GitHub Actions
+
+`.github/workflows/deploy.yml` mengerjakan ulang langkah 1–4 di atas setiap kali
+ada push ke `main` (bisa juga dijalankan manual lewat tab **Actions** → **Run
+workflow**). Langkah 5–8 — database, `config.php`, folder `vtb-private/`, dan
+akun admin — tetap manual sekali di awal; workflow ini hanya mengirim kode.
+
+### Secret yang harus diisi
+
+Settings → Secrets and variables → Actions:
+
+| Secret                       | Isi                                                       |
+| ---------------------------- | --------------------------------------------------------- |
+| `HOSTINGER_SSH_HOST`         | IP server dari hPanel → Advanced → SSH Access              |
+| `HOSTINGER_SSH_USER`         | mis. `u123456789`                                          |
+| `HOSTINGER_SSH_PORT`         | opsional, default `65002`                                  |
+| `HOSTINGER_SSH_KEY`          | **kunci privat** OpenSSH; publiknya ditempel di hPanel     |
+| `HOSTINGER_SSH_KNOWN_HOSTS`  | opsional, keluaran `ssh-keyscan -p 65002 IP`               |
+| `HOSTINGER_DEPLOY_PATH`      | mis. `domains/villatebingbuluh.com/public_html`            |
+| `SITUS_URL`                  | mis. `villatebingbuluh.com`, dipakai untuk cek pasca-deploy |
+
+Buat kuncinya dengan `ssh-keygen -t ed25519 -f vtb-deploy -N ""`, tempel isi
+`vtb-deploy.pub` ke hPanel → SSH Access → Manage SSH keys, dan isi
+`vtb-deploy` (tanpa `.pub`) ke `HOSTINGER_SSH_KEY`. Tanpa
+`HOSTINGER_SSH_KNOWN_HOSTS` identitas server diterima apa adanya saat pertama
+jalan; mengisinya membuat server dipatok dan MITM ditolak.
+
+### Yang sengaja TIDAK ikut terkirim
+
+Workflow menyusun folder `_release/` yang persis menyerupai `public_html/`,
+lalu `rsync --delete`. Yang dibuang sebelum kirim:
+
+- `api/tests/`, `api/dev-server.php`, `api/config.example.php` — hanya untuk
+  pengembangan.
+- **`api/schema.sql` dan `api/migrations/`** — `api/.htaccess` menyajikan berkas
+  yang benar-benar ada secara langsung (aturannya cuma mengalihkan yang *tidak*
+  ada ke `index.php`), jadi kalau ikut terunggah isinya bisa diunduh siapa pun
+  di `/api/schema.sql`. Keduanya diimpor lewat phpMyAdmin dari salinan lokal,
+  server tidak pernah membutuhkannya. `api/tools/` tetap dikirim karena
+  `create-admin.php` dijalankan di server — berkasnya sudah dijaga ganda oleh
+  `RedirectMatch 404` dan pemeriksaan `PHP_SAPI`.
+
+Dua hal yang dilindungi dari `--delete` supaya data produksi tidak ikut terhapus:
+
+- `--exclude='/api/config.php'` — kredensial database, tidak ada di git.
+- `--exclude='/uploads/*/'` — `room-images/` dan `gallery-images/`. Hanya isi
+  subfoldernya yang dilindungi; `uploads/.htaccess` tetap diperbarui.
+
+`vtb-private/` berada di luar `public_html` sehingga tidak pernah tersentuh.
+
+### Kalau gagal
+
+- `rsync tidak ada di server` — paket hostingnya tidak menyediakan `rsync`;
+  ganti langkah kirim dengan tar over SSH atau deploy FTP.
+- `HOSTINGER_DEPLOY_PATH tidak ditemukan` — path-nya relatif terhadap home SSH,
+  bukan `/home/uXXXX/...`.
+- Langkah **Cek situs hidup** merah tapi rsync hijau — kodenya sudah naik,
+  masalahnya di `config.php` atau database. Cek `error_log` di File Manager.
+
+---
+
 ## Catatan keamanan
 
 - **Bukti bayar disimpan di luar `public_html`.** Berkasnya berisi data

@@ -1,0 +1,110 @@
+name: Deploy ke Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-produksi
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build lalu kirim ke public_html
+    runs-on: ubuntu-latest
+
+    env:
+      SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+      SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+      SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+      REMOTE_PATH: ${{ secrets.HOSTINGER_DEPLOY_PATH }}
+
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Pasang Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Pasang dependensi
+        run: npm ci
+
+      - name: Uji paritas harga PHP vs JS
+        run: php api/tests/pricing-parity.php
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Susun folder rilis
+        run: |
+          set -euo pipefail
+          rm -rf _release
+          mkdir -p _release/uploads
+          cp -r dist/. _release/
+          cp public_html.htaccess _release/.htaccess
+          cp uploads.htaccess _release/uploads/.htaccess
+          cp -r api _release/api
+          rm -rf _release/api/tests
+          rm -f _release/api/dev-server.php
+          rm -f _release/api/config.php
+          rm -f _release/api/config.example.php
+          rm -f _release/api/schema.sql
+          rm -rf _release/api/migrations
+          test -f _release/index.html
+          test -f _release/api/index.php
+          test -f _release/api/.htaccess
+          test -f _release/.htaccess
+          test -f _release/uploads/.htaccess
+          echo "Isi rilis:"
+          du -sh _release
+          find _release -maxdepth 2 -mindepth 1 | sort
+
+      - name: Siapkan kunci SSH
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          if [ -n "${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Periksa server
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/id_deploy -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "
+            set -e
+            command -v rsync >/dev/null || { echo 'rsync tidak ada di server'; exit 1; }
+            test -d '$REMOTE_PATH' || { echo 'HOSTINGER_DEPLOY_PATH tidak ditemukan: $REMOTE_PATH'; exit 1; }
+            test -f '$REMOTE_PATH/api/config.php' || echo 'PERINGATAN: api/config.php belum ada di server, API akan gagal'
+            php -v | head -1
+          "
+
+      - name: Kirim rilis
+        run: |
+          set -euo pipefail
+          rsync -rlptzv --delete \
+            --chmod=D755,F644 \
+            --exclude='/api/config.php' \
+            --exclude='/uploads/*/' \
+            -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT" \
+            _release/ "$SSH_USER@$SSH_HOST:$REMOTE_PATH/"
+
+      - name: Cek situs hidup
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w '%{http_code}' "https://${{ secrets.SITUS_URL }}/api/rooms")
+          echo "GET /api/rooms -> $code"
+          test "$code" = "200"
+
+      - name: Bersihkan kunci
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
