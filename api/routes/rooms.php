@@ -99,8 +99,12 @@ function room_fields(array $body): array
     ];
 }
 
-function write_room_images(PDO $pdo, string $roomId, mixed $images): void
+function write_room_images(PDO $pdo, string $roomId, mixed $images): array
 {
+    $previous = $pdo->prepare('SELECT image_url FROM room_images WHERE room_id = ?');
+    $previous->execute([$roomId]);
+    $old = $previous->fetchAll(PDO::FETCH_COLUMN);
+
     $pdo->prepare('DELETE FROM room_images WHERE room_id = ?')->execute([$roomId]);
     $list = is_array($images) ? array_values($images) : [];
     $stmt = $pdo->prepare(
@@ -111,6 +115,8 @@ function write_room_images(PDO $pdo, string $roomId, mixed $images): void
         $isPrimary = array_key_exists('is_primary', $img) ? $img['is_primary'] : ($i === 0);
         $stmt->execute([uuid_v4(), $roomId, (string) $img['url'], $isPrimary ? 1 : 0, $i]);
     }
+
+    return $old;
 }
 
 function route_rooms_create(): never
@@ -139,7 +145,7 @@ function route_rooms_update(string $id): never
     $fields = room_fields($body);
     $cols = array_keys($fields);
 
-    db_transaction(function (PDO $pdo) use ($id, $cols, $fields, $body): void {
+    $replaced = db_transaction(function (PDO $pdo) use ($id, $cols, $fields, $body): array {
         $set = implode(', ', array_map(static fn(string $c): string => "$c = ?", $cols));
         $stmt = $pdo->prepare("UPDATE rooms SET $set WHERE id = ?");
         $stmt->execute([...array_values($fields), $id]);
@@ -150,8 +156,10 @@ function route_rooms_update(string $id): never
                 throw not_found('Kamar tidak ditemukan.');
             }
         }
-        write_room_images($pdo, $id, $body['images'] ?? null);
+        return write_room_images($pdo, $id, $body['images'] ?? null);
     });
+
+    delete_upload_refs(collect_upload_refs($replaced));
 
     json_out(['id' => $id]);
 }
@@ -181,11 +189,16 @@ function translate_room_fk_error(PDOException $e): Throwable
 function route_rooms_delete(string $id): never
 {
     require_auth();
+    $urls = array_column(
+        db_query('SELECT image_url FROM room_images WHERE room_id = ?', [$id]),
+        'image_url',
+    );
     try {
         assert_affected(db_execute('DELETE FROM rooms WHERE id = ?', [$id]), 'Kamar tidak ditemukan.');
     } catch (PDOException $e) {
         throw translate_room_fk_error($e);
     }
+    delete_upload_refs(collect_upload_refs($urls));
     json_out(['deleted' => 1]);
 }
 
@@ -193,6 +206,13 @@ function route_rooms_bulk_delete(): never
 {
     require_auth();
     $ids = require_id_list(request_body()['ids'] ?? null);
+    $urls = array_column(
+        db_query(
+            'SELECT image_url FROM room_images WHERE room_id IN (' . placeholders(count($ids)) . ')',
+            $ids,
+        ),
+        'image_url',
+    );
     try {
         $affected = db_execute(
             'DELETE FROM rooms WHERE id IN (' . placeholders(count($ids)) . ')',
@@ -202,5 +222,6 @@ function route_rooms_bulk_delete(): never
         throw translate_room_fk_error($e);
     }
     assert_affected($affected, 'Kamar tidak ditemukan.');
+    delete_upload_refs(collect_upload_refs($urls));
     json_out(['deleted' => $affected]);
 }

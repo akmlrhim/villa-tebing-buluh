@@ -42,10 +42,12 @@ function route_gallery_create(): never
 function route_gallery_delete(string $id): never
 {
     require_auth();
+    $row = db_query_one('SELECT image_url FROM gallery_images WHERE id = ?', [$id]);
     assert_affected(
         db_execute('DELETE FROM gallery_images WHERE id = ?', [$id]),
         'Foto tidak ditemukan.',
     );
+    delete_upload_refs(collect_upload_refs([$row['image_url'] ?? null]));
     json_out(['deleted' => 1]);
 }
 
@@ -53,10 +55,18 @@ function route_gallery_bulk_delete(): never
 {
     require_auth();
     $ids = require_id_list(request_body()['ids'] ?? null);
+    $urls = array_column(
+        db_query(
+            'SELECT image_url FROM gallery_images WHERE id IN (' . placeholders(count($ids)) . ')',
+            $ids,
+        ),
+        'image_url',
+    );
     $affected = db_execute(
         'DELETE FROM gallery_images WHERE id IN (' . placeholders(count($ids)) . ')',
         $ids,
     );
     assert_affected($affected, 'Foto tidak ditemukan.');
+    delete_upload_refs(collect_upload_refs($urls));
     json_out(['deleted' => $affected]);
 }

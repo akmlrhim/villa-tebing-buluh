@@ -114,6 +114,91 @@ function store_upload(string $bucket): string
     return $filename;
 }
 
+function parse_upload_ref(mixed $value, ?string $bareBucket = null): ?array
+{
+    if (!is_string($value)) {
+        return null;
+    }
+
+    $value = trim($value);
+    if ($value === '') {
+        return null;
+    }
+
+    if (preg_match('#^/uploads/([a-z0-9-]+)/([0-9a-fA-F-]{36}\.[a-zA-Z0-9]+)$#', $value, $m)) {
+        [$bucket, $filename] = [$m[1], $m[2]];
+    } elseif ($bareBucket !== null && preg_match('/^[0-9a-fA-F-]{36}\.[a-zA-Z0-9]+$/', $value)) {
+        [$bucket, $filename] = [$bareBucket, $value];
+    } else {
+        return null;
+    }
+
+    return isset(UPLOAD_BUCKETS[$bucket]) ? [$bucket, $filename] : null;
+}
+
+function collect_upload_refs(array $values, ?string $bareBucket = null): array
+{
+    $refs = [];
+    foreach ($values as $value) {
+        $ref = parse_upload_ref($value, $bareBucket);
+        if ($ref !== null) {
+            $refs[] = $ref;
+        }
+    }
+    return $refs;
+}
+
+function upload_ref_in_use(string $bucket, string $filename): bool
+{
+    $url = public_bucket_url($bucket, $filename);
+
+    $checks = [
+        ['SELECT 1 FROM room_images WHERE image_url = ? LIMIT 1', [$url]],
+        ['SELECT 1 FROM gallery_images WHERE image_url = ? LIMIT 1', [$url]],
+        ['SELECT 1 FROM settings WHERE `key` = ? AND `value` = ? LIMIT 1', ['qris_image_url', $url]],
+        ['SELECT 1 FROM bookings WHERE payment_proof_url = ? LIMIT 1', [$filename]],
+    ];
+
+    foreach ($checks as [$sql, $params]) {
+        if (db_query_one($sql, $params) !== null) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function delete_upload_refs(array $refs): int
+{
+    $deleted = 0;
+    $seen = [];
+
+    foreach ($refs as [$bucket, $filename]) {
+        $key = "$bucket/$filename";
+        if (isset($seen[$key])) {
+            continue;
+        }
+        $seen[$key] = true;
+
+        if (upload_ref_in_use($bucket, $filename)) {
+            continue;
+        }
+
+        $path = bucket_dir($bucket) . DIRECTORY_SEPARATOR . $filename;
+        if (!is_file($path)) {
+            continue;
+        }
+
+        if (@unlink($path)) {
+            $deleted += 1;
+        } else {
+            error_log('[api] gagal menghapus berkas unggahan: ' . $path);
+        }
+    }
+
+    return $deleted;
+}
+
 function proof_signature(string $filename, int $exp): string
 {
     return hash_hmac('sha256', "$filename:$exp", config()['jwt_secret']);

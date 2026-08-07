@@ -42,6 +42,10 @@ function route_settings_save(): never
         );
     }
 
+    $oldQris = array_key_exists('qris_image_url', $patch)
+        ? db_query_one('SELECT `value` FROM settings WHERE `key` = ?', ['qris_image_url'])
+        : null;
+
     db_transaction(function (PDO $pdo) use ($patch): void {
         $stmt = $pdo->prepare(
             'INSERT INTO settings (`key`, `value`) VALUES (?, ?)
@@ -51,6 +55,10 @@ function route_settings_save(): never
             $stmt->execute([$key, $value === null ? '' : (string) $value]);
         }
     });
+
+    if ($oldQris !== null) {
+        delete_upload_refs(collect_upload_refs([$oldQris['value'] ?? null]));
+    }
 
     json_out(['saved' => count($patch)]);
 }

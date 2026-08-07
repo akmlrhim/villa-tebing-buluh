@@ -57,8 +57,12 @@ jobs:
           test -f _release/index.html
           test -f _release/api/index.php
           test -f _release/api/.htaccess
+          test -f _release/api/lib/.htaccess
+          test -f _release/api/routes/.htaccess
+          test -f _release/api/tools/.htaccess
           test -f _release/.htaccess
           test -f _release/uploads/.htaccess
+          test ! -f _release/api/config.php
           echo "Isi rilis:"
           du -sh _release
           find _release -maxdepth 2 -mindepth 1 | sort

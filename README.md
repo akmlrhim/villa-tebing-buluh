@@ -346,6 +346,58 @@ Skrip itu mengompres **di tempat dengan format yang sama** (webp tetap webp,
 jpg tetap jpg) supaya nama berkas yang sudah tercatat di database tidak
 berubah.
 
+### 3. Menghapus gambar ikut menghapus berkasnya
+
+Menghapus baris di database saja akan meninggalkan berkas yatim yang menumpuk
+di disk selamanya. Karena itu berkas fisik ikut dihapus saat:
+
+| Aksi admin | Berkas yang dibersihkan |
+| ---------- | ----------------------- |
+| Hapus kamar (satuan/massal) | semua foto kamar itu |
+| Edit kamar lalu membuang foto | foto yang dibuang saja |
+| Hapus foto galeri (satuan/massal) | foto tersebut |
+| Ganti gambar QRIS | gambar QRIS yang lama |
+| Hapus booking (satuan/massal) | bukti bayarnya |
+
+Aturan pengamannya ada di `delete_upload_refs()` (`api/lib/uploads.php`):
+
+- berkas **hanya** dihapus kalau tidak ada baris lain yang masih memakainya —
+  satu foto yang dipakai kamar **dan** galeri baru hilang setelah referensi
+  terakhirnya dilepas;
+- hanya URL unggahan lokal (`/uploads/<bucket>/<uuid>.<ext>`) yang diproses;
+  URL luar seperti Unsplash dan jalur aneh seperti `../../config.php`
+  diabaikan, jadi tidak bisa dipakai untuk menghapus berkas sembarangan;
+- penghapusan berkas dilakukan **setelah** transaksi database sukses, supaya
+  transaksi yang batal tidak terlanjur menghapus berkas;
+- gagal menghapus berkas tidak membatalkan permintaan, hanya dicatat ke log.
+
+Untuk berkas yatim yang sudah telanjur menumpuk sebelum ini ada:
+
+```bash
+php api/tools/prune-uploads.php        # uji coba, tidak menghapus apa pun
+php api/tools/prune-uploads.php --yes  # benar-benar menghapus
+```
+
+---
+
+## Berkas PHP tidak bisa diakses dari browser
+
+`api/config.php` berisi password database dan `jwt_secret`, jadi ditolak lewat
+`<FilesMatch>` di `api/.htaccess`. Selain itu setiap subfolder `api/` punya
+`.htaccess` berisi `Require all denied`:
+
+- `api/lib/.htaccess`
+- `api/routes/.htaccess`
+- `api/tools/.htaccess`
+
+Ini tidak mengganggu jalannya API, karena `require` di PHP membaca berkas lewat
+filesystem, bukan lewat Apache. Yang diblokir hanya permintaan HTTP langsung
+seperti `/api/lib/db.php`. Satu-satunya berkas PHP yang boleh dipanggil browser
+adalah `api/index.php`.
+
+Workflow deploy memastikan keempat `.htaccess` itu ikut terkirim dan
+`api/config.php` tidak pernah ikut.
+
 ---
 
 ## Promo harga kamar
@@ -422,6 +474,7 @@ ditagih angka lain.
 | `api/tools/create-admin.php` | Buat/ganti password akun admin (CLI saja)                |
 | `api/tools/seed.php`         | Isi semua tabel dengan data contoh (CLI saja)            |
 | `api/tools/compress-uploads.php` | Sapu berkas lama di `uploads/` ke bawah 50 KB        |
+| `api/tools/prune-uploads.php` | Hapus berkas unggahan yatim (tidak dirujuk database)    |
 | `scripts/optimize-images.mjs`| Bangun varian hero `public/img/` dari `assets/img-src/`   |
 | `assets/img-src/`            | Master gambar resolusi penuh (tidak ikut deploy)         |
 | `api/tests/`                 | Uji parity harga PHP ↔ JS                                |

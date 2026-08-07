@@ -358,9 +358,13 @@ function route_bookings_update_status(string $id): never
 function route_bookings_delete(string $id): never
 {
     require_auth();
+    $row = db_query_one('SELECT payment_proof_url FROM bookings WHERE id = ?', [$id]);
     assert_affected(
         db_execute('DELETE FROM bookings WHERE id = ?', [$id]),
         'Booking tidak ditemukan.',
+    );
+    delete_upload_refs(
+        collect_upload_refs([$row['payment_proof_url'] ?? null], 'payment-proofs'),
     );
     json_out(['deleted' => 1]);
 }
@@ -369,10 +373,18 @@ function route_bookings_bulk_delete(): never
 {
     require_auth();
     $ids = require_id_list(request_body()['ids'] ?? null);
+    $proofs = array_column(
+        db_query(
+            'SELECT payment_proof_url FROM bookings WHERE id IN (' . placeholders(count($ids)) . ')',
+            $ids,
+        ),
+        'payment_proof_url',
+    );
     $affected = db_execute(
         'DELETE FROM bookings WHERE id IN (' . placeholders(count($ids)) . ')',
         $ids,
     );
     assert_affected($affected, 'Booking tidak ditemukan.');
+    delete_upload_refs(collect_upload_refs($proofs, 'payment-proofs'));
     json_out(['deleted' => $affected]);
 }
