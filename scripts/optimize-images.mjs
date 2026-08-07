@@ -26,6 +26,13 @@ const PEEK = {
   ],
 };
 
+const OG = {
+  src: 'home-hero.webp',
+  out: 'img/og.jpg',
+  width: 1200,
+  height: 630,
+};
+
 function kb(bytes) {
   return (bytes / 1024).toFixed(1).padStart(6) + 'KB';
 }
@@ -101,6 +108,42 @@ async function buildPeek() {
   }
 }
 
+async function buildOg() {
+  const buf = await readFile(join(srcDir, OG.src));
+  const pipeline = sharp(buf).resize({
+    width: OG.width,
+    height: OG.height,
+    fit: 'cover',
+    position: 'attention',
+  });
+
+  let lo = 1;
+  let hi = 95;
+  let best = null;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    const out = await pipeline
+      .clone()
+      .jpeg({ quality: mid, mozjpeg: true, progressive: true })
+      .toBuffer();
+    if (out.length <= MAX_BYTES) {
+      best = { buf: out, quality: mid };
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  if (!best) throw new Error(`tidak muat ${MAX_BYTES} byte: ${OG.out}`);
+
+  const outPath = join(publicDir, OG.out);
+  await mkdir(dirname(outPath), { recursive: true });
+  await writeFile(outPath, best.buf);
+  console.log(`\n${OG.src}  -> Open Graph`);
+  console.log(
+    `  ${OG.out.padEnd(34)} ${String(OG.width).padStart(4)}w  q=${String(best.quality).padStart(2)}  ${kb(best.buf.length)}`,
+  );
+}
+
 async function* walk(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
@@ -116,6 +159,7 @@ async function auditPublic() {
       WIDTHS.map((w) => join(publicDir, `${h.out}-${w}.webp`)),
     ),
     ...PEEK.variants.map((v) => join(publicDir, v.out)),
+    join(publicDir, OG.out),
   ]);
 
   let over = 0;
@@ -139,6 +183,7 @@ async function auditPublic() {
 
 await buildHeroes();
 await buildPeek();
+await buildOg();
 const over = await auditPublic();
 
 if (over > 0) {

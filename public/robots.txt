@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /pembayaran
+Disallow: /cek-booking
+
+Sitemap: https://villatebingbuluh.com/sitemap.xml

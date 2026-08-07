@@ -30,8 +30,8 @@ function openLightbox(index) {
       :image="hero.url"
       :srcset="hero.srcset"
       :alt="hero.alt"
-      title="Our Gallery"
-      subtitle="Suasana vila apa adanya: kamar, pegunungan, dan sekitarnya. Klik foto untuk melihat lebih besar."
+      title="Galeri Villa Tebing Buluh"
+      subtitle="Suasana vila apa adanya: kamar, gazebo bambu, dan Pegunungan Meratus di sekitarnya. Klik foto untuk melihat lebih besar."
     />
 
     <div class="mx-auto max-w-6xl px-4 sm:px-6">

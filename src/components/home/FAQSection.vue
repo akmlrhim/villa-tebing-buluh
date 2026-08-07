@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, watchEffect } from 'vue';
 import IconGlyph from '../IconGlyph.vue';
 import { useSettings } from '../../composables/useSettings';
+import { createJsonLd } from '../../lib/seo';
 
 const { settings, paymentDeadlineHours } = useSettings();
 
@@ -55,6 +56,22 @@ const faqs = computed(() => [
     a: 'Admin akan menghubungimu lewat WhatsApp untuk konfirmasi ulang. Supaya prosesnya cepat, pastikan foto/screenshot bukti bayar menampilkan nominal dan tanggal transaksi dengan jelas sebelum diunggah.',
   },
 ]);
+
+const jsonLd = createJsonLd('faq');
+
+watchEffect(() => {
+  jsonLd.write({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.value.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  });
+});
+
+onBeforeUnmount(jsonLd.remove);
 </script>
 
 <template>
@@ -86,9 +103,7 @@ const faqs = computed(() => [
             class="text-muted h-5 w-5 shrink-0 transition-transform duration-200 group-open:rotate-180"
           />
         </summary>
-        <p
-          class="mt-3 max-w-[65ch] text-sm leading-relaxed text-black"
-        >
+        <p class="mt-3 max-w-[65ch] text-sm leading-relaxed text-black">
           {{ faq.a }}
         </p>
       </details>

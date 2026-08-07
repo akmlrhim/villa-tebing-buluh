@@ -1,19 +1,24 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import SiteNav from './components/SiteNav.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import WhatsAppFab from './components/WhatsAppFab.vue'
 import ToastHost from './components/ToastHost.vue'
 import { useSettings } from './composables/useSettings'
+import { patchLodgingJsonLd } from './lib/seo'
 
-const { fetchSettings } = useSettings()
+const { settings, loaded, fetchSettings } = useSettings()
 
 const route = useRoute()
 const isAdmin = computed(() => route.path.startsWith('/admin'))
 
 onMounted(() => {
   fetchSettings()
+})
+
+watchEffect(() => {
+  if (loaded.value) patchLodgingJsonLd(settings.value)
 })
 </script>
 

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth";
-import { useToast } from "../composables/useToast";
+import { applySeo } from "../lib/seo";
 import HomeView from "../views/HomeView.vue";
 
 const routes = [
@@ -8,49 +8,66 @@ const routes = [
     path: "/",
     name: "home",
     component: HomeView,
-    meta: { title: "Villa Tebing Buluh · Vila Privat di Tebing Buluh Loksado" },
+    meta: {
+      title:
+        "Villa Tebing Buluh · Penginapan Bambu di Loksado, Kalimantan Selatan",
+      description:
+        "Vila bambu privat di lereng Pegunungan Meratus, Loksado, Hulu Sungai Selatan. Cek sendiri tanggal yang masih kosong, lalu booking langsung via WhatsApp.",
+    },
   },
   {
     path: "/gallery",
     name: "gallery",
     component: () => import("../views/GalleryView.vue"),
-    meta: { title: "Our Gallery · Villa Tebing Buluh" },
+    meta: {
+      title: "Galeri Foto Villa Tebing Buluh Loksado",
+      description:
+        "Foto kamar, gazebo bambu, dan pemandangan Pegunungan Meratus di Villa Tebing Buluh, Loksado — apa adanya, tanpa polesan.",
+    },
   },
   {
     path: "/about",
     name: "about",
     component: () => import("../views/AboutView.vue"),
-    meta: { title: "About · Villa Tebing Buluh" },
+    meta: {
+      title: "Tentang Villa Tebing Buluh · Fasilitas & Lokasi di Loksado",
+      description:
+        "Fasilitas vila, cerita di balik bangunan bambunya, dan cara menuju Villa Tebing Buluh di Hulu Banyu, Loksado, Hulu Sungai Selatan.",
+    },
   },
   {
     path: "/contact",
     name: "contact",
     component: () => import("../views/ContactView.vue"),
-    meta: { title: "Contact · Villa Tebing Buluh" },
+    meta: {
+      title: "Kontak & Lokasi Villa Tebing Buluh Loksado",
+      description:
+        "Alamat, peta, nomor WhatsApp, dan jam operasional admin Villa Tebing Buluh di Jl. Tanuhi, Hulu Banyu, Loksado, Kalimantan Selatan.",
+    },
   },
   {
     path: "/pembayaran",
     name: "payment",
     component: () => import("../views/PaymentView.vue"),
-    meta: { title: "Pembayaran · Villa Tebing Buluh" },
+    meta: { title: "Pembayaran · Villa Tebing Buluh", noindex: true },
   },
   {
     path: "/cek-booking",
     name: "booking-status",
     component: () => import("../views/BookingStatusView.vue"),
-    meta: { title: "Cek Status Booking · Villa Tebing Buluh" },
+    meta: { title: "Cek Status Booking · Villa Tebing Buluh", noindex: true },
   },
 
   {
     path: "/admin/login",
     name: "admin-login",
     component: () => import("../views/admin/AdminLoginView.vue"),
-    meta: { title: "Login Admin · Villa Tebing Buluh" },
+    meta: { title: "Login Admin · Villa Tebing Buluh", noindex: true },
   },
   {
     path: "/admin",
     component: () => import("../views/admin/AdminLayout.vue"),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, noindex: true },
     children: [
       {
         path: "",
@@ -96,6 +113,13 @@ const routes = [
       },
     ],
   },
+
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: () => import("../views/NotFoundView.vue"),
+    meta: { title: "Halaman tidak ditemukan · Villa Tebing Buluh", noindex: true },
+  },
 ];
 
 export const router = createRouter({
@@ -108,11 +132,7 @@ export const router = createRouter({
   },
 });
 
-router.beforeEach(async (to, from) => {
-  if (!to.matched.length) {
-    useToast().info("Halaman tidak ditemukan.");
-    return from.matched.length ? false : { name: "home" };
-  }
+router.beforeEach(async (to) => {
   if (!to.meta.requiresAuth) return true;
   const { initAuth, isAuthenticated } = useAuth();
   await initAuth();
@@ -123,5 +143,5 @@ router.beforeEach(async (to, from) => {
 });
 
 router.afterEach((to) => {
-  if (to.meta.title) document.title = to.meta.title;
+  applySeo(to);
 });

@@ -3,11 +3,13 @@ import { api, authApi } from '../lib/api'
 import { demoSettings } from '../data/demoData'
 
 const settings = ref({ ...demoSettings })
+const loaded = ref(false)
 let loadPromise = null
 
 async function load() {
   try {
     Object.assign(settings.value, await api.get('/settings'))
+    loaded.value = true
   } catch {
   }
 }
@@ -32,6 +34,7 @@ export function useSettings() {
 
   return {
     settings,
+    loaded,
     fetchSettings,
     saveSettings,
     whatsappNumber,

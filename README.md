@@ -380,6 +380,125 @@ php api/tools/prune-uploads.php --yes  # benar-benar menghapus
 
 ---
 
+## SEO
+
+Situs ini SPA tanpa SSR: server selalu mengirim `index.html` yang sama, isinya
+baru terbentuk setelah JavaScript jalan. Googlebot bisa menjalankan JavaScript,
+jadi ini bukan penghalang — tapi artinya **apa pun yang penting sebaiknya ada
+di HTML mentah**, karena itulah yang dibaca paling awal dan paling andal
+(termasuk oleh perayap yang tidak me-render, seperti pratinjau tautan WhatsApp).
+
+Karena itu pembagiannya:
+
+| Ada di HTML mentah (`index.html`) | Diisi JavaScript saat pindah halaman |
+| --------------------------------- | ------------------------------------ |
+| judul & deskripsi halaman depan   | judul & deskripsi per halaman        |
+| canonical, OG, Twitter card       | canonical, OG, Twitter card per halaman |
+| JSON-LD `LodgingBusiness`         | telepon & jam di JSON-LD itu, dari pengaturan admin |
+| —                                 | JSON-LD `FAQPage` (di halaman depan) |
+
+`src/lib/seo.js` berisi `applySeo()` yang dipanggil `router.afterEach`. Judul,
+deskripsi, dan penanda `noindex` diambil dari `meta` tiap rute di
+`src/router/index.js` — **kalau menambah halaman publik baru, isi `title` dan
+`description` di situ**, kalau tidak halaman itu memakai teks halaman depan dan
+jadi duplikat.
+
+### Yang tidak diindeks
+
+`/pembayaran`, `/cek-booking`, dan seluruh `/admin` ditandai
+`noindex, nofollow` lewat `meta: { noindex: true }`, dan juga ditolak di
+`public/robots.txt`. URL yang tidak dikenal tidak lagi dilempar ke beranda —
+sekarang tampil `NotFoundView` yang ber-`noindex`, supaya salah ketik alamat
+tidak berubah jadi ratusan halaman duplikat di mata Google.
+
+> Halaman ini tetap membalas HTTP 200 (Apache selalu menyajikan `index.html`).
+> Itu wajar untuk SPA dan sudah cukup selama `noindex` terpasang.
+
+### Sitemap
+
+`public/sitemap.xml` ditulis tangan dan hanya memuat empat halaman publik.
+**Perbarui `<lastmod>` kalau isi halamannya berubah banyak**, dan tambahkan
+`<url>` baru kalau ada rute publik baru. Jangan masukkan halaman `noindex`.
+
+Daftarkan sekali di Google Search Console (Sitemaps → `sitemap.xml`).
+
+### robots.txt
+
+`public/robots.txt` mengizinkan semua perayap kecuali di jalur privat, dan
+menunjuk ke sitemap. Perlu diketahui: **Cloudflare menyisipkan blok "Managed
+Content" sendiri** ke balasan `/robots.txt` — blok itu melarang perayap AI
+(GPTBot, ClaudeBot, Google-Extended, dll). Itu datang dari dasbor Cloudflare,
+bukan dari repo ini; ubah di sana kalau tidak dikehendaki.
+
+### Gambar Open Graph
+
+`public/img/og.jpg` (1200×630) dibangun `npm run images` dari
+`assets/img-src/home-hero.webp`, tetap di bawah batas 50 KB seperti gambar
+lain. Formatnya JPEG, bukan WebP, karena sebagian perayap pratinjau tautan
+masih belum menampilkan WebP.
+
+### Google Tag Manager
+
+Bootstrap GTM ada di `public/gtm.js`, **bukan** skrip inline di `index.html`.
+Alasannya CSP: `script-src` di `public_html.htaccess` tidak mengizinkan
+`'unsafe-inline'`, jadi skrip inline akan ditolak browser. Berkas terpisah
+dilayani dari domain sendiri sehingga lolos `'self'` tanpa perlu melonggarkan
+kebijakan.
+
+CSP-nya juga perlu mengizinkan host Google, kalau tidak `gtm.js` termuat tapi
+tidak pernah dijalankan dan tag GA4 di dalamnya tidak pernah menyala:
+
+```
+script-src  ... https://www.googletagmanager.com
+connect-src ... https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com
+frame-src   ... https://www.googletagmanager.com
+```
+
+> Kalau nanti ada tag **Custom HTML** di dalam kontainer GTM, tag itu akan
+> membuat skrip inline dan tetap ditolak CSP. Pakai tag bawaan GTM, atau
+> tambahkan nonce — jangan menambahkan `'unsafe-inline'`.
+
+`gtm.js` sengaja dikecualikan dari cache satu tahun (`access plus 5 minutes`),
+karena namanya tidak ber-hash — sama seperti masalah gambar `public/img/`,
+mengganti isinya tanpa mengganti nama akan tersangkut di cache tepi.
+
+### JSON-LD yang ikut pengaturan admin
+
+Blok `LodgingBusiness` di `index.html` (dikenali lewat `id="ld-lodging"`) berisi
+nilai dasar yang sudah ada di HTML mentah. Setelah `/api/settings` terjawab,
+`patchLodgingJsonLd()` di `src/lib/seo.js` menimpa sebagian isinya dengan data
+dari **Kelola Pengaturan** — jadi mengganti nomor WhatsApp di `/admin/pengaturan`
+langsung mengubah structured data, tanpa menyentuh kode:
+
+| Bidang JSON-LD | Sumber di `settings` | Catatan |
+| -------------- | -------------------- | ------- |
+| `telephone`    | `whatsapp_number`    | diubah ke bentuk E.164 (`+62…`) |
+| `name`         | `villa_name`         | |
+| `checkinTime` / `checkoutTime` | `check_in_time` / `check_out_time` | `14.00` → `14:00` |
+| `sameAs`       | `instagram`          | dijadikan URL profil |
+
+Penimpaan hanya jalan setelah API benar-benar menjawab (`loaded` di
+`useSettings`). Kalau API mati, halaman tetap memakai nilai dasar di
+`index.html` dan **tidak** memakai data contoh dari `src/data/demoData.js` —
+supaya nomor telepon palsu tidak pernah ikut terbit.
+
+> **`address` sengaja tidak ikut ditimpa.** Di JSON-LD alamatnya terstruktur
+> (`streetAddress`, `addressLocality`, `postalCode`, …) sedangkan di pengaturan
+> hanya satu baris teks bebas yang tidak bisa dipecah dengan andal. Kalau alamat
+> vila berubah, ubah **dua-duanya**: `/admin/pengaturan` dan blok JSON-LD di
+> `index.html`.
+
+### Yang masih perlu diisi manusia
+
+- **Google Business Profile.** Untuk penginapan, profil bisnis yang terverifikasi
+  jauh lebih menentukan daripada apa pun di halaman ini. Alamat, jam, dan foto
+  di sana harus sama persis dengan yang di situs.
+- **Search Console.** Daftarkan domainnya, kirim sitemap, lalu pakai
+  "Inspeksi URL" untuk memastikan Google benar-benar melihat halaman hasil
+  render — bukan `<div id="app">` yang kosong.
+
+---
+
 ## Berkas PHP tidak bisa diakses dari browser
 
 `api/config.php` berisi password database dan `jwt_secret`, jadi ditolak lewat
@@ -482,6 +601,10 @@ ditagih angka lain.
 | `public_html.htaccess`       | Salin jadi `public_html/.htaccess` saat deploy           |
 | `uploads.htaccess`           | Salin jadi `public_html/uploads/.htaccess` saat deploy   |
 | `shared/pricing.js`          | Mesin harga sisi browser                                 |
+| `public/robots.txt`          | Aturan perayap + penunjuk sitemap                        |
+| `public/sitemap.xml`         | Daftar halaman publik (ditulis tangan)                   |
+| `public/gtm.js`              | Bootstrap Google Tag Manager (dipisah karena CSP)        |
+| `src/lib/seo.js`             | Judul/deskripsi/canonical/OG per rute + helper JSON-LD   |
 | `src/lib/api.js`             | Klien REST + `friendlyDbError`                           |
 | `src/lib/storage.js`         | Unggah gambar ke `/api/upload/*`                         |
 | `src/composables/`           | State per-domain (rooms, bookings, promos, gallery, dst) |

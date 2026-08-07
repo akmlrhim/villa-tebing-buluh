@@ -166,7 +166,7 @@ export const demoSettings = {
     'Jl. Tanuhi, Hulu Banyu, Kec. Loksado, Kabupaten Hulu Sungai Selatan, Kalimantan Selatan 71282',
   check_in_time: '14.00',
   check_out_time: '12.00',
-  instagram: 'villatebingbuluh',
+  instagram: 'villatebingbuluh_',
   qris_image_url: '',
   qris_merchant_name: 'Villa Tebing Buluh',
   qris_nmid: 'ID1024xxxxxxxxx',
