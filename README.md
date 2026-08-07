@@ -24,10 +24,26 @@ Browser  ->  Apache  ->  public_html/index.html   SPA hasil `npm run build`
 Browser **tidak pernah** bicara langsung ke database. Seluruh otorisasi dijaga
 di layer API (`api/lib/auth.php` + pemisahan endpoint publik vs admin).
 
-Situs ini tidak memuat webfont sama sekali — semua teks memakai `system-ui`
-(font bawaan perangkat tamu). Jangan menambahkan `<link>` ke Google Fonts:
-itu menambah request pihak ketiga dan membuat teks bergeser saat halaman
-dimuat, dua hal yang paling terasa di koneksi lambat.
+Seluruh teks memakai **Inter**, yang **di-host sendiri** lewat paket
+`@fontsource-variable/inter`. Deklarasi `@font-face`-nya ditulis tangan di
+`src/style.css` dan sengaja menunjuk **satu berkas saja**:
+`inter-latin-wght-normal.woff2` (48 KB, sumbu bobot 100-900, subset latin).
+
+Yang perlu diketahui kalau menyentuh bagian ini:
+
+- **Jangan meng-`import` `@fontsource-variable/inter` (index.css).** Berkas itu
+  menarik 7 subset (cyrillic, greek, vietnamese, latin-ext, …). Browser memang
+  hanya mengunduh subset yang terpakai berkat `unicode-range`, tapi Vite tetap
+  menyalin ketujuh woff2 ke `dist/` dan semuanya ikut ter-`rsync` ke server.
+  Subset `latin` sudah mencakup `×`, `²`, `·`, en dash, dan em dash, jadi
+  cukup satu.
+- **Jangan menambahkan `<link>` ke Google Fonts.** Itu request pihak ketiga,
+  dan CSP di `public_html.htaccess` memakai `font-src 'self'` sehingga akan
+  ditolak browser. Font yang di-host sendiri lolos tanpa mengubah CSP.
+- Berkas fontnya **di-preload** lewat plugin `preloadFont()` di
+  `vite.config.js`, yang membaca nama ber-hash dari bundle lalu menyisipkan
+  `<link rel="preload" as="font" crossorigin>`. Tanpa itu font baru diminta
+  setelah layout, dan teks sempat berkedip dari font sistem ke Inter.
 
 ### Kenapa PHP
 
@@ -605,6 +621,7 @@ ditagih angka lain.
 | `public/sitemap.xml`         | Daftar halaman publik (ditulis tangan)                   |
 | `public/gtm.js`              | Bootstrap Google Tag Manager (dipisah karena CSP)        |
 | `src/lib/seo.js`             | Judul/deskripsi/canonical/OG per rute + helper JSON-LD   |
+| `src/style.css`              | Token tema Tailwind + `@font-face` Inter (satu subset)   |
 | `src/lib/api.js`             | Klien REST + `friendlyDbError`                           |
 | `src/lib/storage.js`         | Unggah gambar ke `/api/upload/*`                         |
 | `src/composables/`           | State per-domain (rooms, bookings, promos, gallery, dst) |
