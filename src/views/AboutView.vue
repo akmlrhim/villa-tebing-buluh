@@ -12,8 +12,8 @@ const { settings, villaName } = useSettings();
 const selectedRoom = ref(null);
 
 const hero = {
-  url: '/img/about/hero-2000.webp',
-  srcset: [640, 1080, 1600, 2000]
+  url: '/img/about/hero-1080.webp',
+  srcset: [640, 828, 1080]
     .map((w) => `/img/about/hero-${w}.webp ${w}w`)
     .join(', '),
   alt: 'Tebing dan pantai berpasir putih di pesisir dekat vila',

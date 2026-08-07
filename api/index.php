@@ -10,6 +10,7 @@ require __DIR__ . '/lib/http.php';
 require __DIR__ . '/lib/db.php';
 require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/uploads.php';
+require __DIR__ . '/lib/images.php';
 require __DIR__ . '/lib/pricing.php';
 require __DIR__ . '/routes/auth.php';
 require __DIR__ . '/routes/rooms.php';

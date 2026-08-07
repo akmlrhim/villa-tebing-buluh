@@ -290,6 +290,64 @@ Dua hal yang dilindungi dari `--delete` supaya data produksi tidak ikut terhapus
 
 ---
 
+## Gambar: batas keras 50 KB
+
+Semua gambar yang tersimpan di server — aset statis maupun unggahan admin —
+harus **di bawah 50 KB**. Ada dua jalur yang menjaganya.
+
+### 1. Aset statis (`public/img/`)
+
+Master resolusi penuh disimpan di **`assets/img-src/`**. Folder ini sengaja ada
+di luar `public/`, jadi tidak ikut terkirim ke server (workflow hanya menyalin
+`dist/` dan `api/`). Jangan hapus: ini satu-satunya sumber kalau varian perlu
+dibuat ulang.
+
+```bash
+npm run images
+```
+
+Perintah itu membaca `assets/img-src/`, memotong ke rasio **3:2**, lalu menulis
+varian **640 / 828 / 1080** ke `public/img/`. Kualitas WebP dicari otomatis
+(binary search) — dipakai angka tertinggi yang masih muat 50 KB. Di akhir,
+skrip memindai seluruh `public/` dan keluar dengan kode error kalau masih ada
+berkas di atas 50 KB.
+
+**Kalau menambah gambar hero baru:** taruh master di `assets/img-src/`,
+daftarkan di array `HEROES` pada `scripts/optimize-images.mjs`, jalankan
+`npm run images`.
+
+> **Kenapa maksimal 1080px?** Batas 50 KB membuat lebar besar mustahil: pada
+> 1600px kualitas WebP jatuh ke q≈6 dan pada 2000px berkasnya tetap 56–130 KB
+> bahkan di kualitas terendah. Jadi varian 1600/2000 dihapus, bukan diperkecil
+> kualitasnya. Konsekuensinya hero terlihat agak lembut di monitor lebar —
+> sebagian besar tertutup gradien gelap di atasnya. Kalau suatu saat batasnya
+> dilonggarkan, ubah `MAX_BYTES` dan `WIDTHS` di skrip lalu jalankan ulang.
+
+### 2. Unggahan admin (`uploads/`)
+
+`api/lib/images.php` mengompres **setiap** berkas yang masuk sebelum disimpan.
+Apa pun yang diunggah (JPG/PNG/WebP) keluar sebagai `.webp`:
+
+- sisi terpanjang dipotong ke maksimal **1600px**;
+- orientasi EXIF dari kamera HP diluruskan;
+- kualitas dicari otomatis sampai muat 50 KB, dan kalau tetap tidak muat,
+  ukurannya diperkecil 20% lalu dicoba lagi (sampai batas 320px);
+- gambar bergaya grafis — **kode QRIS**, tangkapan layar — dideteksi lewat
+  ukuran hasilnya lalu disimpan **lossless**, jadi QRIS tetap tajam dan
+  terpindai (contoh: 4,8 KB → 0,7 KB, tanpa kehilangan piksel).
+
+Berkas yang sudah telanjur ada di server bisa disapu sekali jalan:
+
+```bash
+php api/tools/compress-uploads.php
+```
+
+Skrip itu mengompres **di tempat dengan format yang sama** (webp tetap webp,
+jpg tetap jpg) supaya nama berkas yang sudah tercatat di database tidak
+berubah.
+
+---
+
 ## Promo harga kamar
 
 Admin bisa memberi harga khusus untuk **periode menginap** tertentu lewat menu
@@ -358,10 +416,14 @@ ditagih angka lain.
 | `api/lib/db.php`             | PDO + helper query/transaksi                             |
 | `api/lib/auth.php`           | JWT HS256 tanpa dependensi + `require_auth()`            |
 | `api/lib/uploads.php`        | Bucket unggahan + tanda tangan bukti bayar               |
+| `api/lib/images.php`         | Kompresi WebP unggahan (batas keras 50 KB)               |
 | `api/lib/pricing.php`        | Mesin harga + promo (**kembaran** `shared/pricing.js`)   |
 | `api/routes/`                | auth, rooms, bookings, promos, gallery, settings, upload |
 | `api/tools/create-admin.php` | Buat/ganti password akun admin (CLI saja)                |
 | `api/tools/seed.php`         | Isi semua tabel dengan data contoh (CLI saja)            |
+| `api/tools/compress-uploads.php` | Sapu berkas lama di `uploads/` ke bawah 50 KB        |
+| `scripts/optimize-images.mjs`| Bangun varian hero `public/img/` dari `assets/img-src/`   |
+| `assets/img-src/`            | Master gambar resolusi penuh (tidak ikut deploy)         |
 | `api/tests/`                 | Uji parity harga PHP ↔ JS                                |
 | `api/dev-server.php`         | Router server bawaan PHP (development saja)              |
 | `public_html.htaccess`       | Salin jadi `public_html/.htaccess` saat deploy           |

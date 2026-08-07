@@ -3,7 +3,7 @@ import IconGlyph from '../IconGlyph.vue';
 
 const cover = {
   url: '/img/gallery_heros.webp',
-  srcset: '/img/gallery_heros-mobile.webp 750w, /img/gallery_heros.webp 1500w',
+  srcset: '/img/gallery_heros-mobile.webp 750w, /img/gallery_heros.webp 1080w',
   alt: 'Suasana galeri Villa Tebing Buluh',
 };
 </script>
@@ -35,8 +35,8 @@ const cover = {
           Galeri
         </h2>
         <p class="mt-3 text-sm leading-relaxed text-white/85">
-          Lihat suasana kamar, pegunungan, dan sekitar vila lewat kumpulan
-          foto lengkap kami.
+          Lihat suasana kamar, pegunungan, dan sekitar vila lewat kumpulan foto
+          lengkap kami.
         </p>
         <RouterLink
           to="/gallery"

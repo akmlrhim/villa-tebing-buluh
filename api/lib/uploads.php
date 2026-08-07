@@ -10,8 +10,6 @@ const UPLOAD_BUCKETS = [
 
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp'];
 
-const EXT_BY_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
-
 function ini_size_bytes(string|false $value): int
 {
     $value = trim((string) $value);
@@ -48,9 +46,9 @@ function ensure_bucket_dir(string $bucket): string
     return $dir;
 }
 
-function random_filename(string $mime): string
+function random_filename(): string
 {
-    return uuid_v4() . '.' . (EXT_BY_MIME[$mime] ?? 'jpg');
+    return uuid_v4() . '.webp';
 }
 
 function safe_filename(mixed $name): string
@@ -110,11 +108,8 @@ function store_upload(string $bucket): string
     }
 
     $dir = ensure_bucket_dir($bucket);
-    $filename = random_filename($mime);
-    if (!move_uploaded_file($file['tmp_name'], $dir . DIRECTORY_SEPARATOR . $filename)) {
-        error_log('[api] move_uploaded_file gagal ke ' . $dir);
-        throw new HttpError(500, 'Berkas gagal disimpan di server.', 'SAVE_FAILED');
-    }
+    $filename = random_filename();
+    compress_to_webp($file['tmp_name'], $mime, $dir . DIRECTORY_SEPARATOR . $filename);
 
     return $filename;
 }
