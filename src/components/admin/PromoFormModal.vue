@@ -3,7 +3,7 @@ import { computed, toRef } from 'vue'
 import IconGlyph from '../IconGlyph.vue'
 import CurrencyInput from './CurrencyInput.vue'
 import { usePromoForm } from '../../composables/usePromoForm'
-import { fieldClass, btnGhost, btnPrimary } from '../../lib/ui'
+import { fieldClass, dateClass, btnGhost, btnPrimary } from '../../lib/ui'
 import { formatRupiah } from '../../lib/format'
 
 const props = defineProps({
@@ -52,11 +52,11 @@ const labelClass = 'mb-1.5 block text-[0.8125rem] font-medium text-body'
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
             <label :class="labelClass">Malam pertama *</label>
-            <input v-model="form.start_date" type="date" :class="fieldClass" />
+            <input v-model="form.start_date" type="date" :class="dateClass" />
           </div>
           <div>
             <label :class="labelClass">Malam terakhir *</label>
-            <input v-model="form.end_date" type="date" :class="fieldClass" />
+            <input v-model="form.end_date" type="date" :class="dateClass" />
           </div>
         </div>
         <p class="-mt-2.5 text-xs leading-relaxed text-muted">

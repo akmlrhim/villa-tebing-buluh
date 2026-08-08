@@ -94,7 +94,7 @@ function onClear() {
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2
-            class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl"
+            class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
           >
             Pilih kamarmu
           </h2>
@@ -200,7 +200,7 @@ function onClear() {
       class="mx-auto max-w-6xl scroll-mt-24 px-4 pt-16 sm:px-6 md:pt-20"
     >
       <h2
-        class="text-[20px] font-semibold tracking-tight text-black md:text-2xl"
+        class="text-[18px] font-semibold tracking-tight text-black md:text-2xl"
       >
         Kalender hunian vila
       </h2>

@@ -80,7 +80,7 @@ onBeforeUnmount(jsonLd.remove);
     class="mx-auto max-w-3xl scroll-mt-24 px-4 pt-16 pb-10 sm:px-6 md:pt-20 md:pb-10"
   >
     <div class="text-center">
-      <h2 class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl">
+      <h2 class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl">
         Pertanyaan yang sering ditanyakan
       </h2>
       <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-black">

@@ -5,7 +5,7 @@ import CurrencyInput from './CurrencyInput.vue'
 import { useBookingForm } from '../../composables/useBookingForm'
 import { formatRupiah, todayISO } from '../../lib/format'
 import { STATUSES } from '../../lib/bookingStatus'
-import { fieldClass, selectClass, btnGhost, btnPrimary } from '../../lib/ui'
+import { fieldClass, selectClass, dateClass, btnGhost, btnPrimary } from '../../lib/ui'
 
 const props = defineProps({
   booking: { type: Object, default: undefined },
@@ -18,9 +18,6 @@ const { form, saving, errorMsg, isOpen, isEdit, nights, markTotalTouched, onSubm
   toRef(props, 'rooms'),
   emit,
 )
-
-const DATE_CLASS =
-  'h-10.5 w-full cursor-pointer appearance-none rounded-sm border border-hairline bg-canvas px-3.5 pr-10 text-sm placeholder:text-sm leading-normal text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-date-and-time-value]:text-left'
 </script>
 
 <template>
@@ -67,21 +64,11 @@ const DATE_CLASS =
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1.5 block text-[0.8125rem] font-semibold text-ink">Check-in *</label>
-            <div class="relative">
-              <input v-model="form.check_in" type="date" :min="todayISO()" :class="DATE_CLASS"
-                @click="$event.currentTarget.showPicker?.()" />
-              <IconGlyph name="calendar"
-                class="pointer-events-none absolute right-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted" />
-            </div>
+            <input v-model="form.check_in" type="date" :min="todayISO()" :class="dateClass" />
           </div>
           <div>
             <label class="mb-1.5 block text-[0.8125rem] font-semibold text-ink">Check-out *</label>
-            <div class="relative">
-              <input v-model="form.check_out" type="date" :min="form.check_in || todayISO()" :class="DATE_CLASS"
-                @click="$event.currentTarget.showPicker?.()" />
-              <IconGlyph name="calendar"
-                class="pointer-events-none absolute right-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted" />
-            </div>
+            <input v-model="form.check_out" type="date" :min="form.check_in || todayISO()" :class="dateClass" />
           </div>
         </div>
 

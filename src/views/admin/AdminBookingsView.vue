@@ -13,7 +13,7 @@ import { useAdminRooms } from '../../composables/useAdminRooms'
 import { useToast } from '../../composables/useToast'
 import { usePagination } from '../../composables/usePagination'
 import { STATUSES, STATUS_LABEL } from '../../lib/bookingStatus'
-import { btnPrimary, selectClass } from '../../lib/ui'
+import { btnPrimary, selectClass, searchClass } from '../../lib/ui'
 import { friendlyDbError } from '../../lib/api'
 
 const { bookings, loading, fetchBookings, updateBookingStatus, deleteBooking, bulkDeleteBookings } = useBookings()
@@ -76,6 +76,14 @@ const filtered = computed(() =>
 		return true
 	}),
 )
+
+const hasFilter = computed(() => Boolean(filterStatus.value || filterRoom.value || search.value))
+
+function resetFilters() {
+	filterStatus.value = ''
+	filterRoom.value = ''
+	search.value = ''
+}
 
 const { page, pageCount, pageItems: paged, total, rangeStart, rangeEnd, goTo } = usePagination(filtered, 10)
 
@@ -144,24 +152,33 @@ async function onDelete() {
 			</div>
 		</div>
 
-		<div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-			<div class="relative">
-				<IconGlyph name="search"
-					class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-				<input v-model="search"
-					class="h-10.5 w-full rounded-sm border border-hairline bg-canvas px-3.5 text-sm placeholder:text-sm leading-normal text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 pl-9"
-					placeholder="Cari nama tamu…" />
+		<div class="mt-5 rounded-md border border-hairline bg-canvas p-3 sm:p-4">
+			<div class="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
+				<div class="relative">
+					<IconGlyph name="search"
+						class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+					<input v-model="search" :class="searchClass" placeholder="Cari nama tamu…" />
+				</div>
+				<select v-model="filterStatus" :class="selectClass">
+					<option value="">Semua status</option>
+					<option v-for="s in STATUSES" :key="s.value" :value="s.value">{{ s.label }}</option>
+				</select>
+				<select v-model="filterRoom" :class="selectClass">
+					<option value="">Semua kamar</option>
+					<option v-for="r in rooms" :key="r.id" :value="r.id">{{ r.name }}</option>
+				</select>
 			</div>
-			<select v-model="filterStatus" :class="selectClass">
-				<option value="">Semua status</option>
-				<option v-for="s in STATUSES" :key="s.value" :value="s.value">{{ s.label }}</option>
-			</select>
-			<select v-model="filterRoom" :class="selectClass">
-				<option value="">Semua kamar</option>
-				<option v-for="r in rooms" :key="r.id" :value="r.id">{{ r.name }}</option>
-			</select>
-			<div class="flex items-center text-sm text-muted">
-				{{ filtered.length }} booking
+
+			<div class="mt-3 flex items-center justify-between gap-3 border-t border-hairline-soft pt-3">
+				<p class="text-xs text-muted sm:text-sm">
+					Menampilkan <strong class="font-semibold text-ink">{{ filtered.length }}</strong>
+					dari {{ bookings.length }} booking
+				</p>
+				<button v-if="hasFilter" type="button"
+					class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-muted transition-colors hover:bg-surface-strong hover:text-ink sm:text-sm"
+					@click="resetFilters">
+					<IconGlyph name="x" class="h-3.5 w-3.5" /> Reset filter
+				</button>
 			</div>
 		</div>
 

@@ -11,6 +11,7 @@
     "create-admin": "php api/tools/create-admin.php",
     "seed": "php api/tools/seed.php",
     "images": "node scripts/optimize-images.mjs",
+    "favicons": "node scripts/make-favicons.mjs",
     "test:pricing": "php api/tests/pricing-parity.php"
   },
   "dependencies": {

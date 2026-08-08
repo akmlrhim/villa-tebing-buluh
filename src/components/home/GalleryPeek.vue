@@ -30,7 +30,7 @@ const cover = {
     <div class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
       <div class="max-w-md">
         <h2
-          class="text-[24px] font-semibold tracking-tight text-white md:text-4xl"
+          class="text-[21px] font-semibold tracking-tight text-white md:text-4xl"
         >
           Galeri
         </h2>

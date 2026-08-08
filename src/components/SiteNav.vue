@@ -144,7 +144,7 @@ watch(menuOpen, (open) => {
             v-for="link in links"
             :key="link.to"
             :to="link.to"
-            class="border-hairline-soft text-ink [&.router-link-exact-active]:text-primary border-b py-[15px] text-[17px] font-medium last-of-type:border-b-0 [&.router-link-exact-active]:font-semibold"
+            class="border-hairline-soft text-ink [&.router-link-exact-active]:text-primary border-b py-[15px] text-[16px] font-medium last-of-type:border-b-0 [&.router-link-exact-active]:font-semibold"
           >
             {{ link.label }}
           </RouterLink>

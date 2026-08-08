@@ -45,6 +45,37 @@ Yang perlu diketahui kalau menyentuh bagian ini:
   `<link rel="preload" as="font" crossorigin>`. Tanpa itu font baru diminta
   setelah layout, dan teks sempat berkedip dari font sistem ke Inter.
 
+### Skala teks di layar HP
+
+Teks di bawah 640 px dikecilkan **serempak** dengan menimpa token `--text-*`
+milik Tailwind di `src/style.css`, bukan dengan menempel `sm:text-…` satu per
+satu di ratusan komponen:
+
+```css
+@media (width < 40rem) {
+  :root { --text-sm: 0.8125rem; … }
+}
+```
+
+Utilitas Tailwind v4 menghasilkan `font-size: var(--text-sm)`, jadi satu blok
+ini mengubah seluruh sisi publik **dan** admin sekaligus. Dua hal yang perlu
+diingat kalau menyentuhnya:
+
+- Blok itu harus berada **di luar `@layer`** dan setelah `@theme`. Deklarasi
+  tanpa layer selalu menang atas yang ber-layer, jadi kalau dipindahkan ke
+  dalam `@layer base` seluruh penyesuaiannya diam-diam mati.
+- Tinggi barisnya tidak perlu ikut ditimpa. Tailwind menyimpan
+  `--text-*--line-height` sebagai rasio tanpa satuan, jadi ia mengecil
+  mengikuti ukuran fontnya sendiri.
+
+Ukuran yang ditulis literal (`text-[20px]`, `text-[clamp(…)]`) tidak ikut token
+ini dan harus disetel manual — semuanya sudah disesuaikan, tapi kalau menambah
+yang baru, sesuaikan sendiri.
+
+Satu pengecualian sengaja: input tanggal di `AvailabilitySearch.vue` dipaku
+`text-[16px]`. Safari iOS otomatis mem-_zoom_ halaman saat fokus ke input yang
+fontnya di bawah 16 px, dan itu terasa seperti bug di kolom pencarian beranda.
+
 ### Kenapa PHP
 
 Paket hosting single di Hostinger hanya menjalankan PHP. Versi sebelumnya
@@ -452,6 +483,40 @@ bukan dari repo ini; ubah di sana kalau tidak dikehendaki.
 `assets/img-src/home-hero.webp`, tetap di bawah batas 50 KB seperti gambar
 lain. Formatnya JPEG, bukan WebP, karena sebagian perayap pratinjau tautan
 masih belum menampilkan WebP.
+
+### Favicon di hasil pencarian Google
+
+Set favicon dibangun `npm run favicons` (`scripts/make-favicons.mjs`) dari
+**`assets/logo-mark.png`** — logo vila yang sama, versi mark tanpa tulisan.
+Keluarannya `public/favicon.ico`, `favicon-96.png`, dan `apple-touch-icon.png`.
+Ganti berkas sumbernya lalu jalankan ulang; jangan sunting keluarannya manual.
+
+`public/favicon.png` **sengaja tidak ikut dibangun ulang** supaya isinya tetap
+sama persis dengan yang sudah tayang. Nama itu memakai `max-age` panjang tanpa
+hash, jadi kalau isinya diganti tanpa ganti nama, edge Cloudflare masih akan
+menyajikan versi lama sampai di-purge. Berkas keluaran di atas semuanya nama
+baru, jadi tidak punya masalah itu.
+
+Yang bikin logonya belum muncul di halaman hasil Google, dan sudah diperbaiki:
+
+- **`/favicon.ico` dulu tidak ada.** Karena aturan SPA di `public_html.htaccess`
+  melempar berkas yang tidak ada ke `index.html`, URL itu balas `200 text/html`,
+  bukan 404. Google memakai `/favicon.ico` sebagai cadangan, dan yang diterima
+  malah HTML. Sekarang berkasnya benar-benar ada sehingga `RewriteCond
+  %{REQUEST_FILENAME} !-f` melewatinya.
+- **Ukurannya 128×128.** Google minta sisi kelipatan 48 px; `favicon-96.png`
+  memenuhi itu, dan 96 dipilih supaya mark 128 px cukup diperkecil, bukan
+  diperbesar.
+
+Yang tidak bisa dipercepat dari sisi kode: Google baru menukar ikonnya setelah
+merayapi ulang beranda, dan itu bisa makan hitungan hari sampai minggu. Minta
+perayapan ulang lewat Search Console kalau mau didorong.
+
+Mark-nya line-art tipis, jadi di 16 px detail bambunya memang menyatu. Itu
+disadari dan diterima — logonya harus tetap logo asli.
+
+`apple-touch-icon.png` satu-satunya yang latarnya diputihkan: iOS tidak
+mendukung ikon transparan dan akan menaruhnya di atas hitam.
 
 ### Google Tag Manager
 

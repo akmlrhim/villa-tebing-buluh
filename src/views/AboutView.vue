@@ -123,7 +123,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
       <section class="bg-surface-soft mt-16 py-14 md:mt-20 md:py-16">
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
           <h2
-            class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl"
+            class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
           >
             Fasilitas vila
           </h2>
@@ -153,7 +153,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
 
       <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
         <h2
-          class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl"
+          class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Tipe kamar
         </h2>
@@ -188,7 +188,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
 
       <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
         <h2
-          class="text-ink text-[20px] font-semibold tracking-tight md:text-2xl"
+          class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Lokasi
         </h2>
@@ -241,7 +241,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
         />
 
         <h2
-          class="text-ink mt-3 text-[20px] font-semibold tracking-tight md:text-2xl"
+          class="text-ink mt-3 text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Kata-kata ada batasnya
         </h2>
