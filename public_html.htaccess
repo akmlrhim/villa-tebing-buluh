@@ -20,7 +20,7 @@ RewriteRule ^ index.html [L]
     Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" "expr=%{HTTPS} == 'on'"
 
     <FilesMatch "^(index\.html|gtm\.js|robots\.txt|sitemap\.xml)$">
-        Header set Cache-Control "no-cache, must-revalidate"
+        Header set Cache-Control "no-cache, must-revalidate, no-transform"
     </FilesMatch>
 </IfModule>
 

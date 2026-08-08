@@ -477,6 +477,40 @@ Content" sendiri** ke balasan `/robots.txt` — blok itu melarang perayap AI
 (GPTBot, ClaudeBot, Google-Extended, dll). Itu datang dari dasbor Cloudflare,
 bukan dari repo ini; ubah di sana kalau tidak dikehendaki.
 
+### Googlebot kena 403 — JS Detections Cloudflare
+
+Gejalanya: Search Console membalas 403 waktu diminta mengindeks, padahal
+`robots.txt`, meta `robots`, dan origin Hostinger semuanya normal (cek origin
+langsung dengan `curl --resolve villatebingbuluh.com:443:145.79.28.37`).
+
+Penyebabnya Cloudflare, bukan repo ini. Ada dua hal terpisah:
+
+1. **Bot fight mode** (Security → Settings → filter *Bot traffic*). Di plan
+   Free tidak punya pengecualian verified bot, jadi Googlebot ikut ditantang
+   dan berujung 403. Harus dimatikan dari dasbor.
+2. **JS Detections**, yang menyisipkan `/cdn-cgi/challenge-platform/scripts/
+   jsd/main.js` ke tiap balasan HTML. Di plan Free ini **tidak punya toggle
+   sendiri** dan tetap `On` walau Bot fight mode sudah mati. Skrip sisipan itu
+   inline, jadi juga melanggar CSP `script-src 'self'` kita.
+
+Untuk nomor 2, satu-satunya kendali dari sisi kita adalah direktif
+**`no-transform`** pada `Cache-Control` — Cloudflare tidak menyisipkan skrip
+JSD kalau balasan origin memuatnya. Itu sebabnya blok `FilesMatch` di
+`public_html.htaccess` memakai `no-cache, must-revalidate, no-transform`.
+Jangan hapus `no-transform` itu.
+
+Cara memastikan sudah bersih (harus `0`):
+
+```bash
+curl -sS https://villatebingbuluh.com/ | grep -c "challenge-platform"
+```
+
+Kalau masih 403 setelah keduanya beres, periksa **AI Crawl Control** di level
+account: Cloudflare menggolongkan Googlebot sebagai *mixed-purpose crawler*,
+jadi menyetel Training = Block ikut memblokir Googlebot walau Search = Allow.
+Log penentunya ada di Security → Events, saring UA `Googlebot` atau ASN
+`AS15169`.
+
 ### Gambar Open Graph
 
 `public/img/og.jpg` (1200×630) dibangun `npm run images` dari
