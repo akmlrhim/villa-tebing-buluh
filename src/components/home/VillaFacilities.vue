@@ -15,13 +15,13 @@ const facilities = [
 </script>
 
 <template>
-  <section class="bg-surface-soft mt-20 py-16 md:mt-24 md:py-20">
+  <section class="mt-20 bg-white py-16 md:mt-24 md:py-20">
     <div
       class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 md:grid-cols-[1fr_1.3fr] md:gap-16"
     >
       <div>
         <h2
-          class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
+          class="font-display text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Semua yang kamu butuhkan, tidak lebih
         </h2>

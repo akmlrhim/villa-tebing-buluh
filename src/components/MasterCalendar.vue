@@ -38,6 +38,19 @@ const roomColor = computed(() => {
 	return map
 })
 
+function roomInitials(name) {
+	const words = name.replace(/[()]/g, '').trim().split(/\s+/).filter(Boolean)
+	if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+	return (words[0][0] + words[words.length - 1][0]).toUpperCase()
+}
+const roomCode = computed(() => {
+	const map = {}
+	rooms.value.forEach((room) => {
+		map[room.id] = roomInitials(room.name)
+	})
+	return map
+})
+
 const viewYear = computed(() => new Date(now.getFullYear(), now.getMonth() + monthOffset.value, 1).getFullYear())
 const viewMonth = computed(() => new Date(now.getFullYear(), now.getMonth() + monthOffset.value, 1).getMonth())
 const monthLabel = computed(() => `${MONTH_NAMES[viewMonth.value]} ${viewYear.value}`)
@@ -122,7 +135,7 @@ function shortDate(iso) {
 
 	<div v-else class="grid items-start gap-8 md:grid-cols-[1fr_340px]">
 		<CalendarGrid :month-label="monthLabel" :day-names="DAY_NAMES" :cells="cells" :rooms="rooms" :room-color="roomColor"
-			:today="today" :selected="selected" :month-offset="monthOffset" :months-ahead="props.monthsAhead"
+			:room-code="roomCode" :today="today" :selected="selected" :month-offset="monthOffset" :months-ahead="props.monthsAhead"
 			:cell-class="cellClasses" :cell-aria="cellAria" @prev="monthOffset--" @next="monthOffset++"
 			@select="selected = $event" />
 
@@ -139,12 +152,12 @@ function shortDate(iso) {
 						aria-hidden="true" />
 					<div class="min-w-0 flex-1">
 						<p class="text-sm font-medium text-ink">{{ room.name }}</p>
-						<p v-if="booking" class="mt-0.5 text-[13px] text-muted">
+						<p v-if="booking" class="mt-0.5 text-sm text-muted">
 							Terisi · check-in {{ shortDate(booking.check_in) }} -
 							check-out {{ shortDate(booking.check_out) }}
 							· {{ nightsBetween(booking.check_in, booking.check_out) }} malam
 						</p>
-						<p v-else class="mt-0.5 text-[13px] font-medium text-primary">Kosong, bisa dibooking</p>
+						<p v-else class="mt-0.5 text-sm font-medium text-primary">Kosong, bisa dibooking</p>
 					</div>
 					<button v-if="!booking" type="button"
 						class="shrink-0 text-sm font-medium text-ink underline underline-offset-4 transition-colors hover:text-primary"

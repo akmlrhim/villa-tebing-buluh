@@ -37,7 +37,8 @@ const hasStayDiscount = computed(() => (stay.value?.discount ?? 0) > 0)
 <template>
 	<article class="group relative">
 		<div class="relative aspect-[4/3] overflow-hidden rounded-md bg-surface-strong">
-			<img v-if="cover" :src="cover.url" :alt="cover.alt" loading="lazy"
+			<img v-if="cover" :src="cover.url" :srcset="cover.srcset"
+				sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" :alt="cover.alt" loading="lazy"
 				class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
 				:class="status === 'full' ? 'opacity-55 saturate-[0.6]' : ''" />
 			<span v-if="status"
@@ -62,7 +63,7 @@ const hasStayDiscount = computed(() => (stay.value?.discount ?? 0) > 0)
 				</h3>
 			</div>
 			<p class="mt-0.5 text-sm text-black">{{ metaLine }}</p>
-			<p class="mt-1.5 text-[15px]">
+			<p class="mt-1.5 text-base">
 				<span v-if="highlight?.running" class="mr-1.5 text-black line-through">
 					{{ formatRupiah(room.price_per_night) }}
 				</span>

@@ -3,17 +3,12 @@ import IconGlyph from '../components/IconGlyph.vue';
 import PageHero from '../components/PageHero.vue';
 import WhatsAppGlyph from '../components/WhatsAppGlyph.vue';
 import { useSettings } from '../composables/useSettings';
+import { heroImages } from '../data/demoData';
 import { generalMessage, waLink } from '../lib/whatsapp';
 
 const { settings, whatsappNumber } = useSettings();
 
-const hero = {
-  url: '/img/contact/hero-1080.webp',
-  srcset: [640, 828, 1080]
-    .map((w) => `/img/contact/hero-${w}.webp ${w}w`)
-    .join(', '),
-  alt: 'Deretan kursi berjemur menghadap matahari terbenam',
-};
+const hero = heroImages.contact;
 
 function formatPhone(number) {
   const rest = number.slice(2);
@@ -34,7 +29,7 @@ function formatPhone(number) {
     <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
       <div class="grid gap-10 md:grid-cols-[1fr_1.3fr] md:gap-16">
         <div>
-          <ul class="text-body space-y-5 text-[14px]">
+          <ul class="text-body space-y-5 text-base">
             <li class="flex items-start gap-3.5">
               <IconGlyph
                 name="map-pin"

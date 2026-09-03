@@ -3,7 +3,8 @@ import IconGlyph from '../IconGlyph.vue';
 
 const cover = {
   url: '/img/gallery_heros.webp',
-  srcset: '/img/gallery_heros-mobile.webp 750w, /img/gallery_heros.webp 1080w',
+  srcset:
+    '/img/gallery_heros-mobile.webp 750w, /img/gallery_heros.webp 1080w, /img/gallery_heros-1920.webp 1920w',
   alt: 'Suasana galeri Villa Tebing Buluh',
 };
 </script>
@@ -30,7 +31,7 @@ const cover = {
     <div class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
       <div class="max-w-md">
         <h2
-          class="text-[21px] font-semibold tracking-tight text-white md:text-4xl"
+          class="font-display text-[21px] font-semibold tracking-tight text-white md:text-4xl"
         >
           Galeri
         </h2>

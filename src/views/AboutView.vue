@@ -5,19 +5,14 @@ import PageHero from '../components/PageHero.vue';
 import RoomDetailModal from '../components/RoomDetailModal.vue';
 import { useRooms } from '../composables/useRooms';
 import { useSettings } from '../composables/useSettings';
+import { heroImages } from '../data/demoData';
 import { formatRupiah } from '../lib/format';
 
 const { rooms } = useRooms();
 const { settings, villaName } = useSettings();
 const selectedRoom = ref(null);
 
-const hero = {
-  url: '/img/about/hero-1080.webp',
-  srcset: [640, 828, 1080]
-    .map((w) => `/img/about/hero-${w}.webp ${w}w`)
-    .join(', '),
-  alt: 'Tebing dan pantai berpasir putih di pesisir dekat vila',
-};
+const hero = heroImages.about;
 
 const facilities = [
   {
@@ -77,7 +72,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
     />
 
     <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
-      <div class="mt-8 space-y-4 text-[14px] leading-relaxed text-black">
+      <div class="mt-8 space-y-4 text-base leading-relaxed text-black">
         <p>
           Villa tebing buluh adalah bentuk ekspresi sang pencipta untuk kita.
           Dengan pemandangannya yang memanjakan mata dan deru suara arus sungai
@@ -95,11 +90,10 @@ const mapsQuery = encodeURIComponent(settings.value.address);
           juga bisa bermain bamboo rafting, river tubing dan wahana sungai
           lainnya.
         </p>
-        <p>....</p>
         <p>
-          Semua bookingan dikonfirmasi langsung oleh admin lewat whatsapp, memang
-          sedikit lebih lambat beberapa menit, tapi kamu selalu berbicara dengan
-          orang, bukan mesin.
+          Semua bookingan dikonfirmasi langsung oleh admin lewat whatsapp,
+          memang sedikit lebih lambat beberapa menit, tapi kamu selalu berbicara
+          dengan orang, bukan mesin.
         </p>
         <p>
           Lokasinya berada sekitar ±32 km dari pusat kota Kandangan, dengan
@@ -108,10 +102,10 @@ const mapsQuery = encodeURIComponent(settings.value.address);
         </p>
       </div>
 
-      <section class="bg-surface-soft mt-16 py-14 md:mt-20 md:py-16">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <section class="bg-surface-soft mt-16 rounded-md py-14 md:mt-20 md:py-16">
+        <div class="mx-auto max-w-6xl px-8 sm:px-16">
           <h2
-            class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
+            class="font-display text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
           >
             Fasilitas vila
           </h2>
@@ -127,7 +121,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
                 <IconGlyph :name="facility.icon" class="text-ink h-5 w-5" />
               </span>
               <div>
-                <p class="text-ink text-[15px] font-semibold">
+                <p class="text-ink text-base font-semibold">
                   {{ facility.label }}
                 </p>
                 <p class="text-muted mt-0.5 text-sm leading-relaxed">
@@ -141,7 +135,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
 
       <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
         <h2
-          class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
+          class="font-display text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Tipe kamar
         </h2>
@@ -156,7 +150,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
             @click="selectedRoom = room"
           >
             <span>
-              <span class="text-ink block text-[15px] font-semibold">{{
+              <span class="text-ink block text-base font-semibold">{{
                 room.name
               }}</span>
               <span class="text-muted mt-0.5 block text-sm">
@@ -176,12 +170,12 @@ const mapsQuery = encodeURIComponent(settings.value.address);
 
       <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
         <h2
-          class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
+          class="font-display text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Lokasi
         </h2>
         <div class="mt-6 grid gap-8 md:grid-cols-[1fr_1.4fr]">
-          <div class="text-body space-y-4 text-[14px]">
+          <div class="text-body space-y-4 text-base">
             <p class="flex items-start gap-3">
               <IconGlyph
                 name="map-pin"
@@ -229,7 +223,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
         />
 
         <h2
-          class="text-ink mt-3 text-[18px] font-semibold tracking-tight md:text-2xl"
+          class="font-display text-ink mt-3 text-[18px] font-semibold tracking-tight md:text-2xl"
         >
           Kata-kata ada batasnya
         </h2>

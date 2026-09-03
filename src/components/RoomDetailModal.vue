@@ -95,7 +95,7 @@ function onBackdropClick(event) {
 
 <template>
 	<dialog ref="dialogEl"
-		class="m-0 h-dvh max-h-none w-full max-w-none bg-canvas p-0 md:m-auto md:h-auto md:max-h-[94dvh] md:max-w-4xl rounded-sm"
+		class="m-0 h-dvh max-h-none w-full max-w-none bg-canvas p-0 md:m-auto md:h-auto md:max-h-[94dvh] md:max-w-6xl rounded-sm"
 		@close="emit('close')" @click="onBackdropClick">
 		<div v-if="room" class="flex h-full max-h-dvh flex-col overflow-y-auto md:max-h-[94dvh]">
 			<div
@@ -124,7 +124,7 @@ function onBackdropClick(event) {
 					</p>
 				</div>
 
-				<p class="mt-4 max-w-[65ch] text-[14px] leading-relaxed text-body">
+				<p class="mt-4 max-w-[65ch] text-base leading-relaxed text-body">
 					{{ room.description }}
 				</p>
 

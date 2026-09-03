@@ -20,7 +20,7 @@ const { whatsappNumber } = useSettings();
       />
 
       <h2
-        class="animate-rise-in text-ink mx-auto mt-4 max-w-xl text-[clamp(1.45rem,4vw,2.75rem)] leading-[1.15] font-semibold tracking-[-0.02em] text-balance motion-reduce:animate-none"
+        class="animate-rise-in font-display text-ink mx-auto mt-4 max-w-xl text-[clamp(1.45rem,4vw,2.75rem)] leading-[1.15] font-semibold tracking-[-0.02em] text-balance motion-reduce:animate-none"
       >
         Kamarnya sudah menunggu, tinggal kamu yang pilih tanggal
       </h2>

@@ -6,6 +6,15 @@ const img = (id, w = 1200) =>
 const imgSrcset = (id, widths) =>
   widths.map((w) => `${img(id, w)} ${w}w`).join(', ');
 
+const THUMB_WIDTHS = [480, 768, 1080, 1600, 2000];
+
+const photo = (id, alt, extra = {}) => ({
+  url: img(id, 1600),
+  srcset: imgSrcset(id, THUMB_WIDTHS),
+  alt,
+  ...extra,
+});
+
 export const demoRooms = [
   {
     id: 'demo-cemerlang-1',
@@ -28,18 +37,18 @@ export const demoRooms = [
       'Pemandangan Pegunungan',
     ],
     images: [
-      {
-        url: img('1611892440504-42a792e24d32'),
-        alt: 'Kamar Cemerlang 1, tempat tidur king berbingkai kayu jati dengan pencahayaan hangat',
-      },
-      {
-        url: img('1552321554-5fefe8c9ef14'),
-        alt: 'Kamar mandi dalam Cemerlang 1 yang bersih dengan tanaman hijau',
-      },
-      {
-        url: img('1602002418082-a4443e081dd1'),
-        alt: 'Pemandangan teras pribadi dari dalam kamar Cemerlang 1',
-      },
+      photo(
+        '1611892440504-42a792e24d32',
+        'Kamar Cemerlang 1, tempat tidur king berbingkai kayu jati dengan pencahayaan hangat',
+      ),
+      photo(
+        '1552321554-5fefe8c9ef14',
+        'Kamar mandi dalam Cemerlang 1 yang bersih dengan tanaman hijau',
+      ),
+      photo(
+        '1602002418082-a4443e081dd1',
+        'Pemandangan teras pribadi dari dalam kamar Cemerlang 1',
+      ),
     ],
   },
   {
@@ -62,18 +71,18 @@ export const demoRooms = [
       'Meja Kerja',
     ],
     images: [
-      {
-        url: img('1582719478250-c89cae4dc85b'),
-        alt: 'Kamar Cemerlang 2, interior kayu dengan jendela lebar menghadap pepohonan',
-      },
-      {
-        url: img('1591088398332-8a7791972843'),
-        alt: 'Sudut duduk kamar Cemerlang 2 dengan kursi dan bangku empuk',
-      },
-      {
-        url: img('1566073771259-6a8506099945'),
-        alt: 'Kursi santai di dek kayu dekat kamar Cemerlang 2 saat matahari terbenam',
-      },
+      photo(
+        '1582719478250-c89cae4dc85b',
+        'Kamar Cemerlang 2, interior kayu dengan jendela lebar menghadap pepohonan',
+      ),
+      photo(
+        '1591088398332-8a7791972843',
+        'Sudut duduk kamar Cemerlang 2 dengan kursi dan bangku empuk',
+      ),
+      photo(
+        '1566073771259-6a8506099945',
+        'Kursi santai di dek kayu dekat kamar Cemerlang 2 saat matahari terbenam',
+      ),
     ],
   },
   {
@@ -97,18 +106,18 @@ export const demoRooms = [
       'Gazebo',
     ],
     images: [
-      {
-        url: img('1512918728675-ed5a9ecdebfd'),
-        alt: 'Tempat tidur utama unit Serumpun dengan cahaya pagi',
-      },
-      {
-        url: img('1595576508898-0ad5c879a061'),
-        alt: 'Kamar Serumpun, dua tempat tidur besar untuk keluarga',
-      },
-      {
-        url: img('1584132967334-10e028bd69f7'),
-        alt: 'Dek kayu bersama di depan unit Serumpun',
-      },
+      photo(
+        '1512918728675-ed5a9ecdebfd',
+        'Tempat tidur utama unit Serumpun dengan cahaya pagi',
+      ),
+      photo(
+        '1595576508898-0ad5c879a061',
+        'Kamar Serumpun, dua tempat tidur besar untuk keluarga',
+      ),
+      photo(
+        '1584132967334-10e028bd69f7',
+        'Dek kayu bersama di depan unit Serumpun',
+      ),
     ],
   },
 ];
@@ -174,114 +183,98 @@ export const demoSettings = {
 };
 
 export const demoGallery = [
-  {
-    url: img('1582610116397-edb318620f90', 1600),
-    alt: 'Taman Villa Tebing Buluh saat senja',
+  photo('1582610116397-edb318620f90', 'Taman Villa Tebing Buluh saat senja', {
     group: 'Area Vila',
     tall: false,
-  },
-  {
-    url: img('1584132967334-10e028bd69f7', 1600),
-    alt: 'Dek kayu dan kursi santai di area vila',
+  }),
+  photo('1584132967334-10e028bd69f7', 'Dek kayu dan kursi santai di area vila', {
     group: 'Area Vila',
     tall: false,
-  },
-  {
-    url: img('1571003123894-1f0594d2b5d9', 1600),
-    alt: 'Gazebo bambu dengan tirai putih saat langit ungu senja',
+  }),
+  photo('1571003123894-1f0594d2b5d9', 'Gazebo bambu dengan tirai putih saat langit ungu senja', {
     group: 'Area Vila',
     tall: true,
-  },
-  {
-    url: img('1566073771259-6a8506099945', 1600),
-    alt: 'Deretan kursi berjemur menghadap matahari terbenam',
+  }),
+  photo('1566073771259-6a8506099945', 'Deretan kursi berjemur menghadap matahari terbenam', {
     group: 'Area Vila',
     tall: false,
-  },
-  {
-    url: img('1552733407-5d5c46c3bb3b', 1600),
-    alt: 'Sungai kecil di antara pohon kelapa dekat vila',
+  }),
+  photo('1552733407-5d5c46c3bb3b', 'Sungai kecil di antara pohon kelapa dekat vila', {
     group: 'Area Vila',
     tall: true,
-  },
-  {
-    url: img('1611892440504-42a792e24d32', 1600),
-    alt: 'Interior kamar Cemerlang 1 dengan kayu jati hangat',
+  }),
+  photo('1611892440504-42a792e24d32', 'Interior kamar Cemerlang 1 dengan kayu jati hangat', {
     group: 'Kamar',
     roomSlug: 'cemerlang-1',
     tall: false,
-  },
-  {
-    url: img('1582719478250-c89cae4dc85b', 1600),
-    alt: 'Kamar Cemerlang 2 dengan jendela menghadap pepohonan',
+  }),
+  photo('1582719478250-c89cae4dc85b', 'Kamar Cemerlang 2 dengan jendela menghadap pepohonan', {
     group: 'Kamar',
     roomSlug: 'cemerlang-2',
     tall: false,
-  },
-  {
-    url: img('1595576508898-0ad5c879a061', 1600),
-    alt: 'Unit keluarga Serumpun dengan dua tempat tidur',
+  }),
+  photo('1595576508898-0ad5c879a061', 'Unit keluarga Serumpun dengan dua tempat tidur', {
     group: 'Kamar',
     roomSlug: 'serumpun-family',
     tall: false,
-  },
-  {
-    url: img('1591088398332-8a7791972843', 1600),
-    alt: 'Sudut duduk kamar Cemerlang 2',
+  }),
+  photo('1591088398332-8a7791972843', 'Sudut duduk kamar Cemerlang 2', {
     group: 'Kamar',
     roomSlug: 'cemerlang-2',
     tall: false,
-  },
-  {
-    url: img('1552321554-5fefe8c9ef14', 1600),
-    alt: 'Kamar mandi bersih dengan tanaman gantung',
+  }),
+  photo('1552321554-5fefe8c9ef14', 'Kamar mandi bersih dengan tanaman gantung', {
     group: 'Kamar',
     roomSlug: 'cemerlang-1',
     tall: true,
-  },
-  {
-    url: img('1512918728675-ed5a9ecdebfd', 1600),
-    alt: 'Tempat tidur unit Serumpun dengan cahaya pagi',
+  }),
+  photo('1512918728675-ed5a9ecdebfd', 'Tempat tidur unit Serumpun dengan cahaya pagi', {
     group: 'Kamar',
     roomSlug: 'serumpun-family',
     tall: false,
-  },
-  {
-    url: img('1555400038-63f5ba517a47', 1600),
-    alt: 'Terasering sawah hijau tidak jauh dari vila',
+  }),
+  photo('1555400038-63f5ba517a47', 'Terasering sawah hijau tidak jauh dari vila', {
     group: 'Sekitar Vila',
     tall: false,
-  },
-  {
-    url: img('1573790387438-4da905039392', 1600),
-    alt: 'Tebing dan pantai berpasir putih di pesisir dekat vila',
+  }),
+  photo('1573790387438-4da905039392', 'Tebing dan pantai berpasir putih di pesisir dekat vila', {
     group: 'Sekitar Vila',
     tall: true,
-  },
-  {
-    url: img('1537996194471-e657df975ab4', 1600),
-    alt: 'Pura di tepi danau berkabut pagi hari',
+  }),
+  photo('1537996194471-e657df975ab4', 'Pura di tepi danau berkabut pagi hari', {
     group: 'Sekitar Vila',
     tall: true,
-  },
-  {
-    url: img('1559628233-100c798642d4', 1600),
-    alt: 'Pemandangan udara sawah dan hutan kelapa saat matahari terbit',
+  }),
+  photo('1559628233-100c798642d4', 'Pemandangan udara sawah dan hutan kelapa saat matahari terbit', {
     group: 'Sekitar Vila',
     tall: true,
-  },
-  {
-    url: img('1518548419970-58e3b4079ab2', 1600),
-    alt: 'Pura di atas batu karang saat matahari terbenam',
+  }),
+  photo('1518548419970-58e3b4079ab2', 'Pura di atas batu karang saat matahari terbenam', {
     group: 'Sekitar Vila',
     tall: false,
-  },
+  }),
 ];
 
 export const heroImage = {
-  url: '/img/hero/home-1080.webp',
-  srcset: [640, 828, 1080]
-    .map((w) => `/img/hero/home-${w}.webp ${w}w`)
-    .join(', '),
-  alt: 'Villa Tebing Buluh, teras kayu dikelilingi rumpun bambu dan tanaman tropis',
+  url: img('1441974231531-c6227db76b6e', 1920),
+  srcset: [640, 828, 1080, 1600, 1920].map((w) => `${img('1441974231531-c6227db76b6e', w)} ${w}w`).join(', '),
+  alt: 'Villa Tebing Buluh, hutan bambu hijau lebat saat cahaya matahari menembus dedaunan',
+};
+
+export const heroImages = {
+  gallery: {
+    url: img('1555400038-63f5ba517a47', 1920),
+    srcset: [640, 828, 1080, 1600, 1920].map((w) => `${img('1555400038-63f5ba517a47', w)} ${w}w`).join(', '),
+    alt: 'Terasering hijau dan hutan tropis tidak jauh dari vila',
+  },
+  about: {
+    url: img('1501854140801-50d01698950b', 1920),
+    srcset: [640, 828, 1080, 1600, 1920].map((w) => `${img('1501854140801-50d01698950b', w)} ${w}w`).join(', '),
+    alt: 'Tebing dan pegunungan hijau di pesisir dekat vila',
+  },
+  contact: {
+    url: img('1507525428034-b723cf961d3e', 1920),
+    srcset: [640, 828, 1080, 1600, 1920].map((w) => `${img('1507525428034-b723cf961d3e', w)} ${w}w`).join(', '),
+    alt: 'Deretan kursi berjemur menghadap matahari terbenam di pantai',
+  },
 };

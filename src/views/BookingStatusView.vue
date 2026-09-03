@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import EmptyState from '../components/EmptyState.vue'
 import IconGlyph from '../components/IconGlyph.vue'
 import WhatsAppGlyph from '../components/WhatsAppGlyph.vue'
 import { useBookingStatus } from '../composables/useBookingStatus'
@@ -52,7 +53,7 @@ const INPUT_CLASS =
       <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary/10">
         <IconGlyph name="search" class="h-6 w-6 text-primary" />
       </span>
-      <h1 class="mt-4 text-2xl font-semibold tracking-tight text-ink md:text-3xl">Cek Status Booking</h1>
+      <h1 class="font-display mt-4 text-2xl font-semibold tracking-tight text-ink md:text-3xl">Cek Status Booking</h1>
       <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
         Masukkan kode booking dan nomor WhatsApp yang kamu pakai saat konfirmasi pembayaran.
       </p>
@@ -94,17 +95,19 @@ const INPUT_CLASS =
       </button>
     </form>
 
-    <div v-if="notFound" class="mt-5 rounded-md border border-dashed border-border-strong bg-surface-soft px-6 py-8 text-center">
-      <p class="font-medium text-ink">Booking tidak ditemukan</p>
-      <p class="mx-auto mt-1.5 max-w-xs text-sm text-muted">
-        Pastikan kode booking dan nomor WhatsApp sudah benar, atau tanyakan langsung ke admin.
-      </p>
+    <EmptyState
+      v-if="notFound"
+      icon="search"
+      title="Booking tidak ditemukan"
+      description="Pastikan kode booking dan nomor WhatsApp sudah benar, atau tanyakan langsung ke admin."
+      class="mt-5"
+    >
       <a :href="waLink(whatsappNumber, generalMessage())" target="_blank" rel="noopener noreferrer"
-        class="mt-5 inline-flex h-11 items-center gap-2 rounded-sm bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary-active">
+        class="inline-flex h-11 items-center gap-2 rounded-sm bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary-active">
         <WhatsAppGlyph class="h-4.5 w-4.5" />
         Tanya Admin via WhatsApp
       </a>
-    </div>
+    </EmptyState>
 
     <div v-if="result" class="mt-7 overflow-hidden rounded-md border border-hairline bg-canvas shadow-float">
       <div class="flex items-center justify-between gap-3 bg-primary px-6 py-6 text-center">

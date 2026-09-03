@@ -24,26 +24,29 @@ Browser  ->  Apache  ->  public_html/index.html   SPA hasil `npm run build`
 Browser **tidak pernah** bicara langsung ke database. Seluruh otorisasi dijaga
 di layer API (`api/lib/auth.php` + pemisahan endpoint publik vs admin).
 
-Seluruh teks memakai **Inter**, yang **di-host sendiri** lewat paket
-`@fontsource-variable/inter`. Deklarasi `@font-face`-nya ditulis tangan di
+Teks body memakai **Geist**, yang **di-host sendiri** lewat paket
+`@fontsource-variable/geist`. Deklarasi `@font-face`-nya ditulis tangan di
 `src/style.css` dan sengaja menunjuk **satu berkas saja**:
-`inter-latin-wght-normal.woff2` (48 KB, sumbu bobot 100-900, subset latin).
+`geist-latin-wght-normal.woff2` (sumbu bobot 100-900, subset latin). Judul
+section besar (`font-display` / token `--font-display`) memakai **Playfair
+Display** lewat pola yang sama, juga di-host sendiri lewat
+`@fontsource-variable/playfair-display`.
 
 Yang perlu diketahui kalau menyentuh bagian ini:
 
-- **Jangan meng-`import` `@fontsource-variable/inter` (index.css).** Berkas itu
-  menarik 7 subset (cyrillic, greek, vietnamese, latin-ext, …). Browser memang
-  hanya mengunduh subset yang terpakai berkat `unicode-range`, tapi Vite tetap
-  menyalin ketujuh woff2 ke `dist/` dan semuanya ikut ter-`rsync` ke server.
-  Subset `latin` sudah mencakup `×`, `²`, `·`, en dash, dan em dash, jadi
-  cukup satu.
+- **Jangan meng-`import` `@fontsource-variable/geist` (index.css).** Berkas itu
+  menarik banyak subset (cyrillic, greek, vietnamese, latin-ext, …). Browser
+  memang hanya mengunduh subset yang terpakai berkat `unicode-range`, tapi
+  Vite tetap menyalin semua woff2 ke `dist/` dan semuanya ikut ter-`rsync` ke
+  server. Subset `latin` sudah mencakup `×`, `²`, `·`, en dash, dan em dash,
+  jadi cukup satu per font.
 - **Jangan menambahkan `<link>` ke Google Fonts.** Itu request pihak ketiga,
   dan CSP di `public_html.htaccess` memakai `font-src 'self'` sehingga akan
   ditolak browser. Font yang di-host sendiri lolos tanpa mengubah CSP.
 - Berkas fontnya **di-preload** lewat plugin `preloadFont()` di
   `vite.config.js`, yang membaca nama ber-hash dari bundle lalu menyisipkan
   `<link rel="preload" as="font" crossorigin>`. Tanpa itu font baru diminta
-  setelah layout, dan teks sempat berkedip dari font sistem ke Inter.
+  setelah layout, dan teks sempat berkedip dari font sistem ke Geist.
 
 ### Skala teks di layar HP
 
@@ -337,10 +340,15 @@ Dua hal yang dilindungi dari `--delete` supaya data produksi tidak ikut terhapus
 
 ---
 
-## Gambar: batas keras 50 KB
+## Gambar: anggaran per lebar, bukan lagi rata 50 KB
 
-Semua gambar yang tersimpan di server — aset statis maupun unggahan admin —
-harus **di bawah 50 KB**. Ada dua jalur yang menjaganya.
+**Riwayat 8 Sep 2026:** batas rata 50 KB untuk semua lebar membuat varian
+1080px jatuh ke kualitas q19–30 — terlihat pecah/kotak-kotak di layar lebar,
+dikeluhkan langsung oleh pengguna. Diganti jadi **anggaran per lebar** yang
+mendarat di sekitar q75–87 (tajam), diverifikasi lewat browser sungguhan.
+Kalau butuh dikencangkan lagi demi kuota hosting, ubah `budgetFor()` di
+`scripts/optimize-images.mjs` dan `IMAGE_MAX_BYTES` di `api/lib/images.php` —
+jangan kembalikan ke satu angka rata, itu penyebab masalahnya.
 
 ### 1. Aset statis (`public/img/`)
 
@@ -354,21 +362,24 @@ npm run images
 ```
 
 Perintah itu membaca `assets/img-src/`, memotong ke rasio **3:2**, lalu menulis
-varian **640 / 828 / 1080** ke `public/img/`. Kualitas WebP dicari otomatis
-(binary search) — dipakai angka tertinggi yang masih muat 50 KB. Di akhir,
-skrip memindai seluruh `public/` dan keluar dengan kode error kalau masih ada
-berkas di atas 50 KB.
+varian ke `public/img/`. Kualitas WebP dicari otomatis (binary search) per
+lebar — dipakai angka tertinggi yang masih muat anggaran lebar itu
+(`budgetFor()` di `scripts/optimize-images.mjs`): 640px→70 KB, 828px→110 KB,
+1080px→160 KB, 1600px→270 KB, 1920px→340 KB. Di akhir, skrip memindai
+`public/` dan menandai berkas **di luar pipeline ini** yang masih di atas
+50 KB (favicon/logo dsb — itu masih harus kecil).
 
 **Kalau menambah gambar hero baru:** taruh master di `assets/img-src/`,
 daftarkan di array `HEROES` pada `scripts/optimize-images.mjs`, jalankan
 `npm run images`.
 
-> **Kenapa maksimal 1080px?** Batas 50 KB membuat lebar besar mustahil: pada
-> 1600px kualitas WebP jatuh ke q≈6 dan pada 2000px berkasnya tetap 56–130 KB
-> bahkan di kualitas terendah. Jadi varian 1600/2000 dihapus, bukan diperkecil
-> kualitasnya. Konsekuensinya hero terlihat agak lembut di monitor lebar —
-> sebagian besar tertutup gradien gelap di atasnya. Kalau suatu saat batasnya
-> dilonggarkan, ubah `MAX_BYTES` dan `WIDTHS` di skrip lalu jalankan ulang.
+> **Kenapa `HeroSection.vue`/`PageHero.vue` tidak pakai jalur ini?** Hero utama
+> (Home/About/Gallery/Contact) sengaja memakai Unsplash langsung lewat helper
+> `img()`/`imgSrcset()` di `src/data/demoData.js` (q=80, srcset sampai 1920w) —
+> bukan `public/img/`. Satu-satunya aset dari jalur `public/img/` yang benar-benar
+> tayang saat ini adalah cover "Galeri" di homepage (`GalleryPeek.vue`,
+> `img/gallery_heros*.webp`). Kalau ganti foto galeri itu, master barunya taruh
+> di `assets/img-src/gallery-peek.webp`.
 
 ### 2. Unggahan admin (`uploads/`)
 
@@ -377,8 +388,10 @@ Apa pun yang diunggah (JPG/PNG/WebP) keluar sebagai `.webp`:
 
 - sisi terpanjang dipotong ke maksimal **1600px**;
 - orientasi EXIF dari kamera HP diluruskan;
-- kualitas dicari otomatis sampai muat 50 KB, dan kalau tetap tidak muat,
-  ukurannya diperkecil 20% lalu dicoba lagi (sampai batas 320px);
+- kualitas dicari otomatis sampai muat **220 KB** (`IMAGE_MAX_BYTES`), dan
+  kalau tetap tidak muat, ukurannya diperkecil 20% lalu dicoba lagi (sampai
+  batas 320px) — dengan anggaran 220 KB, foto kamar 1600px biasanya muat di
+  kualitas layak (q≈70+) tanpa perlu diperkecil sama sekali;
 - gambar bergaya grafis — **kode QRIS**, tangkapan layar — dideteksi lewat
   ukuran hasilnya lalu disimpan **lossless**, jadi QRIS tetap tajam dan
   terpindai (contoh: 4,8 KB → 0,7 KB, tanpa kehilangan piksel).
@@ -514,8 +527,8 @@ Log penentunya ada di Security → Events, saring UA `Googlebot` atau ASN
 ### Gambar Open Graph
 
 `public/img/og.jpg` (1200×630) dibangun `npm run images` dari
-`assets/img-src/home-hero.webp`, tetap di bawah batas 50 KB seperti gambar
-lain. Formatnya JPEG, bukan WebP, karena sebagian perayap pratinjau tautan
+`assets/img-src/home-hero.webp`, dengan anggaran 150 KB (`OG_MAX_BYTES`).
+Formatnya JPEG, bukan WebP, karena sebagian perayap pratinjau tautan
 masih belum menampilkan WebP.
 
 ### Favicon di hasil pencarian Google
@@ -702,12 +715,12 @@ ditagih angka lain.
 | `api/lib/db.php`             | PDO + helper query/transaksi                             |
 | `api/lib/auth.php`           | JWT HS256 tanpa dependensi + `require_auth()`            |
 | `api/lib/uploads.php`        | Bucket unggahan + tanda tangan bukti bayar               |
-| `api/lib/images.php`         | Kompresi WebP unggahan (batas keras 50 KB)               |
+| `api/lib/images.php`         | Kompresi WebP unggahan (anggaran 220 KB)                 |
 | `api/lib/pricing.php`        | Mesin harga + promo (**kembaran** `shared/pricing.js`)   |
 | `api/routes/`                | auth, rooms, bookings, promos, gallery, settings, upload |
 | `api/tools/create-admin.php` | Buat/ganti password akun admin (CLI saja)                |
 | `api/tools/seed.php`         | Isi semua tabel dengan data contoh (CLI saja)            |
-| `api/tools/compress-uploads.php` | Sapu berkas lama di `uploads/` ke bawah 50 KB        |
+| `api/tools/compress-uploads.php` | Sapu berkas lama di `uploads/` ke bawah anggaran     |
 | `api/tools/prune-uploads.php` | Hapus berkas unggahan yatim (tidak dirujuk database)    |
 | `scripts/optimize-images.mjs`| Bangun varian hero `public/img/` dari `assets/img-src/`   |
 | `assets/img-src/`            | Master gambar resolusi penuh (tidak ikut deploy)         |
@@ -720,7 +733,7 @@ ditagih angka lain.
 | `public/sitemap.xml`         | Daftar halaman publik (ditulis tangan)                   |
 | `public/gtm.js`              | Bootstrap Google Tag Manager (dipisah karena CSP)        |
 | `src/lib/seo.js`             | Judul/deskripsi/canonical/OG per rute + helper JSON-LD   |
-| `src/style.css`              | Token tema Tailwind + `@font-face` Inter (satu subset)   |
+| `src/style.css`              | Token tema Tailwind + `@font-face` Geist & Playfair Display |
 | `src/lib/api.js`             | Klien REST + `friendlyDbError`                           |
 | `src/lib/storage.js`         | Unggah gambar ke `/api/upload/*`                         |
 | `src/composables/`           | State per-domain (rooms, bookings, promos, gallery, dst) |

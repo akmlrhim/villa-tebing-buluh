@@ -7,7 +7,18 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const srcDir = join(root, 'assets/img-src');
 const publicDir = join(root, 'public');
 
-const MAX_BYTES = 50 * 1024;
+// Anggaran per lebar (bukan satu batas rata 50 KB untuk semua ukuran) —
+// budget rata membuat varian besar (1080px+) jatuh ke kualitas q<30 yang
+// terlihat pecah. Angka ini dikalibrasi supaya kualitas mendarat di sekitar
+// q75-80 (masih tajam) untuk foto biasa. Lihat README bagian "Gambar".
+const AUDIT_MAX_BYTES = 50 * 1024;
+function budgetFor(width) {
+  if (width <= 640) return 70 * 1024;
+  if (width <= 828) return 110 * 1024;
+  if (width <= 1080) return 160 * 1024;
+  if (width <= 1600) return 270 * 1024;
+  return 340 * 1024;
+}
 const WIDTHS = [640, 828, 1080];
 const ASPECT = 3 / 2;
 
@@ -21,6 +32,7 @@ const HEROES = [
 const PEEK = {
   src: 'gallery-peek.webp',
   variants: [
+    { out: 'img/gallery_heros-1920.webp', width: 1920, aspect: 3 / 2 },
     { out: 'img/gallery_heros.webp', width: 1080, aspect: 3 / 2 },
     { out: 'img/gallery_heros-mobile.webp', width: 750, aspect: 3 / 2 },
   ],
@@ -32,6 +44,7 @@ const OG = {
   width: 1200,
   height: 630,
 };
+const OG_MAX_BYTES = 150 * 1024;
 
 function kb(bytes) {
   return (bytes / 1024).toFixed(1).padStart(6) + 'KB';
@@ -66,9 +79,10 @@ async function writeVariant(sourceBuf, outPath, width, aspect) {
     withoutEnlargement: true,
   });
 
-  const best = await encodeUnderLimit(pipeline, MAX_BYTES);
+  const budget = budgetFor(width);
+  const best = await encodeUnderLimit(pipeline, budget);
   if (!best) {
-    throw new Error(`tidak muat ${MAX_BYTES} byte: ${outPath}`);
+    throw new Error(`tidak muat ${budget} byte: ${outPath}`);
   }
 
   await mkdir(dirname(outPath), { recursive: true });
@@ -126,14 +140,14 @@ async function buildOg() {
       .clone()
       .jpeg({ quality: mid, mozjpeg: true, progressive: true })
       .toBuffer();
-    if (out.length <= MAX_BYTES) {
+    if (out.length <= OG_MAX_BYTES) {
       best = { buf: out, quality: mid };
       lo = mid + 1;
     } else {
       hi = mid - 1;
     }
   }
-  if (!best) throw new Error(`tidak muat ${MAX_BYTES} byte: ${OG.out}`);
+  if (!best) throw new Error(`tidak muat ${OG_MAX_BYTES} byte: ${OG.out}`);
 
   const outPath = join(publicDir, OG.out);
   await mkdir(dirname(outPath), { recursive: true });
@@ -172,8 +186,8 @@ async function auditPublic() {
       continue;
     if (known.has(file)) continue;
     const { size } = await stat(file);
-    const flag = size > MAX_BYTES ? '  LEBIH DARI 50KB' : '';
-    if (size > MAX_BYTES) over += 1;
+    const flag = size > AUDIT_MAX_BYTES ? '  LEBIH DARI 50KB' : '';
+    if (size > AUDIT_MAX_BYTES) over += 1;
     console.log(
       `  ${relative(publicDir, file).replace(/\\/g, '/').padEnd(34)}       ${kb(size)}${flag}`,
     );
@@ -187,7 +201,7 @@ await buildOg();
 const over = await auditPublic();
 
 if (over > 0) {
-  console.error(`\n${over} berkas masih di atas 50KB.`);
+  console.error(`\n${over} berkas di luar pipeline masih di atas 50KB.`);
   process.exit(1);
 }
-console.log('\nSemua gambar di public/ sudah di bawah 50KB.');
+console.log('\nSemua gambar di public/ sudah sesuai anggaran (lihat budgetFor per lebar).');

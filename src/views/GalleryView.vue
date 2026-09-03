@@ -1,19 +1,15 @@
 <script setup>
 import { onMounted, ref } from 'vue';
+import EmptyState from '../components/EmptyState.vue';
 import PageHero from '../components/PageHero.vue';
 import PhotoLightbox from '../components/PhotoLightbox.vue';
 import { useGallery } from '../composables/useGallery';
+import { heroImages } from '../data/demoData';
 
 const { images, loading, fetchGallery } = useGallery();
 onMounted(fetchGallery);
 
-const hero = {
-  url: '/img/gallery/hero-1080.webp',
-  srcset: [640, 828, 1080]
-    .map((w) => `/img/gallery/hero-${w}.webp ${w}w`)
-    .join(', '),
-  alt: 'Gazebo bambu dengan tirai putih saat langit ungu senja',
-};
+const hero = heroImages.gallery;
 
 const lightboxOpen = ref(false);
 const lightboxIndex = ref(0);
@@ -43,12 +39,13 @@ function openLightbox(index) {
         />
       </div>
 
-      <p
+      <EmptyState
         v-else-if="!images.length"
-        class="text-muted mt-10 text-center text-sm"
-      >
-        Belum ada foto galeri.
-      </p>
+        icon="image"
+        title="Belum ada foto galeri"
+        description="Foto-foto vila akan muncul di sini begitu admin menambahkannya."
+        class="mt-10"
+      />
 
       <div v-else class="mt-8 columns-2 gap-4 md:columns-3">
         <button
@@ -61,6 +58,8 @@ function openLightbox(index) {
         >
           <img
             :src="item.url"
+            :srcset="item.srcset"
+            sizes="(min-width: 768px) 33vw, 50vw"
             :alt="item.alt"
             loading="lazy"
             class="w-full transition-transform duration-500 ease-out group-hover:scale-[1.03]"

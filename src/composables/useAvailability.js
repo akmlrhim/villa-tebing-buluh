@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { api } from '../lib/api'
 import { demoBookings } from '../data/demoData'
-import { addDaysISO, nightsBetween } from '../lib/format'
+import { addDaysISO, nightsBetween, todayISO } from '../lib/format'
 
 const occupancies = ref([])
 const loading = ref(false)
@@ -55,5 +55,25 @@ export function useAvailability() {
     return nights
   }
 
-  return { occupancies, loading, error, fetchAvailability, isRoomAvailable, occupiedNights }
+  function fullyOccupiedNights(roomIds, monthsAhead = 5) {
+    const nights = new Set()
+    if (!roomIds.length) return nights
+
+    const perRoom = roomIds.map((id) => occupiedNights(id))
+    const end = addDaysISO(todayISO(), monthsAhead * 31)
+    for (let iso = todayISO(); iso < end; iso = addDaysISO(iso, 1)) {
+      if (perRoom.every((set) => set.has(iso))) nights.add(iso)
+    }
+    return nights
+  }
+
+  return {
+    occupancies,
+    loading,
+    error,
+    fetchAvailability,
+    isRoomAvailable,
+    occupiedNights,
+    fullyOccupiedNights,
+  }
 }

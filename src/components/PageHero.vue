@@ -18,7 +18,7 @@ defineProps({
 
 		<div class="mx-auto w-full max-w-6xl px-4 pt-32 sm:px-6">
 			<h1
-				class="animate-rise-in motion-reduce:animate-none max-w-2xl text-[clamp(1.45rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-white">
+				class="animate-rise-in motion-reduce:animate-none font-display max-w-2xl text-[clamp(1.45rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-white">
 				{{ title }}
 			</h1>
 			<p v-if="subtitle"

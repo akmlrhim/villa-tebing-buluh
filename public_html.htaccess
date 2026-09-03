@@ -1,4 +1,9 @@
 
+ErrorDocument 403 /403.html
+ErrorDocument 500 /500.html
+ErrorDocument 502 /502.html
+ErrorDocument 503 /503.html
+
 RewriteEngine On
 
 RewriteCond %{HTTPS} !=on
@@ -19,7 +24,7 @@ RewriteRule ^ index.html [L]
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
     Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" "expr=%{HTTPS} == 'on'"
 
-    <FilesMatch "^(index\.html|gtm\.js|robots\.txt|sitemap\.xml)$">
+    <FilesMatch "^(index\.html|gtm\.js|robots\.txt|sitemap\.xml|40[0-9]\.html|50[0-9]\.html)$">
         Header set Cache-Control "no-cache, must-revalidate, no-transform"
     </FilesMatch>
 </IfModule>

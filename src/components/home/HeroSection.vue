@@ -28,7 +28,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 
 <template>
   <section
-    class="bg-ink relative isolate -mt-14 flex min-h-[640px] flex-col justify-end overflow-hidden pb-24 md:-mt-20 md:h-[78vh] md:max-h-[820px] md:pb-28"
+    class="bg-ink relative isolate -mt-14 flex min-h-screen flex-col justify-end overflow-hidden pb-24 md:-mt-20 md:pb-28"
   >
     <img
       ref="heroImg"
@@ -48,15 +48,16 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 
     <div class="mx-auto w-full max-w-6xl px-4 pt-40 sm:px-6">
       <h1
-        class="animate-rise-in max-w-xl text-[clamp(1.6rem,5vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-white motion-reduce:animate-none"
+        class="animate-rise-in font-display max-w-xl text-[clamp(2rem,6vw,4rem)] leading-[1.05] font-semibold tracking-[-0.01em] text-white motion-reduce:animate-none"
       >
         Villa Tebing Buluh
-        <span class="mt-1 block text-[clamp(1.1rem,3vw,1.75rem)] font-medium tracking-[0.28em]"
+        <span
+          class="text-sand mt-3 block font-sans text-[clamp(0.85rem,2.2vw,1.15rem)] font-medium uppercase"
           >LOKSADO</span
         >
       </h1>
       <p
-        class="animate-rise-in-late mt-4 max-w-lg text-sm leading-relaxed text-white motion-reduce:animate-none"
+        class="animate-rise-in-late mt-6 max-w-lg text-base leading-relaxed font-light text-white/90 motion-reduce:animate-none"
       >
         Rasakan Sebuah pengalaman berbeda dengan pemandangan sunset gunung
         kantawan berbalut embun tipis dan deru suara sungai amandit dari Villa
@@ -67,13 +68,13 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
       >
         <a
           href="#cek-ketersediaan"
-          class="bg-primary hover:bg-primary-active flex h-12 items-center rounded-sm px-6 text-base font-medium text-white transition-colors"
+          class="bg-primary hover:bg-primary-active flex h-12 items-center rounded-full px-6 text-base font-medium text-white transition-colors"
         >
           Cek Ketersediaan
         </a>
         <a
           href="#kamar"
-          class="flex h-12 items-center rounded-sm border border-white/70 px-6 text-base font-medium text-white transition-colors hover:bg-white/10"
+          class="flex h-12 items-center rounded-full border border-white/70 px-6 text-base font-medium text-white transition-colors hover:bg-white/10"
         >
           Lihat Kamar
         </a>

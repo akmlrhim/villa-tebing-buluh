@@ -42,7 +42,7 @@ function amenityIcon(label) {
   <div>
     <h3 class="text-lg font-semibold text-ink">Fasilitas kamar</h3>
     <ul class="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
-      <li v-for="amenity in amenities" :key="amenity" class="flex items-center gap-3 text-[14px] text-body">
+      <li v-for="amenity in amenities" :key="amenity" class="flex items-center gap-3 text-base text-body">
         <IconGlyph :name="amenityIcon(amenity)" class="h-5 w-5 shrink-0 text-muted" />
         {{ amenity }}
       </li>

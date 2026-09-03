@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import EmptyState from '../components/EmptyState.vue'
 import IconGlyph from '../components/IconGlyph.vue'
 import QrisCard from '../components/payment/QrisCard.vue'
 import PaymentConfirmForm from '../components/payment/PaymentConfirmForm.vue'
@@ -54,28 +55,25 @@ function scrollToForm() {
       </div>
     </div>
 
-    <div v-else-if="invalid"
-      class="mx-auto mt-12 max-w-md rounded-md border border-hairline bg-surface-soft px-6 py-10 text-center">
-      <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-canvas shadow-float">
-        <IconGlyph name="calendar" class="h-6 w-6 text-muted" />
-      </span>
-      <h1 class="mt-4 text-xl font-semibold text-ink">Data booking belum lengkap</h1>
-      <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
-        Silakan pilih kamar dan tanggal menginap terlebih dahulu untuk melanjutkan
-        ke pembayaran.
-      </p>
+    <EmptyState
+      v-else-if="invalid"
+      icon="calendar"
+      title="Data booking belum lengkap"
+      description="Silakan pilih kamar dan tanggal menginap terlebih dahulu untuk melanjutkan ke pembayaran."
+      class="mt-12"
+    >
       <RouterLink to="/"
-        class="mt-6 inline-flex h-11 items-center rounded-sm bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-active">
+        class="inline-flex h-11 items-center rounded-sm bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-active">
         Pilih Kamar
       </RouterLink>
-    </div>
+    </EmptyState>
 
     <PaymentSuccess v-else-if="submitted" :code="submitted.code" :guest-name="submitted.guestName" :room="room"
       :check-in="params.checkIn" :check-out="params.checkOut" :total="total" :whatsapp-number="whatsappNumber" />
 
     <template v-else>
       <header class="mt-6">
-        <h1 class="text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+        <h1 class="font-display text-2xl font-semibold tracking-tight text-ink md:text-3xl">
           Selesaikan pembayaran
         </h1>
         <p class="mt-2 max-w-prose text-sm leading-relaxed text-muted">
@@ -97,7 +95,7 @@ function scrollToForm() {
                   class="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-sm font-semibold text-white">
                   {{ i + 1 }}
                 </span>
-                <p class="text-[14px] leading-relaxed text-body">{{ step }}</p>
+                <p class="text-base leading-relaxed text-body">{{ step }}</p>
               </li>
             </ol>
           </section>

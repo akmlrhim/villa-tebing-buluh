@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import AvailabilitySearch from '../components/AvailabilitySearch.vue';
+import EmptyState from '../components/EmptyState.vue';
 import MasterCalendar from '../components/MasterCalendar.vue';
 import RoomCard from '../components/RoomCard.vue';
 import RoomDetailModal from '../components/RoomDetailModal.vue';
@@ -81,9 +82,24 @@ function onClear() {
 
     <section
       id="cek-ketersediaan"
-      class="relative z-10 mx-auto -mt-12 w-full max-w-4xl scroll-mt-24 px-4 sm:px-6"
+      class="bg-surface-soft relative z-10 scroll-mt-24 py-14 md:py-20"
     >
-      <AvailabilitySearch @search="onSearch" @clear="onClear" />
+      <div class="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        <div class="mx-auto max-w-xl text-center">
+          <h2
+            class="font-display text-ink text-xl font-semibold tracking-tight md:text-2xl"
+          >
+            Kapan kamu mau menginap?
+          </h2>
+          <p class="text-muted mt-2 text-sm leading-relaxed md:text-[15px]">
+            Pilih tanggal check-in dan check-out untuk melihat kamar yang masih
+            kosong di Villa Tebing Buluh.
+          </p>
+        </div>
+        <div class="animate-rise-in motion-reduce:animate-none mt-7 md:mt-9">
+          <AvailabilitySearch @search="onSearch" @clear="onClear" />
+        </div>
+      </div>
     </section>
 
     <section
@@ -94,7 +110,7 @@ function onClear() {
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2
-            class="text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
+            class="font-display text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
           >
             Pilih kamarmu
           </h2>
@@ -144,17 +160,13 @@ function onClear() {
         />
       </div>
 
-      <div
+      <EmptyState
         v-if="!loading && rooms.length === 0"
-        class="border-hairline bg-surface-soft mt-8 rounded-md border px-6 py-8 text-center"
+        icon="bed"
+        title="Daftar kamar sedang disiapkan"
+        description="Sementara itu, tanyakan langsung ketersediaan dan harga kamar ke admin."
+        class="mt-8"
       >
-        <p class="text-ink text-base font-semibold">
-          Daftar kamar sedang disiapkan
-        </p>
-        <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-black">
-          Sementara itu, tanyakan langsung ketersediaan dan harga kamar ke
-          admin.
-        </p>
         <a
           :href="
             waLink(
@@ -164,34 +176,30 @@ function onClear() {
           "
           target="_blank"
           rel="noopener noreferrer"
-          class="bg-primary hover:bg-primary-active text-md mt-5 inline-flex h-12 items-center gap-2 rounded-sm px-6 font-medium text-white transition-colors"
+          class="bg-primary hover:bg-primary-active text-md inline-flex h-12 items-center gap-2 rounded-sm px-6 font-medium text-white transition-colors"
         >
           <WhatsAppGlyph class="h-5 w-5" />
           Hubungi Kami
         </a>
-      </div>
+      </EmptyState>
 
-      <div
+      <EmptyState
         v-if="query && rooms.length > 0 && availableCount === 0 && !loading"
-        class="border-hairline bg-surface-soft mt-10 rounded-md border px-6 py-8 text-center"
+        icon="calendar"
+        title="Tanggal itu sudah penuh semua"
+        description="Coba geser tanggalnya satu atau dua hari, atau tanyakan langsung ke admin. Kadang ada pembatalan yang belum masuk kalender."
+        class="mt-10"
       >
-        <p class="text-ink text-base font-semibold">
-          Tanggal itu sudah penuh semua 😔
-        </p>
-        <p class="text-muted mx-auto mt-2 max-w-md text-sm leading-relaxed">
-          Coba geser tanggalnya satu atau dua hari, atau tanyakan langsung ke
-          admin. Kadang ada pembatalan yang belum masuk kalender.
-        </p>
         <a
           :href="waLink(whatsappNumber, askAvailabilityMessage(query))"
           target="_blank"
           rel="noopener noreferrer"
-          class="bg-primary hover:bg-primary-active mt-5 inline-flex h-12 items-center gap-2 rounded-sm px-6 text-base font-medium text-white transition-colors"
+          class="bg-primary hover:bg-primary-active inline-flex h-12 items-center gap-2 rounded-sm px-6 text-base font-medium text-white transition-colors"
         >
           <WhatsAppGlyph class="h-5 w-5" />
           Tanya Admin via WhatsApp
         </a>
-      </div>
+      </EmptyState>
     </section>
 
     <section
@@ -200,7 +208,7 @@ function onClear() {
       class="mx-auto max-w-6xl scroll-mt-24 px-4 pt-16 sm:px-6 md:pt-20"
     >
       <h2
-        class="text-[18px] font-semibold tracking-tight text-black md:text-2xl"
+        class="font-display text-ink text-[18px] font-semibold tracking-tight md:text-2xl"
       >
         Kalender hunian vila
       </h2>

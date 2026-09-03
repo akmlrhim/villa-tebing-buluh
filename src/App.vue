@@ -12,6 +12,7 @@ const { settings, loaded, fetchSettings } = useSettings()
 
 const route = useRoute()
 const isAdmin = computed(() => route.path.startsWith('/admin'))
+const isBare = computed(() => isAdmin.value || route.name === 'not-found')
 
 onMounted(() => {
   fetchSettings()
@@ -24,7 +25,7 @@ watchEffect(() => {
 
 <template>
   <div class="flex min-h-dvh flex-col">
-    <SiteNav v-if="!isAdmin" />
+    <SiteNav v-if="!isBare" />
     <main class="flex-1">
       <RouterView v-slot="{ Component }">
         <Transition name="page" mode="out-in">
@@ -32,8 +33,8 @@ watchEffect(() => {
         </Transition>
       </RouterView>
     </main>
-    <SiteFooter v-if="!isAdmin" />
-    <WhatsAppFab v-if="!isAdmin" />
+    <SiteFooter v-if="!isBare" />
+    <WhatsAppFab v-if="!isBare" />
     <ToastHost />
   </div>
 </template>

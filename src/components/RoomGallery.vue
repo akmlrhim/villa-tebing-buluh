@@ -22,7 +22,8 @@ function next() {
 <template>
   <div class="relative aspect-[16/10] shrink-0 overflow-hidden bg-surface-strong md:aspect-[2/1]">
     <Transition name="photo-fade">
-      <img :key="index" :src="images[index]?.url" :alt="images[index]?.alt"
+      <img :key="index" :src="images[index]?.url" :srcset="images[index]?.srcset"
+        sizes="(min-width: 768px) 1100px, 100vw" :alt="images[index]?.alt"
         class="absolute inset-0 h-full w-full object-cover" />
     </Transition>
 

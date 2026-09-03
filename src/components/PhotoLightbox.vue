@@ -57,7 +57,7 @@ function onBackdropClick(event) {
 			</div>
 
 			<div class="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-4 md:px-20">
-				<img :key="index" :src="current.url" :alt="current.alt"
+				<img :key="index" :src="current.url" :srcset="current.srcset" sizes="100vw" :alt="current.alt"
 					class="max-h-full max-w-full rounded-sm object-contain" />
 
 				<template v-if="items.length > 1">

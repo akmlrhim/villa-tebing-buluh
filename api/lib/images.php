@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-const IMAGE_MAX_BYTES = 50 * 1024;
+const IMAGE_MAX_BYTES = 220 * 1024;
 
 const IMAGE_MAX_EDGE = 1600;
 

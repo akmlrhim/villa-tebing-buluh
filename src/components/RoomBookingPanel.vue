@@ -17,16 +17,16 @@ const emit = defineEmits(['update:guests', 'book'])
 
 <template>
   <div class="rounded-md border border-hairline bg-canvas p-5 shadow-float">
-    <div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">
       <div class="rounded-sm border border-hairline px-3 py-2">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-muted">Check-in</p>
-        <p class="mt-0.5 text-sm" :class="range ? 'text-ink' : 'text-muted-soft'">
+        <p class="mt-0.5 text-sm whitespace-nowrap" :class="range ? 'text-ink' : 'text-muted-soft'">
           {{ range ? formatDateID(range.checkIn) : 'Pilih tanggal' }}
         </p>
       </div>
       <div class="rounded-sm border border-hairline px-3 py-2">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-muted">Check-out</p>
-        <p class="mt-0.5 text-sm" :class="range ? 'text-ink' : 'text-muted-soft'">
+        <p class="mt-0.5 text-sm whitespace-nowrap" :class="range ? 'text-ink' : 'text-muted-soft'">
           {{ range ? formatDateID(range.checkOut) : 'Pilih tanggal' }}
         </p>
       </div>
