@@ -50,14 +50,17 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
       <h1
         class="animate-rise-in max-w-xl text-[clamp(1.6rem,5vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-white motion-reduce:animate-none"
       >
-        Menginap tenang di lereng Meratus, Loksado
+        Villa Tebing Buluh
+        <span class="mt-1 block text-[clamp(1.1rem,3vw,1.75rem)] font-medium tracking-[0.28em]"
+          >LOKSADO</span
+        >
       </h1>
       <p
         class="animate-rise-in-late mt-4 max-w-lg text-sm leading-relaxed text-white motion-reduce:animate-none"
       >
-        Villa Tebing Buluh, vila bambu privat di Hulu Banyu, Loksado, menghadap
-        Gunung Kantawan. Cek tanggal kosong di bawah, lalu booking cukup lewat
-        WhatsApp.
+        Rasakan Sebuah pengalaman berbeda dengan pemandangan sunset gunung
+        kantawan berbalut embun tipis dan deru suara sungai amandit dari Villa
+        Tebing Buluh
       </p>
       <div
         class="animate-rise-in-late mt-8 flex flex-wrap gap-3 motion-reduce:animate-none"

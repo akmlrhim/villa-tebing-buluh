@@ -9,8 +9,7 @@ const routes = [
     name: "home",
     component: HomeView,
     meta: {
-      title:
-        "Villa Tebing Buluh · Penginapan Bambu di Loksado, Kalimantan Selatan",
+      title: "Beranda | Villa Tebing Buluh",
       description:
         "Vila bambu privat di lereng Pegunungan Meratus, Loksado, Hulu Sungai Selatan. Cek sendiri tanggal yang masih kosong, lalu booking langsung via WhatsApp.",
     },
@@ -20,7 +19,7 @@ const routes = [
     name: "gallery",
     component: () => import("../views/GalleryView.vue"),
     meta: {
-      title: "Galeri Foto Villa Tebing Buluh Loksado",
+      title: "Galeri | Villa Tebing Buluh",
       description:
         "Foto kamar, gazebo bambu, dan pemandangan Pegunungan Meratus di Villa Tebing Buluh, Loksado. Apa adanya, tanpa polesan.",
     },
@@ -30,7 +29,7 @@ const routes = [
     name: "about",
     component: () => import("../views/AboutView.vue"),
     meta: {
-      title: "Tentang Villa Tebing Buluh · Fasilitas & Lokasi di Loksado",
+      title: "Tentang Kami | Villa Tebing Buluh",
       description:
         "Fasilitas vila, cerita di balik bangunan bambunya, dan cara menuju Villa Tebing Buluh di Hulu Banyu, Loksado, Hulu Sungai Selatan.",
     },
@@ -40,7 +39,7 @@ const routes = [
     name: "contact",
     component: () => import("../views/ContactView.vue"),
     meta: {
-      title: "Kontak & Lokasi Villa Tebing Buluh Loksado",
+      title: "Kontak | Villa Tebing Buluh",
       description:
         "Alamat, peta, nomor WhatsApp, dan jam operasional admin Villa Tebing Buluh di Jl. Tanuhi, Hulu Banyu, Loksado, Kalimantan Selatan.",
     },
@@ -49,20 +48,20 @@ const routes = [
     path: "/pembayaran",
     name: "payment",
     component: () => import("../views/PaymentView.vue"),
-    meta: { title: "Pembayaran · Villa Tebing Buluh", noindex: true },
+    meta: { title: "Pembayaran | Villa Tebing Buluh", noindex: true },
   },
   {
     path: "/cek-booking",
     name: "booking-status",
     component: () => import("../views/BookingStatusView.vue"),
-    meta: { title: "Cek Status Booking · Villa Tebing Buluh", noindex: true },
+    meta: { title: "Cek Status Booking | Villa Tebing Buluh", noindex: true },
   },
 
   {
     path: "/admin/login",
     name: "admin-login",
     component: () => import("../views/admin/AdminLoginView.vue"),
-    meta: { title: "Login Admin · Villa Tebing Buluh", noindex: true },
+    meta: { title: "Login Admin | Villa Tebing Buluh", noindex: true },
   },
   {
     path: "/admin",
@@ -73,43 +72,43 @@ const routes = [
         path: "",
         name: "admin-dashboard",
         component: () => import("../views/admin/AdminDashboardView.vue"),
-        meta: { title: "Dashboard · Admin" },
+        meta: { title: "Dashboard Admin | Villa Tebing Buluh" },
       },
       {
         path: "kamar",
         name: "admin-rooms",
         component: () => import("../views/admin/AdminRoomsView.vue"),
-        meta: { title: "Kelola Kamar · Admin" },
+        meta: { title: "Kelola Kamar Admin | Villa Tebing Buluh" },
       },
       {
         path: "booking",
         name: "admin-bookings",
         component: () => import("../views/admin/AdminBookingsView.vue"),
-        meta: { title: "Kelola Booking · Admin" },
+        meta: { title: "Kelola Booking Admin | Villa Tebing Buluh" },
       },
       {
         path: "booking/:id",
         name: "admin-booking-detail",
         component: () => import("../views/admin/BookingDetailView.vue"),
-        meta: { title: "Detail Booking · Admin" },
+        meta: { title: "Detail Booking Admin | Villa Tebing Buluh" },
       },
       {
         path: "promo",
         name: "admin-promos",
         component: () => import("../views/admin/AdminPromosView.vue"),
-        meta: { title: "Kelola Promo · Admin" },
+        meta: { title: "Kelola Promo Admin | Villa Tebing Buluh" },
       },
       {
         path: "galeri",
         name: "admin-gallery",
         component: () => import("../views/admin/AdminGalleryView.vue"),
-        meta: { title: "Kelola Galeri · Admin" },
+        meta: { title: "Kelola Galeri Admin | Villa Tebing Buluh" },
       },
       {
         path: "pengaturan",
         name: "admin-settings",
         component: () => import("../views/admin/AdminSettingsView.vue"),
-        meta: { title: "Pengaturan · Admin" },
+        meta: { title: "Pengaturan Admin | Villa Tebing Buluh" },
       },
     ],
   },
@@ -118,7 +117,7 @@ const routes = [
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import("../views/NotFoundView.vue"),
-    meta: { title: "Halaman tidak ditemukan · Villa Tebing Buluh", noindex: true },
+    meta: { title: "Halaman Tidak Ditemukan | Villa Tebing Buluh", noindex: true },
   },
 ];
 

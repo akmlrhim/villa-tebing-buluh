@@ -77,47 +77,35 @@ const mapsQuery = encodeURIComponent(settings.value.address);
     />
 
     <div class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-10">
-      <div class="mt-8 grid gap-8 md:grid-cols-2 md:gap-16">
-        <div class="space-y-4 text-[14px] leading-relaxed text-black">
-          <p>
-            Vila ini awalnya rumah keluarga yang sering dipinjam kerabat untuk
-            liburan. Lama-lama kami sadar: yang orang cari bukan kamar yang
-            banyak fasilitasnya, tapi tempat yang membuat mereka tidak ingin
-            cepat-cepat pulang.
-          </p>
-          <p>
-            Vila bambu ini kami bangun mengikuti kontur lereng Pegunungan
-            Meratus, menghadap langsung ke Gunung Kantawan. Bukan kebetulan -
-            itu pemandangan pertama yang kami mau tamu lihat begitu bangun pagi,
-            sebelum sempat buka ponsel.
-          </p>
-          <p>
-            Jadi kami merawat yang sudah ada: bathtub menghadap pegunungan,
-            gazebo bambu, dan dapur yang boleh dipakai kapan saja. Kalau mau
-            lebih aktif, air terjun dan bamboo rafting ada tidak jauh dari sini;
-            kalau mau santai saja, jalan kaki ke Mangala Coffee yang satu area
-            dengan vila, atau duduk saja memandang Gunung Kantawan sambil dengar
-            bambu bergesekan.
-          </p>
-        </div>
-        <div class="space-y-4 text-[14px] leading-relaxed text-black">
-          <p>
-            Kami sengaja tidak memakai sistem pembayaran online. Semua booking
-            dikonfirmasi langsung oleh admin lewat WhatsApp. Memang lebih lambat
-            beberapa menit, tapi kamu selalu bicara dengan orang, bukan mesin.
-          </p>
-          <p>
-            Bambu dan kayu yang dipakai juga bukan sekadar dekorasi - itu cara
-            kami menjaga vila tetap terasa menyatu dengan Loksado, bukan seperti
-            penginapan yang bisa ada di kota mana saja. Loksado sendiri sudah
-            lama dikenal dengan bamboo rafting-nya; kalau sempat, jangan cuma
-            menginap, coba juga sekali menyusuri sungainya.
-          </p>
-          <p>
-            Lokasinya sekitar 15 menit dari pusat kota, cukup dekat untuk cari
-            makan, cukup jauh untuk tidak dengar suara kendaraan.
-          </p>
-        </div>
+      <div class="mt-8 space-y-4 text-[14px] leading-relaxed text-black">
+        <p>
+          Villa tebing buluh adalah bentuk ekspresi sang pencipta untuk kita.
+          Dengan pemandangannya yang memanjakan mata dan deru suara arus sungai
+          amandit yang terdengar nyaman di telinga melepas semua pikiran yang
+          membebani layaknya sebuah terapi.
+        </p>
+        <p>
+          Bangunan villa terdiri dari bambu berlapis kayu memberikan kesan
+          menyatu dengan alam, bagi mereka yang suka berendam kami menyediakan
+          bathtub outdoor yang menghadap langsung ke alam.
+        </p>
+        <p>
+          Kalau mau lebih aktif, kamu bisa mengunjungi pemandian air panas dan
+          air terjun kilat api yang terletak kurang lebih 1 km dari villa. Kamu
+          juga bisa bermain bamboo rafting, river tubing dan wahana sungai
+          lainnya.
+        </p>
+        <p>....</p>
+        <p>
+          Semua bookingan dikonfirmasi langsung oleh admin lewat whatsapp, memang
+          sedikit lebih lambat beberapa menit, tapi kamu selalu berbicara dengan
+          orang, bukan mesin.
+        </p>
+        <p>
+          Lokasinya berada sekitar ±32 km dari pusat kota Kandangan, dengan
+          jarak tempuh sekitar 45 menit. Villa ini berada di pinggir jalan poros
+          utama Kandangan-Loksado sehingga mudah untuk menemukannya.
+        </p>
       </div>
 
       <section class="bg-surface-soft mt-16 py-14 md:mt-20 md:py-16">

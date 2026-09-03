@@ -31,12 +31,9 @@ _release
 /PRD.md
 /PRODUCT.md
 /DESIGN.md
+/AGENTS.md
 
-# Berkas unggahan (foto kamar, galeri, bukti bayar) - data produksi,
-# bukan bagian dari kode. Jangan pernah ikut ke git.
 uploads
 uploads-private
 
-# Kredensial database + kunci penanda tangan token. Templatnya ada di
-# api/config.example.php yang memang ikut git.
 api/config.php

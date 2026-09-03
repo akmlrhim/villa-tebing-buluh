@@ -2,8 +2,7 @@ export const SITE_URL = 'https://villatebingbuluh.com';
 export const SITE_NAME = 'Villa Tebing Buluh';
 export const OG_IMAGE = `${SITE_URL}/img/og.jpg`;
 
-const DEFAULT_TITLE =
-  'Villa Tebing Buluh · Penginapan Bambu di Loksado, Kalimantan Selatan';
+const DEFAULT_TITLE = 'Villa Tebing Buluh | Penginapan Bambu di Loksado';
 const DEFAULT_DESCRIPTION =
   'Vila bambu privat di lereng Pegunungan Meratus, Loksado, Hulu Sungai Selatan. Cek sendiri tanggal yang masih kosong, lalu booking langsung via WhatsApp.';
 
