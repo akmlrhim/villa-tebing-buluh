@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import EmptyState from '../components/EmptyState.vue';
 import IconGlyph from '../components/IconGlyph.vue';
 import PageHero from '../components/PageHero.vue';
 import RoomDetailModal from '../components/RoomDetailModal.vue';
@@ -8,7 +9,7 @@ import { useSettings } from '../composables/useSettings';
 import { heroImages } from '../data/demoData';
 import { formatRupiah } from '../lib/format';
 
-const { rooms } = useRooms();
+const { rooms, loading } = useRooms();
 const { settings, villaName } = useSettings();
 const selectedRoom = ref(null);
 
@@ -140,6 +141,7 @@ const mapsQuery = encodeURIComponent(settings.value.address);
           Tipe kamar
         </h2>
         <div
+          v-if="rooms.length"
           class="divide-hairline-soft border-hairline mt-6 divide-y rounded-md border"
         >
           <button
@@ -166,6 +168,13 @@ const mapsQuery = encodeURIComponent(settings.value.address);
             </span>
           </button>
         </div>
+        <EmptyState
+          v-else-if="!loading"
+          icon="bed"
+          title="Daftar kamar sedang disiapkan"
+          description="Tipe kamar akan muncul di sini begitu admin menambahkannya."
+          class="mt-6"
+        />
       </section>
 
       <section class="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-20">
