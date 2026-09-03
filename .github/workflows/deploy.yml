@@ -36,6 +36,19 @@ jobs:
       - name: Uji paritas harga PHP vs JS
         run: php api/tests/pricing-parity.php
 
+      - name: Optimalkan & audit ukuran gambar
+        run: |
+          set -euo pipefail
+          npm run images
+          if ! git diff --quiet -- public; then
+            echo "GAGAL: public/ tidak sinkron dengan pipeline scripts/optimize-images.mjs"
+            echo "(anggaran ukurannya per lebar, bukan rata 50 KB - lihat komentar di script)."
+            echo "Jalankan 'npm run images' secara lokal lalu commit ulang berkas di public/."
+            git diff --stat -- public
+            exit 1
+          fi
+          echo "OK: semua gambar di public/ sesuai anggaran dan sudah ter-commit."
+
       - name: Build frontend
         run: npm run build
 
@@ -66,18 +79,6 @@ jobs:
           echo "Isi rilis:"
           du -sh _release
           find _release -maxdepth 2 -mindepth 1 | sort
-
-      - name: Pastikan tidak ada gambar di atas 50 KB
-        run: |
-          set -euo pipefail
-          besar=$(find _release -type f \( -iname '*.webp' -o -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.avif' \) -size +51200c)
-          if [ -n "$besar" ]; then
-            echo "GAGAL: gambar berikut melebihi 50 KB."
-            echo "Jalankan 'npm run images' lalu commit hasilnya."
-            printf '%s\n' "$besar" | xargs -r du -h
-            exit 1
-          fi
-          echo "OK: semua gambar rilis di bawah 50 KB."
 
       - name: Siapkan kunci SSH
         run: |
